@@ -53,19 +53,11 @@ body[data-room-view="desk"] .title-block,body[data-room-view="desk"] .hint{opaci
 /* Résumé viewer: fixed paper proportions, high-resolution source, independent zoom. */
 /* Targeted terminal prompt and window-bound fixes. */
 /* Room navigation and transient architectural captions. */
-.room-nav{position:fixed;z-index:9;top:18px;left:24px;right:24px;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:8px 12px;border:1px solid #aaa09166;background:#f5f1e8d9;backdrop-filter:blur(14px);font-family:Georgia,serif;color:#332c21}
-.room-nav button{font:inherit;color:inherit;border:0;border-radius:3px;background:transparent;padding:8px 10px;cursor:pointer;transition:background .18s}
-.room-nav button:hover,.room-nav button[aria-pressed=true]:not(.room-wordmark){background:#b4a68b24}
-.room-wordmark{font-size:17px!important;white-space:nowrap;letter-spacing:.015em}
-#room-nav-links{display:flex;align-items:center;gap:4px;font-size:13px}
-.floor-plan-button{display:grid;place-items:center}
-#room-menu-toggle{display:none;font-size:13px}
 body .title-block{bottom:24px;left:24px}
 body .hint{position:fixed;z-index:5;bottom:28px;left:50%;transform:translateX(-50%);margin:0;width:max-content;max-width:calc(100vw - 540px);padding:12px 18px;border:1px solid #aaa09145;border-radius:999px;background:#f5f1e8e8;backdrop-filter:blur(14px);color:#332c21;font:14px/1.5 Georgia,serif;opacity:0;pointer-events:none;transition:opacity .25s; text-align:center}
 body .hint.caption-visible,body[data-room-view=desk] .hint.caption-visible{opacity:1;visibility:visible}
 @media(max-width:900px){body .title-block{display:none}body .hint{left:50%;max-width:calc(100vw - 36px);bottom:22px}}
-@media(max-width:600px){.room-nav{top:12px;left:12px;right:12px;padding:5px 8px}#room-menu-toggle{display:block}#room-nav-links{display:none;position:absolute;top:100%;left:-1px;right:-1px;flex-direction:column;align-items:stretch;padding:10px;background:#f5f1e8f5;border:1px solid #aaa09166}.room-nav.menu-open #room-nav-links{display:flex}#room-nav-links button{text-align:left;padding:11px 12px}.floor-plan-button{justify-content:start}}
-@media(prefers-reduced-motion:reduce){body .hint,.room-nav button{transition:none}}
+@media(prefers-reduced-motion:reduce){body .hint{transition:none}}
 /* Persistent back control shares the caption's frosted surface. */
 .room-feedback{position:fixed;z-index:5;left:50%;bottom:28px;transform:translateX(-50%);display:flex;align-items:center;justify-content:center;gap:8px;max-width:calc(100vw - 540px);pointer-events:none}
 body .room-feedback .hint{position:static;left:auto;bottom:auto;transform:none;width:auto;max-width:none;flex:1;min-width:0;margin:0}
@@ -75,18 +67,14 @@ body .room-feedback .hint{position:static;left:auto;bottom:auto;transform:none;w
 @media(max-width:500px){.room-feedback{flex-wrap:wrap;width:calc(100vw - 36px)}body .room-feedback .hint{flex-basis:100%;padding:10px 14px}#back-to-room{padding:9px 14px}}
 /* LiuOS accessibility scale; values come from LIUOS_CONFIG.typography. */
 :root{--os-small:12px;--os-body:14px;--os-title:16px;--os-section:22px;--os-large:28px;--os-bodyLineHeight:1.5;--focus-accent:#89ded0}
-.room-nav{z-index:10000}.room-nav,#laptop-window .room-nav,#resume-window .room-nav{filter:none;backdrop-filter:none;background:#f5f1e8;transform:none}
 .resume-text{background:#fff;color:#17211f;max-width:760px;margin:0 auto;padding:28px;user-select:text;font:14px/1.5 "Segoe UI",sans-serif;overflow-wrap:anywhere;box-shadow:0 4px 16px #0003}
 .resume-text h1{font-size:28px;margin:0 0 10px;letter-spacing:0}.resume-text h2{font-size:22px;border-bottom:1px solid #bbb;margin:22px 0 10px}.resume-text h3{font-size:16px;margin:14px 0 6px}.resume-text p{margin:0 0 8px}.resume-text ul{padding-left:22px;margin:8px 0 14px}.resume-text li+li{margin-top:7px}
 @media(max-width:600px){.dock-divider{display:none}.resume-text{padding:18px}}
 </style>
+<!-- After the inline styles: the nav's button rules must win over the general button[aria-pressed] rule. -->
+<link rel="stylesheet" href="nav/nav.css">
 </head>
 <body>
-<nav class="room-nav" aria-label="Portfolio navigation">
-<button class="room-wordmark" data-view="angle">Nathan Liu</button>
-<button id="room-menu-toggle" aria-label="Portfolio menu" aria-expanded="false" aria-controls="room-nav-links">Menu <span aria-hidden="true">≡</span></button>
-<div id="room-nav-links"><button data-os-route="about">About</button><button data-os-route="experience">Experience</button><button data-os-route="projects">Projects</button><button id="nav-resume">Résumé</button><button data-os-route="contact">Contact</button><button class="floor-plan-button" data-view="front" aria-pressed="false" aria-label="Floor plan" title="Floor plan"><svg viewBox="0 0 20 20" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1"><path d="M2 2h16v16H2zM2 10h7V2m0 8v8m0-8h9"/></svg></button></div>
-</nav>
 
 <main id="stage" aria-label="Interactive 3D room model. Click objects to explore, or drag to look around."></main>
 <div id="drawing-labels" aria-label="Measured room dimensions"></div>
@@ -110,12 +98,13 @@ body .room-feedback .hint{position:static;left:auto;bottom:auto;transform:none;w
 <template id="resume-text-template"><article class="resume-text" aria-label="Nathan Liu résumé"><h1>Nathan Liu</h1><p>New York, NY | 408-930-1186 | ncl9100@nyu.edu | 24natel.com | linkedin.com/in/nathan-ncl-liu | github.com/ncl9100</p><h2>Education</h2><p>New York University New York, NY</p><p>Bachelor of Arts in Computer Science and Data Science | Dean’s List Sep. 2024 – May 2028</p><p>Relevant Coursework: Probability and Statistics, Principles of Data Science I &amp; II, Data Management and Analysis,</p><p>Fundamentals of Machine Learning, Linear Algebra, Causal Inference (in progress)</p><h2>Experience</h2><h3>Data Science Intern Nov. 2025 – Present</h3><p>NYU Entrepreneurial Institute New York, NY</p><ul><li>Built an LLM-assisted pipeline (Perplexity, Google Search APIs) classifying 2.6k+ startup records by NYU school for segment reporting</li><li>Shipped 5 features to a BigQuery-backed React analytics dashboard tracking 2.6k+ annual coaching sessions and 5k+ visits, including drill-down time-series charts and year-over-year comparison</li><li>Audited 31 production data pipelines against documentation, tracing 24 discrepancies to root causes and flagging 7 untracked scripts writing to production data</li><li>Leading CRM deduplication of ˜14k entries, building a 50-row gold set to QA duplicate-detection signals</li></ul><h3>Full-Stack AI Developer June 2025 – Aug. 2025</h3><p>Amazon China</p><ul><li>Trained a scikit-learn regression model on 30-day rolling prices for short-term forecasting in an AI trading assistant (Flask, React)</li><li>Built a signal engine combining TextBlob sentiment on 40 headlines per refresh with 24h price change to classify assets as buy, sell, or hold</li><li>Validated sentiment classification against manually labeled headlines in Jupyter and wrote 26 tests (pytest, Jest)</li></ul><h3>Outreach Coordinator Feb. 2026 – Present</h3><p>NYU Data Science Club New York, NY</p><ul><li>Co-organized NYU’s 2026 Datathon for 50+ participants, leading sponsor outreach to companies including Datadog and TikTok</li></ul><h2>Projects</h2><h3>HotTakes | 2nd Place, NYU Stern Sustainability Hackathon Oct. 2026</h3><ul><li>Trained a gradient-boosted heat demand forecast (scikit-learn) on synthetic hourly data calibrated to Con Ed filings, reaching 8.5% MAPE vs 17.5% for a naive baseline, and presented the model in the pitch</li><li>Validated on real metered steam from 7 buildings, cutting WAPE to 18% vs 24% and 39% for two baselines</li><li>Compared 5 outage reserve policies in an 8,760-hour simulation, finding a reserve does not pay since storage is usually full</li><li>Deployed a Streamlit dashboard (5 tabs, 20 inputs) with a Claude assistant that calls 4 read-only model tools</li></ul><h3>Ad Click-Through Rate Prediction (Fundamentals of ML) | Python, pandas, scikit-learn Summer 2026</h3><ul><li>Predicted clicks on 1M Avazu ad impressions, reaching 0.723 ROC-AUC and 0.411 log loss vs a 0.456 base-rate baseline</li><li>Engineered 105 leakage-free features, adding time features after EDA showed click rates varied by hour and device</li><li>Showed why accuracy misleads on imbalanced data: a never-click model scores 83% accuracy but 0.50 ROC-AUC</li></ul><h3>MarginGuard | Python, DuckDB, Claude API Apr. 2026</h3><ul><li>Built a Python/SQL pipeline in DuckDB joining 1.2M+ labor logs and 90K+ billing records into project-level signals</li><li>Defined margin metrics and erosion thresholds an AI agent uses to rank the 3 highest-exposure of 405 projects</li></ul><h2>Technical Skills</h2><p>Languages: Python, SQL, R, Java, C/C++, JavaScript</p><p>Data &amp; ML: pandas, NumPy, scikit-learn, XGBoost, Matplotlib, Seaborn, Jupyter, Streamlit</p><p>Data &amp; Cloud: BigQuery, DuckDB, PostgreSQL, Google Cloud Run, Git/GitHub</p><p>Methods: Regression and forecasting, classification, clustering, statistical inference, causal inference, root-cause analysis</p></article></template>
 <script type="module" src="resume-viewer/viewer.js"></script>
 <script type="module" src="liuos/laptop.js"></script>
+<script type="module" src="nav/nav.js"></script>
 <script type="module">
 import { LIUOS_CONFIG } from './liuos/settings.js';
 // Résumé viewer state, kept in sync by its resume:opened / resume:closed announcements.
 let resumeOpen=false;
-// LiuOS state, kept in sync by its laptop:opened / laptop:closed / laptop:apps-changed / laptop:screen announcements.
-let laptopOpen=false,laptopActiveApp=null,laptopScreenPowered=true;
+// LiuOS state, kept in sync by its laptop:opened / laptop:closed / laptop:screen announcements.
+let laptopOpen=false,laptopScreenPowered=true;
 // All drafting-paper appearance and motion controls live here. Scene units are inches.
 const DRAFTING_CONFIG = {
   interaction:{debugPicking:false,clickPixels:5,clickMs:300,zoomLimitRatio:1.5,zoomExitDelta:180,zoomExitWindowMs:650,firstCloseupHint:"Click anywhere to step back.",captionMs:4000,lampFadeMs:300,hoverColor:0xa89a80,hoverOpacity:.42},
@@ -519,7 +508,7 @@ motionPreference.addEventListener('change',()=>{resetParallax();if(motionPrefere
 document.addEventListener('visibilitychange',()=>{if(document.hidden)resetParallax();});
 
 let target=new THREE.Vector3(150,12,70),yaw=0.55,pitch=0.85,radius=600;
-function render(){updateNavState();if(document.hidden||laptopOpen)return;document.body.dataset.roomView=currentView;camera.position.set(target.x+radius*Math.sin(yaw+parallax.x)*Math.cos(pitch+parallax.y),target.y+radius*Math.sin(pitch+parallax.y),target.z+radius*Math.cos(yaw+parallax.x)*Math.cos(pitch+parallax.y));camera.lookAt(target);updateBackControl();updateWalls();renderer.render(scene,camera);updateHotspots();updateDimensionLabels();}
+function render(){if(document.hidden||laptopOpen)return;document.body.dataset.roomView=currentView;camera.position.set(target.x+radius*Math.sin(yaw+parallax.x)*Math.cos(pitch+parallax.y),target.y+radius*Math.sin(pitch+parallax.y),target.z+radius*Math.cos(yaw+parallax.x)*Math.cos(pitch+parallax.y));camera.lookAt(target);updateBackControl();updateWalls();renderer.render(scene,camera);updateHotspots();updateDimensionLabels();}
 function fittedRadius(value){return value*Math.max(1,DRAFTING_CONFIG.camera.mobileFitAspect/camera.aspect);}
 function resize(){renderer.setSize(stage.clientWidth,stage.clientHeight);camera.aspect=stage.clientWidth/stage.clientHeight;if(['angle','front','desk'].includes(currentView))radius=fittedRadius(presets[currentView].radius);camera.updateProjectionMatrix();render();}window.addEventListener('resize',resize);
 const presets={stools:{yaw:-2.3,pitch:.55,radius:92,target:[183,18,94],fov:48},resume:{yaw:0,pitch:1.48,radius:25,target:[163.75,30.1,17.2],fov:40},details:{yaw:-.15,pitch:.2,radius:130,target:[154.75,48,10]},angle:{yaw:.55,pitch:.85,radius:600,target:[150,12,70]},front:{yaw:0,pitch:Math.PI/2-.001,radius:560,target:[156,0,73]},side:{yaw:Math.PI/2,pitch:.2,radius:48,target:[215,38,119],fov:65},fridge:{yaw:-.45,pitch:.18,radius:145,target:[284,47,80]},desk:{yaw:0,pitch:.27,radius:29,target:[149.75,34,12]},bed:{yaw:-Math.PI/2,pitch:.15,radius:60,target:[130,34,19.5]}};
@@ -563,34 +552,37 @@ function returnToRoom(){if(laptopOpen||resumeOpen)return;activate('angle');}
 backToRoom.addEventListener('click',returnToRoom);
 function arrivalCaption(view){if(closeupViews.has(view)&&!firstCloseupSeen){firstCloseupSeen=true;return DRAFTING_CONFIG.interaction.firstCloseupHint;}return viewCaptions[view]||defaultCaption;}
 let cameraMove=null,queuedCameraAction=null;
-function cancelCameraMove(){cancelAnimationFrame(animation);animation=0;cameraMove=null;queuedCameraAction=null;if(moving)currentView='custom';moving=false;showCaption();document.querySelectorAll('[data-view]').forEach(button=>button.setAttribute('aria-pressed','false'));}
+function cancelCameraMove(){cancelAnimationFrame(animation);animation=0;cameraMove=null;queuedCameraAction=null;if(moving)currentView='custom';moving=false;showCaption();announceView('custom');}
 
 function navigate(view,onArrive){
 if(!introDone)finishIntro();resetParallax();
 
 cancelCameraMove();currentView=view;closeupView=closeupViews.has(view)?view:null;zoomExitDelta=0;lastZoomOut=0;moving=true;const move=cameraMove={onArrive};clearHighlight();
-document.querySelectorAll('[data-view]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.view==='front'&&view==='front')));
+announceView(view);
 const p=presets[view],start={yaw,pitch,radius,fov:camera.fov,target:target.clone()},destination=new THREE.Vector3(...p.target),time=performance.now();
 hideCaption();
 const reduced=reducedMotion();
 function tick(now){if(cameraMove!==move)return;const t=reduced?1:Math.min((now-time)/900,1);const k=t*t*(3-2*t);yaw=start.yaw+(p.yaw-start.yaw)*k;pitch=start.pitch+(p.pitch-start.pitch)*k;radius=start.radius+((['angle','front','desk'].includes(view)?fittedRadius(p.radius):p.radius)-start.radius)*k;camera.fov=start.fov+((p.fov||38)-start.fov)*k;camera.updateProjectionMatrix();target.lerpVectors(start.target,destination,k);if(t===1){moving=false;showCaption(arrivalCaption(view));}render();if(t<1)animation=requestAnimationFrame(tick);else{const callback=move.onArrive,action=queuedCameraAction;cameraMove=null;queuedCameraAction=null;animation=0;if(callback)callback();if(action)activate(action);}}animation=requestAnimationFrame(tick);
 }
-document.querySelectorAll('[data-view]').forEach(button=>button.addEventListener('click',()=>{if(laptopOpen)document.dispatchEvent(new CustomEvent('laptop:close'));if(resumeOpen)document.dispatchEvent(new CustomEvent('resume:close'));navigate(button.dataset.view);}));
+// Requests from the nav. The room owns the camera, so it decides how to get there.
+const announceView=view=>document.dispatchEvent(new CustomEvent('room:view',{detail:{view}}));
+document.addEventListener('room:go',({detail:{view}})=>{if(laptopOpen)document.dispatchEvent(new CustomEvent('laptop:close'));if(resumeOpen)document.dispatchEvent(new CustomEvent('resume:close'));navigate(view);});
+document.addEventListener('room:open-resume',({detail:{opener}})=>{if(laptopOpen)document.dispatchEvent(new CustomEvent('laptop:close'));openResume(opener);});
+document.addEventListener('room:open-app',({detail:{name,opener}})=>{if(resumeOpen)document.dispatchEvent(new CustomEvent('resume:close'));const launch=()=>document.dispatchEvent(new CustomEvent('laptop:open-app',{detail:{name,opener}}));if(laptopOpen)launch();else navigate('desk',launch);});
 function screenHover(active){screenFace.material.color.setScalar(active?LIUOS_CONFIG.screen.hoverBrightness:LIUOS_CONFIG.screen.brightness);}
 document.addEventListener('keydown',event=>{if(event.key==='Escape'&&moving&&!laptopOpen&&!resumeOpen){event.preventDefault();cancelCameraMove();pointer=null;render();}});
 
 let resumeReturnView='details',resumeReturnFocus=null;
 function openResume(opener=document.activeElement){if(moving||resumeOpen)return;resumeReturnView=presets[currentView]?currentView:'details';resumeReturnFocus=opener;navigate('resume',()=>document.dispatchEvent(new CustomEvent('resume:open')));}
-document.addEventListener('resume:opened',()=>{resumeOpen=true;updateNavState();updateBackControl();});
+document.addEventListener('resume:opened',()=>{resumeOpen=true;updateBackControl();});
 // The room asks LiuOS to open only when the camera is at the desk.
 function requestLaptop(opener=document.activeElement){if(currentView!=='desk'||moving)return;document.dispatchEvent(new CustomEvent('laptop:open',{detail:{opener}}));}
 document.addEventListener('laptop:opened',()=>{laptopOpen=true;updateBackControl();cancelAnimationFrame(waterFrame);resetParallax();});
-document.addEventListener('laptop:closed',()=>{laptopOpen=false;closeRoomMenu();render();if(waterOn&&!document.hidden&&!reducedMotion())waterFrame=requestAnimationFrame(animateWater);});
-document.addEventListener('laptop:apps-changed',event=>{laptopActiveApp=event.detail.active;updateNavState();});
+document.addEventListener('laptop:closed',()=>{laptopOpen=false;render();if(waterOn&&!document.hidden&&!reducedMotion())waterFrame=requestAnimationFrame(animateWater);});
 // LiuOS paints its own screen picture; the room only displays it on the 3D laptop.
 let screenTexture=null;
 document.addEventListener('laptop:screen',({detail})=>{laptopScreenPowered=detail.powered;if(!screenTexture){screenTexture=new THREE.CanvasTexture(detail.canvas);screenTexture.colorSpace=THREE.SRGBColorSpace;screenTexture.anisotropy=renderer.capabilities.getMaxAnisotropy();screenTexture.minFilter=THREE.LinearMipmapLinearFilter;screenTexture.magFilter=THREE.LinearFilter;screenFace.material.map=screenTexture;screenFace.material.needsUpdate=true;}else if(detail.redrawn)screenTexture.needsUpdate=true;render();});
-document.addEventListener('resume:closed',()=>{resumeOpen=false;closeRoomMenu();navigate(resumeReturnView,()=>{if(resumeReturnFocus instanceof HTMLElement&&resumeReturnFocus.isConnected)resumeReturnFocus.focus({preventScroll:true});});});
+document.addEventListener('resume:closed',()=>{resumeOpen=false;navigate(resumeReturnView,()=>{if(resumeReturnFocus instanceof HTMLElement&&resumeReturnFocus.isConnected)resumeReturnFocus.focus({preventScroll:true});});});
 function activate(view){if(view==='lamp'){toggleLamp();return;}if(moving){queuedCameraAction=view;return;}if(view==='faucet')toggleFaucet();else if(view==='laptop')requestLaptop();else if(view==='resume')openResume();else navigate(view);}
 hotspotButtons.forEach(button=>button.addEventListener('click',()=>{if(button.dataset.destination==='desk'){navigate('desk');return;}activate(button.dataset.destination);}));
 // Mesh picking keeps navigation discoverable without extra room controls.
@@ -613,28 +605,13 @@ obj=obj.parent;
 }return null;
 }
 function toggleLamp(){lampOn=!lampOn;cancelAnimationFrame(lampFadeFrame);const from=lampLight.intensity,to=lampOn?1800:0,started=performance.now();lampLight.visible=true;function frame(now){const t=reducedMotion()?1:Math.min(1,(now-started)/DRAFTING_CONFIG.interaction.lampFadeMs),k=t*t*(3-2*t);lampLight.intensity=from+(to-from)*k;emitterMat.emissiveIntensity=lampLight.intensity/900;if(t===1)lampLight.visible=lampOn;render();if(t<1)lampFadeFrame=requestAnimationFrame(frame);}lampFadeFrame=requestAnimationFrame(frame);}
-const roomNav=document.querySelector('.room-nav'),roomMenu=document.getElementById('room-menu-toggle');
-function closeRoomMenu(){roomNav.classList.remove('menu-open');roomMenu.setAttribute('aria-expanded','false');}
-roomMenu.addEventListener('click',()=>{const open=roomMenu.getAttribute('aria-expanded')!=='true';roomMenu.setAttribute('aria-expanded',String(open));roomNav.classList.toggle('menu-open',open);});
-roomNav.addEventListener('click',event=>{if(event.target.closest('[data-view]'))closeRoomMenu();});
-function updateNavState(){
- const active=laptopActiveApp;
- for(const button of document.querySelectorAll('[data-os-route]'))button.setAttribute('aria-pressed',String(button.dataset.osRoute===active));
- document.getElementById('nav-resume').setAttribute('aria-pressed',String(resumeOpen||active==='resume'));
- document.querySelector('.room-wordmark').removeAttribute('aria-pressed');
-}
-function openPortfolioApp(name){const opener=document.activeElement;closeRoomMenu();if(resumeOpen)document.dispatchEvent(new CustomEvent('resume:close'));const launch=()=>document.dispatchEvent(new CustomEvent('laptop:open-app',{detail:{name,opener}}));if(laptopOpen)launch();else navigate('desk',launch);}
-document.querySelectorAll('[data-os-route]').forEach(button=>button.addEventListener('click',()=>openPortfolioApp(button.dataset.osRoute)));
-document.getElementById('nav-resume').addEventListener('click',()=>{closeRoomMenu();const opener=document.activeElement;if(laptopOpen)document.dispatchEvent(new CustomEvent('laptop:close'));openResume(opener);});
-document.addEventListener('pointerdown',event=>{if(!roomNav.contains(event.target))closeRoomMenu();});
-window.addEventListener('resize',()=>{if(innerWidth>600)closeRoomMenu();});
 let pointer=null;
 stage.addEventListener('pointerdown',event=>{if(!introDone){finishIntro();render();return;}resetParallax();pointer={id:event.pointerId,x:event.clientX,y:event.clientY,startX:event.clientX,startY:event.clientY,started:performance.now(),dragged:false};stage.setPointerCapture(event.pointerId);});
 stage.addEventListener('pointermove',event=>{
 if(!pointer){if(event.pointerType==='touch'){clearHighlight();return;}if(moving||!introDone)return;if(event.pointerType==='mouse'&&currentView==='angle'&&DRAFTING_CONFIG.parallax.enabled&&!reducedMotion()&&matchMedia('(hover: hover) and (pointer: fine)').matches){parallax.targetX=(event.clientX/stage.clientWidth-.5)*2*DRAFTING_CONFIG.parallax.yaw;parallax.targetY=(event.clientY/stage.clientHeight-.5)*2*DRAFTING_CONFIG.parallax.pitch;requestParallax();}const selected=pick(event);clearHighlight();if(selected){if(selected.view==='laptop')screenHover(true);stage.style.cursor='pointer';hoverOutline.box.setFromObject(selected.root);hoverOutline.visible=true;}render();return;}
 if(pointer.id!==event.pointerId)return;
 if(Math.hypot(event.clientX-pointer.startX,event.clientY-pointer.startY)<DRAFTING_CONFIG.interaction.clickPixels&&!pointer.dragged)return;
-if(!pointer.dragged)cancelCameraMove();pointer.dragged=true;currentView='custom';clearHighlight();yaw-=(event.clientX-pointer.x)*.007;pitch=Math.max(-.1,Math.min(1.569,pitch+(event.clientY-pointer.y)*.007));pointer.x=event.clientX;pointer.y=event.clientY;document.querySelectorAll('[data-view]').forEach(b=>b.setAttribute('aria-pressed','false'));render();
+if(!pointer.dragged)cancelCameraMove();pointer.dragged=true;currentView='custom';clearHighlight();yaw-=(event.clientX-pointer.x)*.007;pitch=Math.max(-.1,Math.min(1.569,pitch+(event.clientY-pointer.y)*.007));pointer.x=event.clientX;pointer.y=event.clientY;announceView('custom');render();
 });
 stage.addEventListener('pointerup',event=>{const click=pointer&&pointer.id===event.pointerId&&!pointer.dragged&&Math.hypot(event.clientX-pointer.startX,event.clientY-pointer.startY)<DRAFTING_CONFIG.interaction.clickPixels&&performance.now()-pointer.started<DRAFTING_CONFIG.interaction.clickMs;pointer=null;if(click&&!laptopOpen){const selected=pick(event);if(selected){renderer.domElement.focus({preventScroll:true});activate(selected.view);}else if(isCloseup())returnToRoom();}});
 for(const event of ['pointercancel','lostpointercapture'])stage.addEventListener(event,()=>pointer=null);

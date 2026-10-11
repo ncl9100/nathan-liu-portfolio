@@ -110,10 +110,12 @@ body .room-feedback .hint{position:static;left:auto;bottom:auto;transform:none;w
 <template id="resume-text-template"><article class="resume-text" aria-label="Nathan Liu résumé"><h1>Nathan Liu</h1><p>New York, NY | 408-930-1186 | ncl9100@nyu.edu | 24natel.com | linkedin.com/in/nathan-ncl-liu | github.com/ncl9100</p><h2>Education</h2><p>New York University New York, NY</p><p>Bachelor of Arts in Computer Science and Data Science | Dean’s List Sep. 2024 – May 2028</p><p>Relevant Coursework: Probability and Statistics, Principles of Data Science I &amp; II, Data Management and Analysis,</p><p>Fundamentals of Machine Learning, Linear Algebra, Causal Inference (in progress)</p><h2>Experience</h2><h3>Data Science Intern Nov. 2025 – Present</h3><p>NYU Entrepreneurial Institute New York, NY</p><ul><li>Built an LLM-assisted pipeline (Perplexity, Google Search APIs) classifying 2.6k+ startup records by NYU school for segment reporting</li><li>Shipped 5 features to a BigQuery-backed React analytics dashboard tracking 2.6k+ annual coaching sessions and 5k+ visits, including drill-down time-series charts and year-over-year comparison</li><li>Audited 31 production data pipelines against documentation, tracing 24 discrepancies to root causes and flagging 7 untracked scripts writing to production data</li><li>Leading CRM deduplication of ˜14k entries, building a 50-row gold set to QA duplicate-detection signals</li></ul><h3>Full-Stack AI Developer June 2025 – Aug. 2025</h3><p>Amazon China</p><ul><li>Trained a scikit-learn regression model on 30-day rolling prices for short-term forecasting in an AI trading assistant (Flask, React)</li><li>Built a signal engine combining TextBlob sentiment on 40 headlines per refresh with 24h price change to classify assets as buy, sell, or hold</li><li>Validated sentiment classification against manually labeled headlines in Jupyter and wrote 26 tests (pytest, Jest)</li></ul><h3>Outreach Coordinator Feb. 2026 – Present</h3><p>NYU Data Science Club New York, NY</p><ul><li>Co-organized NYU’s 2026 Datathon for 50+ participants, leading sponsor outreach to companies including Datadog and TikTok</li></ul><h2>Projects</h2><h3>HotTakes | 2nd Place, NYU Stern Sustainability Hackathon Oct. 2026</h3><ul><li>Trained a gradient-boosted heat demand forecast (scikit-learn) on synthetic hourly data calibrated to Con Ed filings, reaching 8.5% MAPE vs 17.5% for a naive baseline, and presented the model in the pitch</li><li>Validated on real metered steam from 7 buildings, cutting WAPE to 18% vs 24% and 39% for two baselines</li><li>Compared 5 outage reserve policies in an 8,760-hour simulation, finding a reserve does not pay since storage is usually full</li><li>Deployed a Streamlit dashboard (5 tabs, 20 inputs) with a Claude assistant that calls 4 read-only model tools</li></ul><h3>Ad Click-Through Rate Prediction (Fundamentals of ML) | Python, pandas, scikit-learn Summer 2026</h3><ul><li>Predicted clicks on 1M Avazu ad impressions, reaching 0.723 ROC-AUC and 0.411 log loss vs a 0.456 base-rate baseline</li><li>Engineered 105 leakage-free features, adding time features after EDA showed click rates varied by hour and device</li><li>Showed why accuracy misleads on imbalanced data: a never-click model scores 83% accuracy but 0.50 ROC-AUC</li></ul><h3>MarginGuard | Python, DuckDB, Claude API Apr. 2026</h3><ul><li>Built a Python/SQL pipeline in DuckDB joining 1.2M+ labor logs and 90K+ billing records into project-level signals</li><li>Defined margin metrics and erosion thresholds an AI agent uses to rank the 3 highest-exposure of 405 projects</li></ul><h2>Technical Skills</h2><p>Languages: Python, SQL, R, Java, C/C++, JavaScript</p><p>Data &amp; ML: pandas, NumPy, scikit-learn, XGBoost, Matplotlib, Seaborn, Jupyter, Streamlit</p><p>Data &amp; Cloud: BigQuery, DuckDB, PostgreSQL, Google Cloud Run, Git/GitHub</p><p>Methods: Regression and forecasting, classification, clustering, statistical inference, causal inference, root-cause analysis</p></article></template>
 <script type="module" src="resume-viewer/viewer.js"></script>
 <script type="module">
-import { profile, projects, experience } from './content/portfolio.js';
+import { LIUOS_CONFIG } from './liuos/settings.js';
 import './liuos/laptop.js'; // inserts LiuOS's markup before the code below looks it up
 // Résumé viewer state, kept in sync by its resume:opened / resume:closed announcements.
 let resumeOpen=false;
+// LiuOS state, kept in sync by its laptop:opened / laptop:closed / laptop:apps-changed / laptop:screen announcements.
+let laptopOpen=false,laptopActiveApp=null,laptopScreenPowered=true;
 // All drafting-paper appearance and motion controls live here. Scene units are inches.
 const DRAFTING_CONFIG = {
   interaction:{debugPicking:false,clickPixels:5,clickMs:300,zoomLimitRatio:1.5,zoomExitDelta:180,zoomExitWindowMs:650,firstCloseupHint:"Click anywhere to step back.",captionMs:4000,lampFadeMs:300,hoverColor:0xa89a80,hoverOpacity:.42},
@@ -127,61 +129,6 @@ const DRAFTING_CONFIG = {
   callouts:{desk:['A','Desk',-65,-68],bed:['B','Bed',-90,35],side:['C','Kitchen',82,-42],resume:['D','Résumé',55,47],laptop:['E','Laptop',0,-42]},
   mobileCallouts:{desk:[-25,-64],bed:[-45,35],side:[60,-85],resume:[20,65],laptop:[0,-42]},
   date:{timeZone:'America/New_York'}
-};
-// LiuOS tunables. Stage 2–4 use this same object for apps and wallpaper modules.
-const LIUOS_CONFIG={
- colors:{accent:'#89ded0',text:'#edf6f7',muted:'#a4b7c1',base:'#0b1c2a',glass:'#d0eff50d',border:'#d0eff526',wallpaperTeal:'#174b50',wallpaperBlue:'#284560',bezel:'#10151b',backdrop:'#07111d80',field:'#04132140',camera:'#587082'},
- typography:{small:12,body:14,title:16,section:22,large:28,bodyLineHeight:1.5},
- font:'"Segoe UI",sans-serif',blur:22,radius:14,transitionMs:300,
- puzzle:{answers:['python'],hint:'Named after a comedy group; also a kind of snake.',celebrationMs:380},
- apps:[{id:'projects',title:'Projects',icon:'folder'},{id:'experience',title:'Experience',icon:'briefcase'},{id:'terminal',title:'Terminal',icon:'terminal'},{id:'resume',title:'Résumé',icon:'document'},{id:'about',title:'About me',icon:'person'},{id:'contact',title:'Contact',icon:'mail'},{id:'guide',title:'AI guide',icon:'spark'}],
- profile:{...profile,avatarSelector:"#signin-panel .avatar img",aboutHeading:"About Nathan"},
- projects,
- experience,
- content:{
-  "copyEmailLabel":"Copy", "copiedEmailLabel":"Copied", "copyFailedLabel":"Try again",
-  "contactHeading": "Let’s connect",
-  "contactIntro": "Find me online or send a note.",
-  "contactLabels": [
-    [
-      "email",
-      "Email"
-    ],
-    [
-      "linkedin",
-      "LinkedIn"
-    ],
-    [
-      "github",
-      "GitHub"
-    ]
-  ],
-  "projectsHeading": "Projects",
-  "projectsBreadcrumb": "Workspace / Projects",
-  "descriptionHeading": "About the project",
-  "roleHeading": "My role",
-  "experienceHeading": "Experience",
-  "experienceIntro": "Work and contributions, newest first.",
-  "guideHeading": "AI guide",
-  "guideIntro": "An assistant for questions about my work, interests, and experience.",
-  "guideTodo": "TODO · connect the AI backend and approved source material",
-  "guideNote": "The guide is not connected yet. It will answer from material I choose to share and cite supporting projects and facts.",
-  "guidePrompt": "Ask about Nathan…"
-},
- terminal:{
-  "historyLimit": 100,
-  "greeting": "LiuOS terminal · type help to explore.",
-  "passwordNote": "Favorite language? That's the lock screen password. No hints here.",
-  "help": "help · whoami · experience · projects · ls projects · open hottakes · open marginguard · open website · open <project-id> · cat resume · contact · clear",
-  "resumeMessage": "Opening the original résumé PDF.",
-  "notFound": "Project not found. Use projects for available IDs.",
-  "unknown": "Unknown command. Type help.",
-  "openingPrefix": "Opening "
-},
- resumeViewer:{windowWidth:530,pageMaxWidth:620,zoomStep:.25,minZoom:.75,maxZoom:2},
- windows:{contactWidth:560,contactHeight:380,widthRatio:.65,heightRatio:.7,minWidth:260,maxWidth:720,minHeight:200,maxHeight:420,cascade:28,animationMs:180,mobileBreakpoint:600},
- screen:{resolution:2048,aspect:12.8/6.7,glareOpacity:.055,vignetteOpacity:.13,wallpaperFps:15,animatedWallpaper:false,brightness:.94,hoverBrightness:1,calloutGap:24},
- wallpaper:{speed:.12,resolution:.5,maxFps:30,cursorStrength:.035,cursorDamping:4,pixelRatioCap:2,module:'./liuos/wallpaper.js'},clock:{refreshMs:30000}
 };
 const osElement=document.getElementById('laptop-window');osElement.style.setProperty('--os-window-animation',LIUOS_CONFIG.windows.animationMs+'ms');
 for(const [name,value] of Object.entries(LIUOS_CONFIG.colors))osElement.style.setProperty('--os-'+name,value);
@@ -443,9 +390,9 @@ const wetPatch=new THREE.Mesh(new THREE.CircleGeometry(1.3,48),new THREE.MeshBas
 waterGroup.traverse(obj=>{if(obj.isMesh)obj.raycast=()=>{};});
 let waterOn=false,waterFrame=0;const dropTransform=new THREE.Object3D();
 function updateWater(seconds){waterTime.value=seconds;for(let i=0;i<32;i++){const phase=(seconds*1.4+i/32)%1,angle=i*2.39996,spread=phase*1.1;dropTransform.position.set(outlet.x+Math.cos(angle)*spread,sinkBottom+.3+Math.sin(phase*Math.PI)*(.2+(i%4)*.19),outlet.z+Math.sin(angle)*spread);dropTransform.scale.set(.6,1.5,.6);dropTransform.updateMatrix();droplets.setMatrixAt(i,dropTransform.matrix);}droplets.instanceMatrix.needsUpdate=true;for(let i=0;i<3;i++){const phase=(seconds*1.5+i/3)%1;const scale=.16+phase*1.5;ripples[i].scale.set(scale,scale,scale);ripples[i].material.opacity=(1-phase)*.32;}}
-function animateWater(now){if(!waterOn||document.hidden||document.getElementById('laptop-window')?.open)return;updateWater(now*.001);render();waterFrame=requestAnimationFrame(animateWater);}
+function animateWater(now){if(!waterOn||document.hidden||laptopOpen)return;updateWater(now*.001);render();waterFrame=requestAnimationFrame(animateWater);}
 function toggleFaucet(){waterOn=!waterOn;cancelAnimationFrame(waterFrame);waterGroup.visible=waterOn;faucetHandle.rotation.x=waterOn?-.5:0;updateWater(0);render();if(waterOn&&!reducedMotion()&&!document.hidden)waterFrame=requestAnimationFrame(animateWater);}
-document.addEventListener('visibilitychange',()=>{cancelAnimationFrame(waterFrame);if(waterOn&&!document.hidden&&!reducedMotion()&&!document.getElementById('laptop-window')?.open)waterFrame=requestAnimationFrame(animateWater);});
+document.addEventListener('visibilitychange',()=>{cancelAnimationFrame(waterFrame);if(waterOn&&!document.hidden&&!reducedMotion()&&!laptopOpen)waterFrame=requestAnimationFrame(animateWater);});
 const refrigerator=kb(29,63,25,289.5,31.5,74.5,white);
 const fridgeTrim=kb(.8,.4,24,274.6,43,74.5,silver);
 kb(23,35,32,292.5,17.5,103,cabinet);kb(24,1.5,32,292,35.75,103,white);
@@ -571,17 +518,17 @@ function finishIntro(){cancelAnimationFrame(introFrame);introDone=true;stage.dat
 function startDraftingIntro(){if(reducedMotion()){finishIntro();render();return;}stage.dataset.intro='running';const started=performance.now();function frame(now){applyIntro(Math.min(now-started,DRAFTING_CONFIG.intro.duration));if(now-started>=DRAFTING_CONFIG.intro.duration)finishIntro();render();if(!introDone)introFrame=requestAnimationFrame(frame);}introFrame=requestAnimationFrame(frame);}
 let parallaxFrame=0,parallaxTime=0;const parallax={x:0,y:0,targetX:0,targetY:0};
 function resetParallax(){cancelAnimationFrame(parallaxFrame);parallaxFrame=0;parallax.x=parallax.y=parallax.targetX=parallax.targetY=0;}
-function dampParallax(now){parallaxFrame=0;if(document.hidden||document.getElementById('laptop-window')?.open||reducedMotion()||!introDone||moving)return;const k=1-Math.exp(-DRAFTING_CONFIG.parallax.damping*Math.min(.05,(now-parallaxTime)/1000));parallaxTime=now;parallax.x+=(parallax.targetX-parallax.x)*k;parallax.y+=(parallax.targetY-parallax.y)*k;render();if(Math.abs(parallax.targetX-parallax.x)+Math.abs(parallax.targetY-parallax.y)>DRAFTING_CONFIG.parallax.epsilon)parallaxFrame=requestAnimationFrame(dampParallax);}
+function dampParallax(now){parallaxFrame=0;if(document.hidden||laptopOpen||reducedMotion()||!introDone||moving)return;const k=1-Math.exp(-DRAFTING_CONFIG.parallax.damping*Math.min(.05,(now-parallaxTime)/1000));parallaxTime=now;parallax.x+=(parallax.targetX-parallax.x)*k;parallax.y+=(parallax.targetY-parallax.y)*k;render();if(Math.abs(parallax.targetX-parallax.x)+Math.abs(parallax.targetY-parallax.y)>DRAFTING_CONFIG.parallax.epsilon)parallaxFrame=requestAnimationFrame(dampParallax);}
 function requestParallax(){if(!parallaxFrame){parallaxTime=performance.now();parallaxFrame=requestAnimationFrame(dampParallax);}}
 motionPreference.addEventListener('change',()=>{resetParallax();if(motionPreference.matches){finishIntro();cancelAnimationFrame(waterFrame);}else if(waterOn)waterFrame=requestAnimationFrame(animateWater);render();});
 document.addEventListener('visibilitychange',()=>{if(document.hidden)resetParallax();});
 
 let target=new THREE.Vector3(150,12,70),yaw=0.55,pitch=0.85,radius=600;
-function render(){updateNavState();if(document.hidden||document.getElementById('laptop-window')?.open)return;document.body.dataset.roomView=currentView;camera.position.set(target.x+radius*Math.sin(yaw+parallax.x)*Math.cos(pitch+parallax.y),target.y+radius*Math.sin(pitch+parallax.y),target.z+radius*Math.cos(yaw+parallax.x)*Math.cos(pitch+parallax.y));camera.lookAt(target);updateBackControl();updateWalls();renderer.render(scene,camera);updateHotspots();updateDimensionLabels();}
+function render(){updateNavState();if(document.hidden||laptopOpen)return;document.body.dataset.roomView=currentView;camera.position.set(target.x+radius*Math.sin(yaw+parallax.x)*Math.cos(pitch+parallax.y),target.y+radius*Math.sin(pitch+parallax.y),target.z+radius*Math.cos(yaw+parallax.x)*Math.cos(pitch+parallax.y));camera.lookAt(target);updateBackControl();updateWalls();renderer.render(scene,camera);updateHotspots();updateDimensionLabels();}
 function fittedRadius(value){return value*Math.max(1,DRAFTING_CONFIG.camera.mobileFitAspect/camera.aspect);}
 function resize(){renderer.setSize(stage.clientWidth,stage.clientHeight);camera.aspect=stage.clientWidth/stage.clientHeight;if(['angle','front','desk'].includes(currentView))radius=fittedRadius(presets[currentView].radius);camera.updateProjectionMatrix();render();}window.addEventListener('resize',resize);
 const presets={stools:{yaw:-2.3,pitch:.55,radius:92,target:[183,18,94],fov:48},resume:{yaw:0,pitch:1.48,radius:25,target:[163.75,30.1,17.2],fov:40},details:{yaw:-.15,pitch:.2,radius:130,target:[154.75,48,10]},angle:{yaw:.55,pitch:.85,radius:600,target:[150,12,70]},front:{yaw:0,pitch:Math.PI/2-.001,radius:560,target:[156,0,73]},side:{yaw:Math.PI/2,pitch:.2,radius:48,target:[215,38,119],fov:65},fridge:{yaw:-.45,pitch:.18,radius:145,target:[284,47,80]},desk:{yaw:0,pitch:.27,radius:29,target:[149.75,34,12]},bed:{yaw:-Math.PI/2,pitch:.15,radius:60,target:[130,34,19.5]}};
-let animation=0,moving=false,currentView='angle',laptopPowered=true,laptopUnlocked=false;
+let animation=0,moving=false,currentView='angle';
 const hint=document.querySelector('.hint');let captionTimer=0,captionHideTimer=0;
 const defaultCaption='Click around. Most things in here do something.';
 const viewCaptions={angle:defaultCaption,front:'The floor plan. Click an object to explore.',desk:'You’re at your desk. Click the laptop to open LiuOS.',bed:'You’re on your bed. Drag to look around.',side:'You’re in the kitchen. Drag to look around.',fridge:'The fridge. Drag to look around.',stools:'Four stools beside the kitchen.',details:'Your desk objects. Click the lamp or laptop.',resume:'Your résumé, up close.'};
@@ -594,7 +541,7 @@ const leaders=new Map(),leaderSvg=document.getElementById('callout-lines');
 for(const button of hotspotButtons){const name=button.dataset.destination,[letter,title]=DRAFTING_CONFIG.callouts[name],action=button.textContent;button.replaceChildren();const heading=document.createElement('span'),detail=document.createElement('span');heading.className='callout-title';heading.textContent=letter+' / '+title;detail.className='callout-action';detail.textContent=action;button.append(heading,detail);const line=document.createElementNS('http://www.w3.org/2000/svg','polyline'),dot=document.createElementNS('http://www.w3.org/2000/svg','circle');dot.setAttribute('r','2');leaderSvg.append(line,dot);leaders.set(name,{line,dot});}
 function updateHotspots(){
 for(const [index,button] of hotspotButtons.entries()){
-const name=button.dataset.destination,leader=leaders.get(name);if(name==='laptop')button.querySelector('.callout-action').textContent=laptopPowered?'Open laptop':'Turn on laptop';
+const name=button.dataset.destination,leader=leaders.get(name);if(name==='laptop')button.querySelector('.callout-action').textContent=laptopScreenPowered?'Open laptop':'Turn on laptop';
 const available=(!moving||name==='laptop')&&modelProgress===1&&(name==='laptop'?currentView==='desk':name==='resume'?['angle','front','custom','desk','details'].includes(currentView):['angle','front','custom'].includes(currentView));
 button.hidden=!available;button.disabled=!introDone;leader.line.style.display=leader.dot.style.display=available?'':'none';if(!available)continue;
 const point=new THREE.Vector3(...hotspotPositions[name]).project(camera);
@@ -616,8 +563,8 @@ const closeupViews=new Set(['desk','bed','side','fridge','stools','details']);
 let closeupView=null,firstCloseupSeen=false,zoomExitDelta=0,lastZoomOut=0;
 const backToRoom=document.getElementById('back-to-room');
 function isCloseup(){return closeupView!==null;}
-function updateBackControl(){backToRoom.hidden=!isCloseup()||document.getElementById('laptop-window').open||resumeOpen;}
-function returnToRoom(){if(document.getElementById('laptop-window').open||resumeOpen)return;activate('angle');}
+function updateBackControl(){backToRoom.hidden=!isCloseup()||laptopOpen||resumeOpen;}
+function returnToRoom(){if(laptopOpen||resumeOpen)return;activate('angle');}
 backToRoom.addEventListener('click',returnToRoom);
 function arrivalCaption(view){if(closeupViews.has(view)&&!firstCloseupSeen){firstCloseupSeen=true;return DRAFTING_CONFIG.interaction.firstCloseupHint;}return viewCaptions[view]||defaultCaption;}
 let cameraMove=null,queuedCameraAction=null;
@@ -633,13 +580,12 @@ hideCaption();
 const reduced=reducedMotion();
 function tick(now){if(cameraMove!==move)return;const t=reduced?1:Math.min((now-time)/900,1);const k=t*t*(3-2*t);yaw=start.yaw+(p.yaw-start.yaw)*k;pitch=start.pitch+(p.pitch-start.pitch)*k;radius=start.radius+((['angle','front','desk'].includes(view)?fittedRadius(p.radius):p.radius)-start.radius)*k;camera.fov=start.fov+((p.fov||38)-start.fov)*k;camera.updateProjectionMatrix();target.lerpVectors(start.target,destination,k);if(t===1){moving=false;showCaption(arrivalCaption(view));}render();if(t<1)animation=requestAnimationFrame(tick);else{const callback=move.onArrive,action=queuedCameraAction;cameraMove=null;queuedCameraAction=null;animation=0;if(callback)callback();if(action)activate(action);}}animation=requestAnimationFrame(tick);
 }
-document.querySelectorAll('[data-view]').forEach(button=>button.addEventListener('click',()=>{if(laptopDialog.open)laptopDialog.close();if(resumeOpen)document.dispatchEvent(new CustomEvent('resume:close'));navigate(button.dataset.view);}));
-const laptopDialog=document.getElementById('laptop-window');let laptopReturnFocus=null;
+document.querySelectorAll('[data-view]').forEach(button=>button.addEventListener('click',()=>{if(laptopOpen)document.dispatchEvent(new CustomEvent('laptop:close'));if(resumeOpen)document.dispatchEvent(new CustomEvent('resume:close'));navigate(button.dataset.view);}));
+const laptopDialog=document.getElementById('laptop-window');let laptopReturnFocus=null,laptopPowered=true,laptopUnlocked=false;
 // The in-room screen keeps a static wallpaper frame and minute-based clock updates.
 // The live shader is reserved for the visible LiuOS screen to keep room rendering light.
 const screenCanvas=document.createElement('canvas');screenCanvas.width=LIUOS_CONFIG.screen.resolution;screenCanvas.height=Math.round(screenCanvas.width/LIUOS_CONFIG.screen.aspect);
-const screenContext=screenCanvas.getContext('2d'),screenTexture=new THREE.CanvasTexture(screenCanvas);
-screenTexture.colorSpace=THREE.SRGBColorSpace;screenTexture.anisotropy=renderer.capabilities.getMaxAnisotropy();screenTexture.minFilter=THREE.LinearMipmapLinearFilter;screenTexture.magFilter=THREE.LinearFilter;screenFace.material.map=screenTexture;screenFace.material.needsUpdate=true;
+const screenContext=screenCanvas.getContext('2d');
 let screenMinute='',screenState='',screenClockTimer=0;
 function localClock(now=new Date()){return {time:now.toLocaleTimeString([],{hour:'numeric',minute:'2-digit',hour12:false}),date:now.toLocaleDateString([],{weekday:'long',month:'long',day:'numeric'})};}
 function drawScreen(force=false){const now=new Date(),minute=Math.floor(now.getTime()/60000),state=laptopPowered+'/'+laptopUnlocked;if(!force&&minute===screenMinute&&state===screenState)return false;screenMinute=minute;screenState=state;
@@ -654,18 +600,21 @@ function drawScreen(force=false){const now=new Date(),minute=Math.floor(now.getT
  }
  const glare=ctx.createLinearGradient(0,h,w,0),opacity=LIUOS_CONFIG.screen.glareOpacity;glare.addColorStop(0,'rgba(255,255,255,0)');glare.addColorStop(.35,'rgba(255,255,255,0)');glare.addColorStop(.48,`rgba(255,255,255,${opacity})`);glare.addColorStop(.65,'rgba(255,255,255,0)');glare.addColorStop(1,'rgba(255,255,255,0)');ctx.fillStyle=glare;ctx.fillRect(0,0,w,h);
  const vignette=ctx.createRadialGradient(w/2,h/2,h*.2,w/2,h/2,w*.6);vignette.addColorStop(0,'rgba(0,0,0,0)');vignette.addColorStop(1,`rgba(0,0,0,${LIUOS_CONFIG.screen.vignetteOpacity})`);ctx.fillStyle=vignette;ctx.fillRect(0,0,w,h);
- screenTexture.needsUpdate=true;return true;
+ return true;
 }
-function scheduleScreenClock(){clearTimeout(screenClockTimer);if(document.hidden)return;screenClockTimer=setTimeout(()=>{if(drawScreen())render();scheduleScreenClock();},60000-Date.now()%60000+25);}
-document.addEventListener('visibilitychange',()=>{if(document.hidden)clearTimeout(screenClockTimer);else{if(drawScreen())render();scheduleScreenClock();}});
+function announceScreen(redrawn){document.dispatchEvent(new CustomEvent('laptop:screen',{detail:{canvas:screenCanvas,redrawn,powered:laptopPowered}}));}
+function announceApps(){let active=null;if(laptopDialog.open&&laptopUnlocked){const focused=document.querySelector('.os-window.os-focused:not(.os-closing):not([hidden])');active=focused?.dataset.appWindow;}document.dispatchEvent(new CustomEvent('laptop:apps-changed',{detail:{active}}));}
+document.addEventListener('laptop:screen-request',()=>{announceScreen(drawScreen());scheduleScreenClock();});
+function scheduleScreenClock(){clearTimeout(screenClockTimer);if(document.hidden)return;screenClockTimer=setTimeout(()=>{if(drawScreen())announceScreen(true);scheduleScreenClock();},60000-Date.now()%60000+25);}
+document.addEventListener('visibilitychange',()=>{if(document.hidden)clearTimeout(screenClockTimer);else{if(drawScreen())announceScreen(true);scheduleScreenClock();}});
 function screenHover(active){screenFace.material.color.setScalar(active?LIUOS_CONFIG.screen.hoverBrightness:LIUOS_CONFIG.screen.brightness);}
-function syncLaptop(){document.getElementById('lock-screen').hidden=laptopUnlocked;document.getElementById('desktop').hidden=!laptopUnlocked;document.getElementById('power-off').hidden=!laptopPowered;drawScreen();render();updateWallpaperState();}
+function syncLaptop(){document.getElementById('lock-screen').hidden=laptopUnlocked;document.getElementById('desktop').hidden=!laptopUnlocked;document.getElementById('power-off').hidden=!laptopPowered;announceScreen(drawScreen());announceApps();updateWallpaperState();}
 let osClockTimer=0,osUnlockTimer=0,signinRevealed=false,osUnlocking=false,alternateWallpaper=false;
 const signinPanel=document.getElementById('signin-panel'),lockScreen=document.getElementById('lock-screen'),puzzlePanel=document.getElementById('os-puzzle'),startMenu=document.getElementById('start-menu');
 function refreshOsClock(){const now=new Date(),clock=localClock(now);document.getElementById('os-clock').textContent=clock.time;document.getElementById('os-date').textContent=clock.date;document.getElementById('desktop-time').textContent=now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});}
 function resetSignin(){clearTimeout(osUnlockTimer);osUnlocking=false;signinRevealed=false;lockScreen.classList.remove('signin-revealed');signinPanel.classList.remove('is-correct','is-wrong','is-unlocking');signinPanel.inert=true;document.getElementById('lock-curtain').inert=false;puzzlePanel.hidden=true;document.getElementById('puzzle-toggle').setAttribute('aria-expanded','false');document.getElementById('password-answer').value='';document.getElementById('answer-message').textContent='';document.getElementById('guest-signin').disabled=false;}
 function revealSignin(){if(signinRevealed||laptopUnlocked)return;signinRevealed=true;lockScreen.classList.add('signin-revealed');signinPanel.inert=false;document.getElementById('lock-curtain').inert=true;document.getElementById('guest-signin').focus();}
-function openLaptop(opener=document.activeElement){if(currentView!=='desk'||moving)return;laptopReturnFocus=opener;laptopPowered=true;if(!laptopUnlocked)resetSignin();refreshOsClock();clearInterval(osClockTimer);osClockTimer=setInterval(refreshOsClock,LIUOS_CONFIG.clock.refreshMs);syncLaptop();laptopDialog.prepend(roomNav);laptopDialog.showModal();updateNavState();updateBackControl();cancelAnimationFrame(waterFrame);resetParallax();updateWallpaperState();(laptopUnlocked?document.getElementById('start-button'):document.getElementById('reveal-signin')).focus();}
+function openLaptop(opener=document.activeElement){laptopReturnFocus=opener;laptopPowered=true;if(!laptopUnlocked)resetSignin();refreshOsClock();clearInterval(osClockTimer);osClockTimer=setInterval(refreshOsClock,LIUOS_CONFIG.clock.refreshMs);syncLaptop();laptopDialog.prepend(document.querySelector('.room-nav'));laptopDialog.showModal();document.dispatchEvent(new CustomEvent('laptop:opened'));announceApps();updateWallpaperState();(laptopUnlocked?document.getElementById('start-button'):document.getElementById('reveal-signin')).focus();}
 function unlock(celebrate=false){if(osUnlocking)return;osUnlocking=true;document.getElementById('guest-signin').disabled=true;signinPanel.inert=true;const complete=()=>{if(!laptopDialog.open)return;laptopUnlocked=true;osUnlocking=false;syncLaptop();const desktop=document.getElementById('desktop');desktop.classList.remove('os-entering');void desktop.offsetWidth;desktop.classList.add('os-entering');document.getElementById('start-button').focus();};
  if(reducedMotion()){complete();return;}if(celebrate){signinPanel.classList.add('is-correct');document.getElementById('answer-message').textContent='Access granted. Nice to meet a fellow Python fan.';osUnlockTimer=setTimeout(()=>{signinPanel.classList.add('is-unlocking');osUnlockTimer=setTimeout(complete,LIUOS_CONFIG.transitionMs);},LIUOS_CONFIG.puzzle.celebrationMs);}else{signinPanel.classList.add('is-unlocking');osUnlockTimer=setTimeout(complete,LIUOS_CONFIG.transitionMs);}}
 document.getElementById('reveal-signin').addEventListener('click',revealSignin);
@@ -682,7 +631,10 @@ document.getElementById('wallpaper-toggle').addEventListener('click',()=>{altern
 document.getElementById('desktop-time').textContent=new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
 
 document.getElementById('close-laptop').addEventListener('click',()=>laptopDialog.close());
-laptopDialog.addEventListener('close',()=>{document.body.prepend(roomNav);closeRoomMenu();clearInterval(osClockTimer);clearTimeout(osUnlockTimer);if(osUnlocking){resetSignin();syncLaptop();}if(laptopReturnFocus instanceof HTMLElement)laptopReturnFocus.focus();updateWallpaperState();render();if(waterOn&&!document.hidden&&!reducedMotion())waterFrame=requestAnimationFrame(animateWater);});
+laptopDialog.addEventListener('close',()=>{document.body.prepend(document.querySelector('.room-nav'));clearInterval(osClockTimer);clearTimeout(osUnlockTimer);if(osUnlocking){resetSignin();syncLaptop();}if(laptopReturnFocus instanceof HTMLElement)laptopReturnFocus.focus();updateWallpaperState();announceApps();document.dispatchEvent(new CustomEvent('laptop:closed'));});
+document.addEventListener('laptop:open',event=>openLaptop(event.detail?.opener));
+document.addEventListener('laptop:close',()=>{if(laptopDialog.open)laptopDialog.close();});
+document.addEventListener('laptop:open-app',({detail:{name,opener}})=>{laptopPowered=true;laptopUnlocked=true;resetSignin();syncLaptop();if(!laptopDialog.open)openLaptop(opener);const win=showApp(name);if(win&&name==='contact'){if(win.maximized)toggleMaximize(win);placeWindow(win);}if(win&&name!=='contact'&&!win.maximized&&desktopElement.clientWidth>=LIUOS_CONFIG.windows.mobileBreakpoint)toggleMaximize(win);});
 // Window management is separate from the app content builders introduced in stage 3.
 const desktopElement=document.getElementById('desktop'),windowLayer=document.getElementById('os-windows'),pinnedElement=document.getElementById('os-pinned'),searchPanel=document.getElementById('os-search'),searchInput=document.getElementById('workspace-search');
 const iconPaths={code:'<path d="m8 6-6 6 6 6m8-12 6 6-6 6m-3-15-2 18"/>',briefcase:'<rect x="3" y="7" width="18" height="14" rx="2"/><path d="M8 7V3h8v4M3 12h18m-11 0v3h4v-3"/>',folder:'<path d="M3 7V5h6l2 2h10v13H3Z"/>',terminal:'<rect x="3" y="4" width="18" height="16" rx="3"/><path d="m7 9 3 3-3 3m6 0h4"/>',document:'<path d="M6 3h8l4 4v14H6Zm8 0v5h4M9 12h6m-6 4h6"/>',person:'<circle cx="12" cy="8" r="3"/><path d="M5 21v-2a7 7 0 0 1 14 0v2"/>',mail:'<rect x="3" y="5" width="18" height="14" rx="3"/><path d="m4 7 8 6 8-6"/>',spark:'<path d="m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5Z"/>',system:'<path d="m12 3 9 9-9 9-9-9Z"/><circle cx="12" cy="12" r="3"/>',search:'<circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/>',close:'<path d="m6 6 12 12M18 6 6 18"/>',minimize:'<path d="M5 17h14"/>',maximize:'<rect x="5" y="5" width="14" height="14" rx="2"/>'};
@@ -727,10 +679,10 @@ function renderTerminal(parent){parent.classList.add('os-terminal');const output
 }
 function buildAppContent(name,parent){if(name.startsWith('project:')){renderProject(parent,LIUOS_CONFIG.projects.find(p=>p.id===name.slice(8)));return;}switch(name){case 'experience':renderExperience(parent);break;case 'projects':renderProjects(parent);break;case 'terminal':return renderTerminal(parent);case 'resume':return renderResume(parent);case 'about':renderAbout(parent);break;case 'contact':renderContact(parent);break;case 'guide':{const cfg=LIUOS_CONFIG.content;parent.append(osNode('h3',cfg.guideHeading),osNode('p',cfg.guideIntro));osTodo(parent,cfg.guideTodo);parent.append(osNode('p',cfg.guideNote));const prompt=osNode('input');prompt.placeholder=cfg.guidePrompt;prompt.disabled=true;prompt.setAttribute('aria-label','AI guide is not connected');parent.append(prompt);break;}}}
 function windowDockButton(win){return document.querySelector('#os-pinned [data-app="'+(win.app.id.startsWith('project:')?'projects':win.app.id)+'"]');}
-function updateDock(){updateNavState();updateWallpaperState();for(const button of pinnedElement.querySelectorAll('[data-app]')){const win=osWindows.get(button.dataset.app);button.classList.toggle('os-running',!!win);button.classList.toggle('os-minimized',!!win?.minimized);button.classList.toggle('os-active',!!win&&!win.minimized&&win.element.classList.contains('os-focused'));button.setAttribute('aria-label',win?(win.minimized?'Restore ':'Focus ')+win.app.title:'Open '+button.dataset.title);}}
+function updateDock(){announceApps();updateWallpaperState();for(const button of pinnedElement.querySelectorAll('[data-app]')){const win=osWindows.get(button.dataset.app);button.classList.toggle('os-running',!!win);button.classList.toggle('os-minimized',!!win?.minimized);button.classList.toggle('os-active',!!win&&!win.minimized&&win.element.classList.contains('os-focused'));button.setAttribute('aria-label',win?(win.minimized?'Restore ':'Focus ')+win.app.title:'Open '+button.dataset.title);}}
 function focusWindow(win,moveFocus=false){if(win.closing)return;for(const other of osWindows.values())other.element.classList.remove('os-focused');win.element.classList.add('os-focused');win.element.style.zIndex=String(++nextWindowZ);if(moveFocus){win.element.focus({preventScroll:true});if(typeof win.focusContent==='function')win.focusContent();else win.focusContent?.onFocus?.();}updateDock();}
 function minimizeWindow(win){win.minimized=true;win.element.hidden=true;win.element.classList.remove('os-focused');const candidates=[...osWindows.values()].filter(w=>!w.minimized&&!w.closing).sort((a,b)=>Number(b.element.style.zIndex)-Number(a.element.style.zIndex));if(candidates[0])focusWindow(candidates[0]);windowDockButton(win)?.focus();updateDock();document.getElementById('os-announcement').textContent=win.app.title+(win.app.id.startsWith('project:')?' minimized. Restore it from Projects.':' minimized. Restore it from the dock.');}
-function closeWindow(win){if(win.closing)return;win.closing=true;win.element.classList.add('os-closing');updateNavState();const remove=()=>{win.focusContent?.onClose?.();win.element.remove();osWindows.delete(win.app.id);const next=[...osWindows.values()].filter(w=>!w.minimized&&!w.closing).sort((a,b)=>Number(b.element.style.zIndex)-Number(a.element.style.zIndex))[0];if(next)focusWindow(next,true);else windowDockButton(win)?.focus();updateDock();};if(reducedMotion())remove();else setTimeout(remove,LIUOS_CONFIG.windows.animationMs);}
+function closeWindow(win){if(win.closing)return;win.closing=true;win.element.classList.add('os-closing');announceApps();const remove=()=>{win.focusContent?.onClose?.();win.element.remove();osWindows.delete(win.app.id);const next=[...osWindows.values()].filter(w=>!w.minimized&&!w.closing).sort((a,b)=>Number(b.element.style.zIndex)-Number(a.element.style.zIndex))[0];if(next)focusWindow(next,true);else windowDockButton(win)?.focus();updateDock();};if(reducedMotion())remove();else setTimeout(remove,LIUOS_CONFIG.windows.animationMs);}
 function toggleMaximize(win){win.maximized=!win.maximized;win.element.classList.toggle('os-maximized',win.maximized);win.element.querySelector('[data-window-action="maximize"]').setAttribute('aria-label',(win.maximized?'Restore ':'Maximize ')+win.app.title);clampWindow(win);focusWindow(win);updateWallpaperState();}
 function desktopWindowBounds(){const width=desktopElement.clientWidth,height=desktopElement.clientHeight;const icons=document.getElementById('os-icons'),dock=document.querySelector('.os-dock');return {left:Math.min(icons.offsetLeft+icons.offsetWidth+16,width-272),top:52,right:width-12,bottom:Math.max(252,dock.offsetTop-12)};}
 function placeWindow(win){if(desktopElement.clientWidth<LIUOS_CONFIG.windows.mobileBreakpoint)return;const bounds=desktopWindowBounds(),cfg=LIUOS_CONFIG.windows,el=win.element;const width=Math.min(bounds.right-bounds.left,Math.max(cfg.minWidth,Math.min(cfg.maxWidth,win.app.id==='contact'?cfg.contactWidth:desktopElement.clientWidth*cfg.widthRatio))),height=Math.min(bounds.bottom-bounds.top,Math.max(cfg.minHeight,Math.min(cfg.maxHeight,win.app.id==='contact'?cfg.contactHeight:desktopElement.clientHeight*cfg.heightRatio)));el.style.width=Math.round(width)+'px';el.style.height=Math.round(height)+'px';const x=bounds.left+(bounds.right-bounds.left-width)/2,y=bounds.top+(bounds.bottom-bounds.top-height)/2,offset=win.openIndex*cfg.cascade;const cascade=offset<=Math.min(bounds.right-x-width,bounds.bottom-y-height)?offset:0;el.style.left=Math.round(x+cascade)+'px';el.style.top=Math.round(y+cascade)+'px';clampWindow(win);}
@@ -756,14 +708,22 @@ desktopElement.addEventListener('pointerdown',event=>{if(!event.target.closest('
 function handleLaptopEscape(){hideOsMenus();const focused=[...osWindows.values()].filter(w=>!w.minimized&&!w.closing).sort((a,b)=>Number(b.element.style.zIndex)-Number(a.element.style.zIndex))[0];if(laptopUnlocked&&focused)closeWindow(focused);else if(![...osWindows.values()].some(w=>w.closing))laptopDialog.close();}
 laptopDialog.addEventListener('keydown',event=>{if(event.key==='Escape'){event.preventDefault();event.stopPropagation();if(!event.repeat)handleLaptopEscape();}});
 laptopDialog.addEventListener('cancel',event=>{event.preventDefault();handleLaptopEscape();});
-document.addEventListener('keydown',event=>{if(event.key==='Escape'&&moving&&!laptopDialog.open&&!resumeOpen){event.preventDefault();cancelCameraMove();pointer=null;render();}});
+document.addEventListener('keydown',event=>{if(event.key==='Escape'&&moving&&!laptopOpen&&!resumeOpen){event.preventDefault();cancelCameraMove();pointer=null;render();}});
 window.addEventListener('resize',()=>{for(const win of osWindows.values()){if(win.wasMobile&&desktopElement.clientWidth>=LIUOS_CONFIG.windows.mobileBreakpoint)placeWindow(win);else clampWindow(win);win.wasMobile=desktopElement.clientWidth<LIUOS_CONFIG.windows.mobileBreakpoint;}updateWallpaperState();});
 
 let resumeReturnView='details',resumeReturnFocus=null;
 function openResume(opener=document.activeElement){if(moving||resumeOpen)return;resumeReturnView=presets[currentView]?currentView:'details';resumeReturnFocus=opener;navigate('resume',()=>document.dispatchEvent(new CustomEvent('resume:open')));}
 document.addEventListener('resume:opened',()=>{resumeOpen=true;updateNavState();updateBackControl();});
+// The room asks LiuOS to open only when the camera is at the desk.
+function requestLaptop(opener=document.activeElement){if(currentView!=='desk'||moving)return;document.dispatchEvent(new CustomEvent('laptop:open',{detail:{opener}}));}
+document.addEventListener('laptop:opened',()=>{laptopOpen=true;updateBackControl();cancelAnimationFrame(waterFrame);resetParallax();});
+document.addEventListener('laptop:closed',()=>{laptopOpen=false;closeRoomMenu();render();if(waterOn&&!document.hidden&&!reducedMotion())waterFrame=requestAnimationFrame(animateWater);});
+document.addEventListener('laptop:apps-changed',event=>{laptopActiveApp=event.detail.active;updateNavState();});
+// LiuOS paints its own screen picture; the room only displays it on the 3D laptop.
+let screenTexture=null;
+document.addEventListener('laptop:screen',({detail})=>{laptopScreenPowered=detail.powered;if(!screenTexture){screenTexture=new THREE.CanvasTexture(detail.canvas);screenTexture.colorSpace=THREE.SRGBColorSpace;screenTexture.anisotropy=renderer.capabilities.getMaxAnisotropy();screenTexture.minFilter=THREE.LinearMipmapLinearFilter;screenTexture.magFilter=THREE.LinearFilter;screenFace.material.map=screenTexture;screenFace.material.needsUpdate=true;}else if(detail.redrawn)screenTexture.needsUpdate=true;render();});
 document.addEventListener('resume:closed',()=>{resumeOpen=false;closeRoomMenu();navigate(resumeReturnView,()=>{if(resumeReturnFocus instanceof HTMLElement&&resumeReturnFocus.isConnected)resumeReturnFocus.focus({preventScroll:true});});});
-function activate(view){if(view==='lamp'){toggleLamp();return;}if(moving){queuedCameraAction=view;return;}if(view==='faucet')toggleFaucet();else if(view==='laptop')openLaptop();else if(view==='resume')openResume();else navigate(view);}
+function activate(view){if(view==='lamp'){toggleLamp();return;}if(moving){queuedCameraAction=view;return;}if(view==='faucet')toggleFaucet();else if(view==='laptop')requestLaptop();else if(view==='resume')openResume();else navigate(view);}
 hotspotButtons.forEach(button=>button.addEventListener('click',()=>{if(button.dataset.destination==='desk'){navigate('desk');return;}activate(button.dataset.destination);}));
 // Mesh picking keeps navigation discoverable without extra room controls.
 const raycaster=new THREE.Raycaster(),mouse=new THREE.Vector2();
@@ -790,15 +750,14 @@ function closeRoomMenu(){roomNav.classList.remove('menu-open');roomMenu.setAttri
 roomMenu.addEventListener('click',()=>{const open=roomMenu.getAttribute('aria-expanded')!=='true';roomMenu.setAttribute('aria-expanded',String(open));roomNav.classList.toggle('menu-open',open);});
 roomNav.addEventListener('click',event=>{if(event.target.closest('[data-view]'))closeRoomMenu();});
 function updateNavState(){
- const dialog=document.getElementById('laptop-window');let active=null;
- if(dialog.open&&laptopUnlocked){const focused=document.querySelector('.os-window.os-focused:not(.os-closing):not([hidden])');active=focused?.dataset.appWindow;}
+ const active=laptopActiveApp;
  for(const button of document.querySelectorAll('[data-os-route]'))button.setAttribute('aria-pressed',String(button.dataset.osRoute===active));
  document.getElementById('nav-resume').setAttribute('aria-pressed',String(resumeOpen||active==='resume'));
  document.querySelector('.room-wordmark').removeAttribute('aria-pressed');
 }
-function openPortfolioApp(name){const opener=document.activeElement;closeRoomMenu();if(resumeOpen)document.dispatchEvent(new CustomEvent('resume:close'));const launch=()=>{laptopPowered=true;laptopUnlocked=true;resetSignin();syncLaptop();if(!laptopDialog.open)openLaptop(opener);const win=showApp(name);if(win&&name==='contact'){if(win.maximized)toggleMaximize(win);placeWindow(win);}if(win&&name!=='contact'&&!win.maximized&&desktopElement.clientWidth>=LIUOS_CONFIG.windows.mobileBreakpoint)toggleMaximize(win);};if(laptopDialog.open&&laptopUnlocked)launch();else navigate('desk',launch);}
+function openPortfolioApp(name){const opener=document.activeElement;closeRoomMenu();if(resumeOpen)document.dispatchEvent(new CustomEvent('resume:close'));const launch=()=>document.dispatchEvent(new CustomEvent('laptop:open-app',{detail:{name,opener}}));if(laptopOpen)launch();else navigate('desk',launch);}
 document.querySelectorAll('[data-os-route]').forEach(button=>button.addEventListener('click',()=>openPortfolioApp(button.dataset.osRoute)));
-document.getElementById('nav-resume').addEventListener('click',()=>{closeRoomMenu();const opener=document.activeElement;if(laptopDialog.open)laptopDialog.close();openResume(opener);});
+document.getElementById('nav-resume').addEventListener('click',()=>{closeRoomMenu();const opener=document.activeElement;if(laptopOpen)document.dispatchEvent(new CustomEvent('laptop:close'));openResume(opener);});
 document.addEventListener('pointerdown',event=>{if(!roomNav.contains(event.target))closeRoomMenu();});
 window.addEventListener('resize',()=>{if(innerWidth>600)closeRoomMenu();});
 let pointer=null;
@@ -809,17 +768,17 @@ if(pointer.id!==event.pointerId)return;
 if(Math.hypot(event.clientX-pointer.startX,event.clientY-pointer.startY)<DRAFTING_CONFIG.interaction.clickPixels&&!pointer.dragged)return;
 if(!pointer.dragged)cancelCameraMove();pointer.dragged=true;currentView='custom';clearHighlight();yaw-=(event.clientX-pointer.x)*.007;pitch=Math.max(-.1,Math.min(1.569,pitch+(event.clientY-pointer.y)*.007));pointer.x=event.clientX;pointer.y=event.clientY;document.querySelectorAll('[data-view]').forEach(b=>b.setAttribute('aria-pressed','false'));render();
 });
-stage.addEventListener('pointerup',event=>{const click=pointer&&pointer.id===event.pointerId&&!pointer.dragged&&Math.hypot(event.clientX-pointer.startX,event.clientY-pointer.startY)<DRAFTING_CONFIG.interaction.clickPixels&&performance.now()-pointer.started<DRAFTING_CONFIG.interaction.clickMs;pointer=null;if(click&&!document.getElementById('laptop-window').open){const selected=pick(event);if(selected){renderer.domElement.focus({preventScroll:true});activate(selected.view);}else if(isCloseup())returnToRoom();}});
+stage.addEventListener('pointerup',event=>{const click=pointer&&pointer.id===event.pointerId&&!pointer.dragged&&Math.hypot(event.clientX-pointer.startX,event.clientY-pointer.startY)<DRAFTING_CONFIG.interaction.clickPixels&&performance.now()-pointer.started<DRAFTING_CONFIG.interaction.clickMs;pointer=null;if(click&&!laptopOpen){const selected=pick(event);if(selected){renderer.domElement.focus({preventScroll:true});activate(selected.view);}else if(isCloseup())returnToRoom();}});
 for(const event of ['pointercancel','lostpointercapture'])stage.addEventListener(event,()=>pointer=null);
 stage.addEventListener('pointerleave',()=>{parallax.targetX=parallax.targetY=0;requestParallax();clearHighlight();render();});
-function zoomRoom(event){event.preventDefault();if(moving||document.getElementById('laptop-window').open)return;const delta=event.deltaY*(event.deltaMode===1?16:event.deltaMode===2?stage.clientHeight:1),now=performance.now();
+function zoomRoom(event){event.preventDefault();if(moving||laptopOpen)return;const delta=event.deltaY*(event.deltaMode===1?16:event.deltaMode===2?stage.clientHeight:1),now=performance.now();
 if(isCloseup()){const cfg=DRAFTING_CONFIG.interaction,base=closeupView==='desk'?fittedRadius(presets[closeupView].radius):presets[closeupView].radius,limit=base*cfg.zoomLimitRatio,next=radius*Math.exp(delta*.001);
 if(delta>0&&next>=limit){if(now-lastZoomOut>cfg.zoomExitWindowMs)zoomExitDelta=0;zoomExitDelta+=delta;lastZoomOut=now;if(zoomExitDelta>=cfg.zoomExitDelta){returnToRoom();return;}}else zoomExitDelta=0;
 cancelCameraMove();radius=Math.max(18,Math.min(limit,next));render();return;}
 cancelCameraMove();radius=Math.max(18,Math.min(DRAFTING_CONFIG.camera.maxRadius,radius*Math.exp(delta*.001)));render();}
 stage.addEventListener('wheel',zoomRoom,{passive:false});
 renderer.domElement.addEventListener('webglcontextlost',event=>{event.preventDefault();status.textContent='Graphics connection lost. Reload this page to restore the model.';status.hidden=false;});
-screenHover(false);drawScreen();scheduleScreenClock();applyIntro(0);resize();status.hidden=true;startDraftingIntro();
+screenHover(false);document.dispatchEvent(new CustomEvent('laptop:screen-request'));applyIntro(0);resize();status.hidden=true;startDraftingIntro();
 window.deskStudy={measured,estimated,room,scene,camera,renderer,refrigerator,aboveFridge,aboveCounter,aboveStove,fridgePartition};
 }catch(error){status.hidden=false;status.textContent='The 3D view could not load. Check your internet connection and WebGL support, then reload. ';console.error(error);}
 </script>

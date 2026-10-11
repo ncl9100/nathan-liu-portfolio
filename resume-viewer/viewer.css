@@ -1,0 +1,43 @@
+/* Résumé viewer: the pop-up that shows the résumé. */
+
+#resume-window {
+  width: min(900px, 95vw);
+  background: #c5bcae;
+  max-height: 94dvh;
+}
+.resume-reading {
+  padding: 22px;
+  overflow: auto;
+  max-height: calc(94dvh - 55px);
+}
+.resume-reading img {
+  display: block;
+  width: 100%;
+  height: auto;
+  box-shadow: 0 12px 30px #0003;
+  background: white;
+}
+.pdf-download {
+  font-size: 12px;
+  padding: 8px;
+}
+
+/* Opening animation: the paper scales up slightly as it appears. */
+#resume-window[open] { animation: paper-in .25s ease-out; }
+@keyframes paper-in {
+  from { opacity: 0; transform: scale(.94); }
+  to { opacity: 1; transform: scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  #resume-window[open] { animation: none; }
+}
+@media (max-width: 600px) {
+  .resume-reading { padding: 10px; }
+}
+
+/* Leave room at the top for the nav bar, which moves inside the pop-up while it's open. */
+#resume-window { padding-top: 82px; }
+#resume-window .resume-reading {
+  padding: 16px;
+  max-height: calc(94dvh - 160px);
+}

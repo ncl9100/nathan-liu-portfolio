@@ -1,0 +1,16 @@
+<main id="stage" aria-label="Interactive 3D room model. Click objects to explore, or drag to look around."></main>
+<div id="drawing-labels" aria-label="Measured room dimensions"></div>
+<svg id="callout-lines" aria-hidden="true"></svg>
+<aside class="title-block" aria-label="Drawing title block"><div class="project"><small>Project</small>Personal Room</div><div class="title-fields"><div><small>Scale</small>1:20</div><div><small>Drawn by</small>Nathan Liu</div><div><small>Sheet</small>08</div><div><small>Date</small><time id="drawing-date"></time></div></div></aside>
+<div id="destinations" aria-label="Room destinations">
+<button class="hotspot" data-destination="desk" hidden>Sit at desk</button>
+
+<button class="hotspot" data-destination="resume" hidden>Read résumé</button>
+<button class="hotspot" data-destination="laptop" hidden>Turn on laptop</button>
+</div>
+
+<div id="status" role="status">Loading the 3D study…</div>
+
+<div class="room-feedback"><p class="hint" role="status" aria-live="polite">Click around. Most things in here do something.</p><button id="back-to-room" hidden>Back to room <span aria-hidden="true">↗</span></button></div>
+
+<img hidden aria-hidden="true" id="resume-image" src="assets/resume/resume.png" alt="Nathan Liu’s résumé, rendered directly from the supplied PDF. Download the PDF for selectable text.">

@@ -35,7 +35,9 @@ showcases my experience. Audience: recruiters and hiring managers for ML / data 
   exactly so the browser loads it once. If you change the version, change it in both files.
 
 ## Quality bar
-- Keep it working on phones (the nav has a mobile menu) and with `prefers-reduced-motion`.
+- **Compatibility is a priority.** Every change must work on phones, tablets, and desktops: touch and
+  mouse, screens from about 320px wide up, and current Chrome, Safari, Firefox, and Edge. Respect
+  `prefers-reduced-motion`. Check the phone layout before calling anything done.
 - No console errors.
 
 ## Run, test, and deploy
@@ -48,6 +50,7 @@ showcases my experience. Audience: recruiters and hiring managers for ML / data 
   3. Every nav link works, on desktop and in the mobile menu.
   4. Résumé opens and closes (button and Esc), and the camera returns.
   5. Console has no errors.
+  6. Check every page at phone width (about 390px) and desktop width.
 - Vercel deploys the `main` branch as-is, so `main` is the live site. Work on a branch and
   merge through a PR. Don't push, open PRs, or merge unless I ask.
 

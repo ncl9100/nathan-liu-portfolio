@@ -68,3 +68,7 @@ body :is(button, a, input, summary, [tabindex]):focus-visible {
 @media(max-width:600px){
   .resume-text{padding:18px}
 }
+
+/* Drafting-paper theme, shared by every page (the room's settings.js sets the same values at runtime). */
+:root{--paper-center:#f5f1e8;--paper-edge:#ded7ca;--drawing-ink:#655e52;--drawing-rule:#aaa091;--drawing-serif:Georgia,'Times New Roman',serif;color:var(--drawing-ink)}
+body{background:radial-gradient(ellipse at 48% 43%,var(--paper-center) 0%,var(--paper-center) 20%,var(--paper-edge) 100%)}

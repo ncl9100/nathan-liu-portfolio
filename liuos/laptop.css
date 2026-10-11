@@ -299,3 +299,12 @@ body:has(#laptop-window[open]){overflow:hidden}
   #laptop-window .desktop-icons{top:244px;bottom:90px;left:16px;right:16px;grid-template-columns:repeat(2,minmax(76px,1fr));align-content:start;overflow:auto;padding:4px;gap:10px}
   #laptop-window .desktop-icons button{width:100%;min-height:86px}
 }
+
+/* Dock divider (moved from the old inline styles). */
+.dock-divider{height:23px;width:1px;background:var(--os-border);margin:0 2px}
+@media(max-width:600px){
+  .dock-divider{margin:0 1px}
+}
+@media(max-width:600px){
+  .dock-divider{display:none}
+}

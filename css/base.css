@@ -49,3 +49,22 @@ body :is(button, a, input, summary, [tabindex]):focus-visible {
     outline: 2px solid var(--focus-accent) !important;
     outline-offset: 2px !important;
   }
+
+/* Shared by LiuOS and the résumé viewer: window title bars and the résumé text layout. */
+.windowbar{display:flex;align-items:center;justify-content:space-between;padding:15px 22px;background:#e4e8df}
+.windowbar h2{font-size:15px;margin:0}
+.windowbar button{background:#fff9}
+.windowbar{padding:9px 14px}
+@media(max-width:600px){
+  .windowbar button{padding:8px;font-size:10px}
+}
+.resume-text{background:#fff;color:#17211f;max-width:760px;margin:0 auto;padding:28px;user-select:text;font:14px/1.5 "Segoe UI",sans-serif;overflow-wrap:anywhere;box-shadow:0 4px 16px #0003}
+.resume-text h1{font-size:28px;margin:0 0 10px;letter-spacing:0}
+.resume-text h2{font-size:22px;border-bottom:1px solid #bbb;margin:22px 0 10px}
+.resume-text h3{font-size:16px;margin:14px 0 6px}
+.resume-text p{margin:0 0 8px}
+.resume-text ul{padding-left:22px;margin:8px 0 14px}
+.resume-text li+li{margin-top:7px}
+@media(max-width:600px){
+  .resume-text{padding:18px}
+}

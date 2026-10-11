@@ -1,0 +1,51 @@
+:root {
+    font-family: Inter, Segoe UI, sans-serif;
+    color: #243b38;
+    background: #eeeee8;
+  }
+
+  * { box-sizing: border-box; }
+
+  body { margin: 0; }
+  
+  button {
+    border: 0;
+    border-radius: 9px;
+    background: transparent;
+    color: #334a45;
+    padding: 10px 14px;
+    font-size: 12px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  button:hover { background: #e4eae2; }
+  
+  a { color: inherit; }
+
+  dialog {
+    border: 1px solid #a8b3a7;
+    border-radius: 18px;
+    padding: 0;
+    width: min(760px, 92vw);
+    max-height: 85dvh;
+    background: #faf9f3;
+    color: #243b38;
+    box-shadow: 0 30px 100px #1116;
+  }
+  dialog::backdrop {
+    background: #16291fb3;
+    backdrop-filter: blur(5px);
+  }
+  
+  [hidden] { display: none !important; }
+  
+  dialog {
+    width: min(920px, 94vw);
+    max-height: 90dvh;
+  }
+
+  /* Keyboard focus ring (accessibility). */
+body :is(button, a, input, summary, [tabindex]):focus-visible {
+    outline: 2px solid var(--focus-accent) !important;
+    outline-offset: 2px !important;
+  }

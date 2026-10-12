@@ -50,3 +50,11 @@
 /* Technical skills */
 .r-skills { margin: 0; padding-left: calc(10.8 * var(--pt)); font-size: calc(10 * var(--pt)); line-height: 1.2; }
 
+/* Narrow screens (phones): an exact copy would shrink the text to ~7px, so keep the styling but use
+   readable sizes and let lines rewrap. --r-zoom lets LiuOS make this text bigger or smaller.
+   Add .r-exact to the sheet to keep the exact page at any width (LiuOS does when it has room). */
+@container (max-width: 560px) {
+  .resume-sheet:not(.r-exact) { --pt: calc(1.25px * var(--r-zoom, 1)); min-height: 0; padding: 18px 16px; overflow-wrap: break-word; }
+  .resume-sheet:not(.r-exact) .r-row { flex-wrap: wrap; width: auto; }
+  .resume-sheet:not(.r-exact) .r-row > :last-child { margin-left: auto; }
+}

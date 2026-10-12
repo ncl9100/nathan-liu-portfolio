@@ -33,12 +33,6 @@
 /* ---- The paper frame (the sheet's own styles are in css/resume-sheet.css) */
 .sheet-frame { container-type: inline-size; box-shadow: 0 14px 40px #2b221633; }
 
-/* Phones (viewer only; LiuOS zooms instead): an exact copy would shrink the text to ~7px, so keep the styling but use readable sizes and let lines rewrap. */
-@container (max-width: 560px) {
-  #resume-window .resume-sheet { --pt: 1.25px; min-height: 0; padding: 18px 16px; }
-  #resume-window .r-row { flex-wrap: wrap; width: auto; }
-  #resume-window .r-row > :last-child { margin-left: auto; }
-}
 @media (max-width: 600px) {
   .viewer-column { margin-top: 64px; width: calc(100% - 20px); }
 }

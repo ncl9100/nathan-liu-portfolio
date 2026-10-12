@@ -117,7 +117,10 @@ function renderResume(parent){
  const less=osNode('button','−'),more=osNode('button','+'),fit=osNode('button','Fit width'),percent=osNode('output','100%');less.setAttribute('aria-label','Zoom out resume');more.setAttribute('aria-label','Zoom in resume');percent.setAttribute('aria-live','polite');zoomControls.append(less,percent,more,fit);toolbar.append(zoomControls,osLink('Download PDF',source,'Liu_Nathan_Resume.pdf'));
  const viewport=osNode('div',undefined,'os-resume-viewport');viewport.tabIndex=0;viewport.setAttribute('role','region');viewport.setAttribute('aria-label','Resume page; scroll to read');
  const paper=osNode('div',undefined,'os-resume-paper');paper.innerHTML=resumeSheet;viewport.append(paper);
- let zoom=1;function update(){const width=Math.min(cfg.pageMaxWidth,Math.max(1,viewport.clientWidth-28));paper.style.width=Math.round(width*zoom)+'px';percent.value=Math.round(zoom*100)+'%';percent.textContent=percent.value;less.disabled=zoom<=cfg.minZoom;more.disabled=zoom>=cfg.maxZoom;}
+ const sheet=paper.querySelector('.resume-sheet');
+ // Room for the exact page: zoom widens the page (its text scales with its width). Too narrow (phones):
+ // the page fits the window, text rewraps at a readable size, and zoom changes that size instead.
+ let zoom=1;function update(){const width=Math.min(cfg.pageMaxWidth,Math.max(1,viewport.clientWidth-28)),exact=width>=cfg.exactMinWidth;sheet.classList.toggle('r-exact',exact);paper.style.width=Math.round(exact?width*zoom:width)+'px';paper.style.setProperty('--r-zoom',exact?'1':String(zoom));percent.value=Math.round(zoom*100)+'%';percent.textContent=percent.value;less.disabled=zoom<=cfg.minZoom;more.disabled=zoom>=cfg.maxZoom;}
  less.addEventListener('click',()=>{zoom=Math.max(cfg.minZoom,zoom-cfg.zoomStep);update();});more.addEventListener('click',()=>{zoom=Math.min(cfg.maxZoom,zoom+cfg.zoomStep);update();});fit.addEventListener('click',()=>{zoom=1;update();viewport.scrollLeft=0;});
  parent.append(toolbar,viewport);const observer=new ResizeObserver(update);observer.observe(viewport);return {onFocus:update,onClose:()=>observer.disconnect()};
 }

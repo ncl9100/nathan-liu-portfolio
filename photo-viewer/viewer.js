@@ -58,6 +58,11 @@ document.addEventListener('photo:open', async ({ detail }) => {
   if (full && token === opened && dialog.open) image.src = detail.src;
 });
 
+function restoreNav() {
+  const nav = document.querySelector('.room-nav');
+  if (nav && nav.parentElement !== document.body) document.body.prepend(nav);
+}
+
 async function closePhoto() {
   if (!dialog.open || closing) return;
   closing = true;
@@ -65,9 +70,11 @@ async function closePhoto() {
     dialog.classList.add('closing');
     const shrink = print.animate([{ transform: 'none' }, { transform: fromStart() }], { duration: 350, easing: 'ease-in', fill: 'forwards' });
     await shrink.finished.catch(() => {});
-    dialog.close();
     shrink.cancel();
-  } else dialog.close();
+  }
+  // Put the nav back before the dialog leaves the top layer, or it vanishes for a frame (most obvious on phones).
+  restoreNav();
+  dialog.close();
 }
 
 document.addEventListener('photo:close', closePhoto);
@@ -83,6 +90,6 @@ dialog.addEventListener('close', () => {
   opened++;
   closing = false;
   dialog.classList.remove('closing');
-  document.body.prepend(document.querySelector('.room-nav'));
+  restoreNav();
   announce('photo:closed');
 });

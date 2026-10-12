@@ -120,13 +120,31 @@
 .os-window-title .os-icon{width:16px;height:16px;color:var(--os-accent)}
 .os-window-actions{display:flex;gap:3px}
 #laptop-window .os-window-actions button{width:27px;height:27px;min-width:0;padding:5px;border-color:transparent;border-radius:var(--os-radius);display:grid;place-items:center}
+#laptop-window .os-window-actions [data-window-action="close"]:hover,
+#laptop-window .os-window-actions [data-window-action="close"]:focus-visible{background:#c42b1c;border-color:#c42b1c;color:#fff}
+#laptop-window .os-window-actions [data-window-action="close"]:hover .os-icon,
+#laptop-window .os-window-actions [data-window-action="close"]:focus-visible .os-icon{color:#fff}
+#laptop-window .os-window-actions [data-window-action="close"]:active{background:#9a2216;border-color:#9a2216;color:#fff}
 .os-window-actions .os-icon{width:14px;height:14px}
+.os-window-resize{position:absolute;z-index:4;touch-action:none}
+.os-resize-n,.os-resize-s{left:8px;right:8px;height:8px;cursor:ns-resize}
+.os-resize-e,.os-resize-w{top:8px;bottom:8px;width:8px;cursor:ew-resize}
+.os-resize-n{top:0}
+.os-resize-s{bottom:0}
+.os-resize-e{right:0}
+.os-resize-w{left:0}
+.os-resize-ne,.os-resize-nw,.os-resize-se,.os-resize-sw{width:12px;height:12px}
+.os-resize-ne{top:0;right:0;cursor:nesw-resize}
+.os-resize-nw{top:0;left:0;cursor:nwse-resize}
+.os-resize-se{bottom:0;right:0;cursor:nwse-resize}
+.os-resize-sw{bottom:0;left:0;cursor:nesw-resize}
+.os-window.os-maximized .os-window-resize{display:none}
 .os-window-content{padding:24px;overflow:auto;flex:1;font-size:var(--os-small);line-height:1.7}
 .os-window-content h3{font-weight:400;font-size:22px;letter-spacing:-.5px;margin:0 0 13px}
 /* :not(:where(...)) keeps these off the shared résumé sheet without making the selectors any stronger. */
 .os-window-content p:not(:where(.resume-sheet *)){color:var(--os-muted);margin:0 0 18px}
 .os-todo{font-family:var(--os-labelFont);text-transform:uppercase;font-size:var(--os-small);letter-spacing:.12em;padding:5px 8px;display:inline-block;color:var(--os-accent);border:1px solid var(--os-border);border-radius:var(--os-radius);margin-bottom:15px}
-.os-window.os-maximized{left:12px!important;top:52px!important;width:calc(100% - 24px)!important;height:calc(100% - 137px)!important;max-height:none;max-width:none}
+.os-window.os-maximized{left:0!important;top:48px!important;width:100%!important;height:calc(100% - 122px)!important;max-height:none;max-width:none;border-radius:0}
 .os-dock{position:absolute;bottom:17px;left:50%;transform:translateX(-50%);z-index:20;display:flex;gap:5px;align-items:center;padding:7px;border:1px solid var(--os-border);border-radius:var(--os-radius);background:var(--os-base);box-shadow:0 14px 30px var(--os-shadow);max-width:calc(100% - 24px)}
 .os-pinned{display:flex;gap:4px}
 #laptop-window .os-dock button{position:relative;width:38px;height:42px;padding:8px;display:grid;place-items:center;border-color:transparent;border-radius:var(--os-radius);background:transparent;flex-shrink:0}
@@ -159,6 +177,7 @@
   .os-dock-clock{min-width:45px;font-size:var(--os-small);padding:0 2px}
   .os-dock .os-icon{width:18px;height:18px}
   .os-window-actions [data-window-action="maximize"]{display:none!important}
+  .os-window-resize{display:none}
 }
 @media(prefers-reduced-motion:reduce){
   .os-window,.os-window.os-closing{animation:none!important}
@@ -229,8 +248,8 @@ body:has(#laptop-window[open]){overflow:hidden}
 .os-terminal-form input{width:calc(100% - 138px);margin-left:8px;caret-color:transparent}
 .os-terminal-cursor{position:absolute;left:calc(var(--terminal-start,110px) + var(--terminal-caret,0px));top:0;color:var(--os-text)}
 @media(min-width:600px){
-  .os-window{min-width:0;max-height:none}
-  .os-window.os-maximized{left:12px!important;top:52px!important;width:calc(100% - 24px)!important;height:calc(100% - 137px)!important}
+  .os-window{min-width:0;max-width:none;max-height:none}
+  .os-window.os-maximized{left:0!important;top:48px!important;width:100%!important;height:calc(100% - 122px)!important}
 }
 #laptop-window .room-nav{font-family:Georgia,serif;color:#332c21;background:#f5f1e8f2}
 #laptop-window .room-nav button{font:inherit;color:#332c21;background:transparent;border:0;border-radius:3px;padding:8px 10px;box-shadow:none;letter-spacing:normal;transform:none}
@@ -313,4 +332,45 @@ body:has(#laptop-window[open]){overflow:hidden}
 }
 @media(max-width:600px){
   .dock-divider{display:none}
+}
+
+/* Full-width taskbar, edge-to-edge windows, and the phone-shaped mobile frame. */
+#laptop-window{padding:6px 12px 12px;--os-dock-height:52px}
+#laptop-window[open]{display:flex;flex-direction:column}
+.os-bezel{position:relative;top:auto;left:auto;right:auto;flex:none;padding:2px 4px 8px;z-index:8;color:var(--os-base)}
+.os-brand,.os-bezel .os-mark{color:var(--os-base);border-color:var(--os-base)}
+.os-camera{position:static;left:auto;top:auto;width:6px;height:6px;margin:0;background:var(--os-base);opacity:.45}
+#laptop-window #close-laptop{font-family:var(--os-labelFont);letter-spacing:.08em;text-transform:uppercase;font-weight:600;padding:4px 2px;background:transparent;border-color:transparent;color:color-mix(in srgb,var(--os-base) 72%,transparent)}
+#laptop-window #close-laptop:hover,#laptop-window #close-laptop:focus-visible{color:var(--os-base);background:transparent;border-color:transparent}
+#laptop-window .lock-screen,#laptop-window .os-desktop{flex:1 1 auto;min-height:0}
+.os-window.os-maximized{left:0!important;top:0!important;width:100%!important;height:calc(100% - var(--os-dock-height))!important;max-height:none;max-width:none;border-radius:0;border-width:0;box-shadow:none}
+.os-dock{position:absolute;left:0;right:0;bottom:0;transform:none;z-index:20;display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:8px;height:var(--os-dock-height);padding:0 10px;border:0;border-top:1px solid var(--os-border);border-radius:0;background:var(--os-base);box-shadow:none;width:100%;max-width:none}
+.os-tray-left{justify-self:start;min-width:0}
+.os-dock-center{display:flex;align-items:center;justify-content:center;gap:2px;min-width:0}
+.os-tray-right{justify-self:end;display:flex;align-items:center;gap:10px}
+.os-weather,.os-battery{display:flex;align-items:center;gap:6px;font-family:var(--os-labelFont);color:var(--os-text);line-height:1.15;white-space:nowrap}
+.os-weather .os-icon,.os-battery .os-icon{width:16px;height:16px;flex-shrink:0;color:var(--os-accent)}
+.os-weather-label{color:var(--os-muted)}
+.os-dock-clock{display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:1px;line-height:1.15;min-width:0;text-align:right;padding:0}
+#laptop-window .os-dock-clock,#laptop-window #desktop-clock-time{font-size:var(--os-small)!important;color:var(--os-text)}
+#laptop-window #desktop-clock-date{font-size:10px!important;color:var(--os-muted)}
+#laptop-window .start-menu{bottom:calc(var(--os-dock-height) + 8px);left:8px;transform:none}
+.os-search{bottom:calc(var(--os-dock-height) + 8px);left:8px;transform:none}
+#laptop-window .desktop-icons{top:20px}
+.os-widget{top:20px}
+#laptop-window .os-dock button{width:40px;height:40px;min-width:40px;min-height:40px;padding:8px}
+@media(min-width:600px){
+  .os-window.os-maximized{left:0!important;top:0!important;width:100%!important;height:calc(100% - var(--os-dock-height))!important}
+}
+@media(max-width:600px){
+  #laptop-window{width:min(380px,calc(100vw - 20px));height:calc(100dvh - 76px);max-height:calc(100dvh - 76px);margin:64px auto 12px;padding:12px 8px 14px;border-radius:32px}
+  .os-bezel{padding:0 4px 8px}
+  #laptop-window .lock-screen,#laptop-window .os-desktop{height:auto;max-height:none;border-radius:20px}
+  .os-window,.os-window.os-maximized{left:0!important;top:0!important;width:100%!important;height:calc(100% - var(--os-dock-height))!important;padding-bottom:0;border-radius:0}
+  .os-dock{bottom:0;padding:0 8px;gap:6px;width:100%;max-width:none;height:var(--os-dock-height)}
+  #laptop-window .os-dock button{width:34px;height:34px;min-width:34px;min-height:34px;padding:6px}
+  .os-weather-label,.os-battery span{display:none}
+  .os-tray-right{gap:6px}
+  #laptop-window .os-widget{top:16px}
+  #laptop-window .desktop-icons{top:200px;bottom:calc(var(--os-dock-height) + 12px)}
 }

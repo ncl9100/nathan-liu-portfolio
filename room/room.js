@@ -2,7 +2,7 @@
 //
 // Listens for:  room:go {view}                 move the camera (nav)
 //               resume:opened / resume:closed  track the résumé viewer; go to the shelves view on close
-//               laptop:opened / laptop:closed  pause while LiuOS covers the room
+//               laptop:opened / laptop:closed  pause while LiuOS covers the room; go to the shelves view on close
 //               laptop:screen {canvas,...}     show LiuOS's picture on the 3D laptop screen
 //               photo:opened / photo:closed    track the photo pop-up; hide the counter print while it's open
 // Announces:    room:view {view}               where the camera is (nav highlights)
@@ -183,14 +183,15 @@ const windowGroup=new THREE.Group();fixtures.add(windowGroup);
 box(.5,59,90,.3,57,67.5,new THREE.MeshStandardMaterial({color:'#a8b9ba',roughness:.5}),windowGroup);
 for(let i=0;i<30;i++)box(.75,.7,90,1,28+i*1.9,67.5,white,windowGroup);
 rb(3,1.5,94,1,26.5,67.5,white);rb(5,23,48,3,11.5,67.5,white);
-// Your bed: the supplied outer footprint, with a 56-inch headboard offset.
+// Your bed: the supplied outer footprint. Headboard is an open rectangle of the
+// same 2-inch stock as the posts — two posts, a top rail, and a lower rail.
 function bed(x,z,length,width,mat,headAtStart){
 const bedGroup=new THREE.Group();fixtures.add(bedGroup);
 const b=(...args)=>box(...args.slice(0,6),args[6]||material,bedGroup);
+const t=2,headH=40,headX=x+(headAtStart?-1:1)*(length/2-1),footX=x+(headAtStart?1:-1)*(length/2-1),sideZ=[z-width/2+1,z+width/2-1];
 b(length,3,width,x,17,z,trim);b(length-3,7,width-2,x,22,z,mat);
-for(const bx of [x-length/2+1,x+length/2-1])for(const bz of [z-width/2+1,z+width/2-1])b(2,18,2,bx,9,bz);
-const headX=x+(headAtStart?-1:1)*(length/2-1);
-b(2,17,width,headX,31,z,material);
+for(const bz of sideZ){b(t,headH-t,t,headX,(headH-t)/2,bz);b(t,18,t,footX,9,bz);}
+b(t,t,width,headX,headH-t/2,z);b(t,t,width-t*2,headX,26.5,z);
 // A curved pillow and a subdivided blanket make the bed feel occupied.
 const pillow=new THREE.Mesh(new THREE.SphereGeometry(1,24,16),mat);pillow.scale.set(7,2.4,(width-10)/2);pillow.position.set(headX+(headAtStart?9:-9),27,z);pillow.castShadow=true;pillow.receiveShadow=true;bedGroup.add(pillow);
 const cloth=new THREE.PlaneGeometry(length-16,width+4,48,32);cloth.rotateX(-Math.PI/2);const positions=cloth.attributes.position;
@@ -608,7 +609,7 @@ Object.defineProperty(presets,'seated',{enumerable:true,get:()=>camera.aspect<.8
 let animation=0,moving=false,currentView='angle';
 const hint=document.querySelector('.hint');let captionTimer=0,captionHideTimer=0;
 const defaultCaption='Click around. Most things in here do something.';
-const viewCaptions={angle:defaultCaption,front:'The floor plan. Click an object to explore.',desk:'You’re at your desk. Click the laptop to open LiuOS.',bed:'You’re on your bed. Drag to look around.',otherBed:'Your roommate’s bed. Drag to look around.',side:'You’re in the kitchen. Drag to look around.',fridge:'The fridge. Drag to look around.',seated:'Pull up a stool. Click a photo to look closer.',details:'Your shelves and desk. Click the lamp or laptop.',resume:'Your resume, up close.',zoom:'A closer look. Click outside the room to step back.'};
+const viewCaptions={angle:defaultCaption,front:'The floor plan. Click an object to explore.',desk:'You’re at your desk. Click the laptop to open LiuOS.',bed:'You’re on your bed. Drag to look around.',otherBed:'Your roommate’s bed. Drag to look around.',side:'You’re in the kitchen. Drag to look around.',fridge:'The fridge. Drag to look around.',seated:'Pull up a stool. Click a photo to look closer.',details:'Still at the desk. Click the laptop, or wander.',resume:'Your resume, up close.',zoom:'A closer look. Click outside the room to step back.'};
 function hideCaption(){clearTimeout(captionTimer);clearTimeout(captionHideTimer);hint.classList.remove('caption-visible');captionHideTimer=setTimeout(()=>hint.hidden=true,reducedMotion()?0:250);}
 function showCaption(message=defaultCaption,duration=DRAFTING_CONFIG.interaction.captionMs){hideCaption();clearTimeout(captionHideTimer);hint.hidden=false;hint.textContent=message;hint.classList.add('caption-visible');captionTimer=setTimeout(hideCaption,duration);}
 
@@ -640,8 +641,12 @@ const closeupViews=new Set(['desk','bed','otherBed','side','fridge','seated','de
 let closeupView=null,firstCloseupSeen=false,zoomExitDelta=0,lastZoomOut=0;
 const backToRoom=document.getElementById('back-to-room');
 function isCloseup(){return closeupView!==null;}
-function updateBackControl(){backToRoom.hidden=!isCloseup()||laptopOpen||resumeOpen||photoOpen;}
-function returnToRoom(){if(laptopOpen||resumeOpen||photoOpen)return;activate('angle');}
+function updateBackControl(){
+backToRoom.hidden=!isCloseup()||laptopOpen||resumeOpen||photoOpen;
+const label=closeupView==='desk'?'Back to desk':'Back to room';
+if(backToRoom.dataset.label!==label){backToRoom.dataset.label=label;backToRoom.innerHTML=label+' <span aria-hidden="true">↗</span>';}
+}
+function returnToRoom(){if(laptopOpen||resumeOpen||photoOpen)return;activate(closeupView==='desk'?'details':'angle');}
 backToRoom.addEventListener('click',returnToRoom);
 // The roommate's-bed caption always shows; the one-time step-back hint waits for the next close-up.
 function arrivalCaption(view){if(closeupViews.has(view)&&view!=='otherBed'&&!firstCloseupSeen){firstCloseupSeen=true;return DRAFTING_CONFIG.interaction.firstCloseupHint;}return viewCaptions[view]||defaultCaption;}
@@ -679,9 +684,11 @@ function openPhoto(index){if(moving||photoOpen||resumeOpen)return;if(currentView
 document.addEventListener('photo:opened',()=>{photoOpen=true;clearHighlight();if(openPrint)openPrint.print.visible=false;updateBackControl();render();});
 document.addEventListener('photo:closed',()=>{photoOpen=false;if(openPrint)openPrint.print.visible=true;openPrint=null;render();renderer.domElement.focus({preventScroll:true});});
 // The room asks LiuOS to open only when the camera is at the desk.
-function requestLaptop(opener=document.activeElement){if(currentView!=='desk'||moving)return;document.dispatchEvent(new CustomEvent('laptop:open',{detail:{opener}}));}
+// Closing it goes to the shelves view, same as the résumé's "Back to desk".
+let laptopReturnFocus=null;
+function requestLaptop(opener=document.activeElement){if(currentView!=='desk'||moving)return;laptopReturnFocus=opener;document.dispatchEvent(new CustomEvent('laptop:open',{detail:{opener}}));}
 document.addEventListener('laptop:opened',()=>{laptopOpen=true;updateBackControl();cancelAnimationFrame(waterFrame);resetParallax();});
-document.addEventListener('laptop:closed',()=>{laptopOpen=false;render();if(waterOn&&!document.hidden&&!reducedMotion())waterFrame=requestAnimationFrame(animateWater);});
+document.addEventListener('laptop:closed',()=>{laptopOpen=false;render();if(waterOn&&!document.hidden&&!reducedMotion())waterFrame=requestAnimationFrame(animateWater);navigate('details',()=>{if(laptopReturnFocus instanceof HTMLElement&&laptopReturnFocus.isConnected)laptopReturnFocus.focus({preventScroll:true});});});
 // LiuOS paints its own screen picture; the room only displays it on the 3D laptop.
 let screenTexture=null;
 document.addEventListener('laptop:screen',({detail})=>{laptopScreenPowered=detail.powered;if(!screenTexture){screenTexture=new THREE.CanvasTexture(detail.canvas);screenTexture.colorSpace=THREE.SRGBColorSpace;screenTexture.anisotropy=renderer.capabilities.getMaxAnisotropy();screenTexture.minFilter=THREE.LinearMipmapLinearFilter;screenTexture.magFilter=THREE.LinearFilter;screenFace.material.map=screenTexture;screenFace.material.needsUpdate=true;}else if(detail.redrawn)screenTexture.needsUpdate=true;render();});

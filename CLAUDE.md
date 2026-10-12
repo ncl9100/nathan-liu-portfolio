@@ -11,8 +11,10 @@ showcases my experience. Audience: recruiters and hiring managers for ML / data 
   callouts, title block.
 - **LiuOS** (the laptop's desktop) — exists: lock screen, apps, windows, dock. Planned: redesign
   it to match my real laptop.
-- **Career content** — exists: nav opens LiuOS apps and the résumé pop-up. Planned: nav links go
-  to their own About / Experience / Projects / Résumé pages, not LiuOS.
+- **Career content** — exists: the same nav on every page links to Experience, Projects, and
+  Contact pages (in `pages/`), and Résumé opens the PDF in a new tab. Planned: an About page, design
+  TBD (an animated character that speaks facts about me is one idea worth exploring); until then,
+  About opens LiuOS.
 
 "Planned" items are context only. Don't start them, or build toward them, unless I ask.
 
@@ -29,7 +31,11 @@ showcases my experience. Audience: recruiters and hiring managers for ML / data 
     reads `LIUOS_CONFIG` for the 3D screen's brightness). Never import another component's logic.
 - Facts about me (profile, projects, experience) live only in `content/portfolio.js`. Update them
   there; don't copy them elsewhere.
-- Shared styles: `css/base.css`. Shared files: `assets/`.
+- Career pages live in `pages/<name>/index.html` with their own `.css` and `.js`. Shared page
+  styles are in `pages/pages.css` and the scroll fade-in is `pages/reveal.js`. Every page sets
+  `<body data-page="...">` (the nav uses it) and ends with a "Back to the room" button.
+- Shared styles: `css/base.css` (including the drafting-paper theme). Shared files: `assets/`
+  (project screenshots in `assets/projects/`).
 - CSS order matters: `nav/nav.css` loads last on purpose (see the comment in `index.html`).
 - Three.js is imported by URL in both `room/room.js` and `liuos/laptop.js`. The URLs must match
   exactly so the browser loads it once. If you change the version, change it in both files.

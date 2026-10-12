@@ -7,7 +7,7 @@ export const LIUOS_CONFIG={
  typography:{small:12,body:14,title:16,section:22,large:28,bodyLineHeight:1.5},
  font:'Georgia,"Times New Roman",serif',labelFont:'Inter,"Segoe UI",sans-serif',blur:0,radius:0,transitionMs:300,
  puzzle:{answers:['python'],hint:'Named after a comedy group; also a kind of snake.',celebrationMs:380},
- apps:[{id:'projects',title:'Projects',icon:'folder'},{id:'experience',title:'Experience',icon:'briefcase'},{id:'terminal',title:'Terminal',icon:'terminal'},{id:'resume',title:'Résumé',icon:'document'},{id:'about',title:'About me',icon:'person'},{id:'contact',title:'Contact',icon:'mail'},{id:'guide',title:'AI guide',icon:'spark'}],
+ apps:[{id:'projects',title:'Projects',icon:'folder'},{id:'experience',title:'Experience',icon:'briefcase'},{id:'terminal',title:'Terminal',icon:'terminal'},{id:'resume',title:'Resume',icon:'document'},{id:'about',title:'About me',icon:'person'},{id:'contact',title:'Contact',icon:'mail'},{id:'guide',title:'AI guide',icon:'spark'}],
  profile:{...profile,avatarSelector:"#signin-panel .avatar img",aboutHeading:"About Nathan"},
  projects,
  experience,
@@ -46,7 +46,7 @@ export const LIUOS_CONFIG={
   "greeting": "LiuOS terminal · type help to explore.",
   "passwordNote": "Favorite language? That's the lock screen password. No hints here.",
   "help": "help · whoami · experience · projects · ls projects · open hottakes · open marginguard · open website · open <project-id> · cat resume · contact · clear",
-  "resumeMessage": "Opening the original résumé PDF.",
+  "resumeMessage": "Opening the original resume PDF.",
   "notFound": "Project not found. Use projects for available IDs.",
   "unknown": "Unknown command. Type help.",
   "openingPrefix": "Opening "

@@ -33,7 +33,10 @@
 .os-date,.os-continue,.os-lock-wordmark{font-family:var(--os-labelFont);text-transform:uppercase;letter-spacing:.12em}
 .os-date{font-size:14px;margin-top:12px;color:var(--os-muted);pointer-events:none}
 .os-continue{position:absolute;bottom:62px;font-size:var(--os-small);color:var(--os-muted);pointer-events:none}
-.os-continue span{display:block;color:var(--os-accent);font-size:22px;margin-bottom:12px}
+.os-continue span[aria-hidden]{display:block;color:var(--os-accent);font-size:22px;margin-bottom:12px}
+/* Phones and tablets have no keys to press, so they get their own wording. */
+.os-continue-touch{display:none}
+@media(pointer:coarse){.os-continue-mouse{display:none}.os-continue-touch{display:inline}}
 .os-signin{position:relative;width:min(340px,calc(100% - 40px));margin:76px auto 28px;padding:27px 26px 20px;background:var(--os-base);border:1px solid var(--os-border);border-radius:var(--os-radius);box-shadow:0 14px 30px var(--os-shadow);opacity:0;transform:translateY(25px);transition:opacity 360ms,transform 480ms cubic-bezier(.2,.7,.2,1);visibility:hidden}
 .signin-revealed .os-lock-curtain{opacity:0;transform:translateY(-90px);pointer-events:none}
 .signin-revealed .os-signin{opacity:1;transform:none;visibility:visible}
@@ -337,7 +340,9 @@ body:has(#laptop-window[open]){overflow:hidden}
 /* Full-width taskbar, edge-to-edge windows, and the phone-shaped mobile frame. */
 #laptop-window{padding:6px 12px 12px;--os-dock-height:52px}
 #laptop-window[open]{display:flex;flex-direction:column}
-.os-bezel{position:relative;top:auto;left:auto;right:auto;flex:none;padding:2px 4px 8px;z-index:8;color:var(--os-base)}
+/* Three equal-width side columns keep the camera dot in the exact middle, however long the labels are. */
+.os-bezel{position:relative;top:auto;left:auto;right:auto;flex:none;padding:2px 4px 8px;z-index:8;color:var(--os-base);display:grid;grid-template-columns:1fr auto 1fr}
+.os-bezel>#close-laptop{justify-self:end}
 .os-brand,.os-bezel .os-mark{color:var(--os-base);border-color:var(--os-base)}
 .os-camera{position:static;left:auto;top:auto;width:6px;height:6px;margin:0;background:var(--os-base);opacity:.45}
 #laptop-window #close-laptop{font-family:var(--os-labelFont);letter-spacing:.08em;text-transform:uppercase;font-weight:600;padding:4px 2px;background:transparent;border-color:transparent;color:color-mix(in srgb,var(--os-base) 72%,transparent)}

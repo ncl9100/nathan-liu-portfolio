@@ -76,10 +76,13 @@ const mesh=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),faces);mesh.position.set(
 // Top faces land exactly at the measured heights.
 box(measured.width,estimated.desktopThickness,measured.depth,0,30-estimated.desktopThickness/2,0);
 const shelfZ=-measured.depth/2+measured.shelfDepth/2;
+// Shelves fit between the uprights and each board stops at its front rail. Two faces in the
+// same spot flicker as the camera moves, so no piece shares a face with another.
+const shelfSpan=measured.shelfWidth-2*estimated.upright,railDepth=0.65;
 for(const height of measured.shelfHeights){
-box(measured.shelfWidth,estimated.board,measured.shelfDepth,0,height-estimated.board/2,shelfZ);
+box(shelfSpan,estimated.board,measured.shelfDepth-railDepth,0,height-estimated.board/2,shelfZ-railDepth/2);
 // A tall front rail does not imply a 2.75-inch-thick whole shelf board.
-box(measured.shelfWidth,measured.frontStripHeight,0.65,0,height-measured.frontStripHeight/2,shelfZ+measured.shelfDepth/2-0.325,trim);
+box(shelfSpan,measured.frontStripHeight,railDepth,0,height-measured.frontStripHeight/2,shelfZ+measured.shelfDepth/2-railDepth/2,trim);
 }
 const aboveDesk=75-30;
 for(const x of [-21+estimated.upright/2,21-estimated.upright/2])box(estimated.upright,aboveDesk,10,x,30+aboveDesk/2,shelfZ);
@@ -112,7 +115,8 @@ const powerButton=box(.7,.13,.55,.9,30.55,-.5,keyMat,keys);textSurface('⏻',.5,
 const chair=new THREE.Group();scene.add(chair);
 box(18,1.5,17,-7,17,26,material,chair);box(16.5,1,15.5,-7,18.2,26,chairMat,chair);
 for(const x of [-15,1])for(const z of [19,33])box(1.2,17,1.2,x,8.5,z,material,chair);
-for(const x of [-15,1])box(1.2,18,1.2,x,27,33,material,chair);
+// The back posts stop half an inch under the backrest's top, so the two tops don't flicker.
+for(const x of [-15,1])box(1.2,17.5,1.2,x,26.75,33,material,chair);
 box(17,11,1.5,-7,30.5,33,chairMat,chair);
 // Floor and room structure are built below after relocating the desk.
 scene.add(new THREE.HemisphereLight(0xe8efff,0x8b7153,1.35));
@@ -172,7 +176,8 @@ partitionBox(2,passThrough.height,6,201,(passThrough.bottom+passThrough.top)/2,k
 partitionBox(2,passThrough.height,kitchenEndZ-openingEndZ,201,(passThrough.bottom+passThrough.top)/2,(kitchenEndZ+openingEndZ)/2);
 partitionBox(.15,35,passThrough.width,199.9,17.5,openingCenterZ,new THREE.MeshStandardMaterial({color:'#343638',roughness:.8}));
 // Narrow white ledge around the room-side edge, below the clear opening.
-partitionBox(6,1,passThrough.width,200,passThrough.bottom-.5,openingCenterZ,white);
+// It sits a tenth of an inch proud of the wall top so the two surfaces don't flicker.
+partitionBox(6,1,passThrough.width,200,passThrough.bottom-.4,openingCenterZ,white);
 scene.updateMatrixWorld(true);
 const clearHeight=new THREE.Box3().setFromObject(upperPartition).min.y-new THREE.Box3().setFromObject(lowerPartition).max.y;
 if(Math.abs(clearHeight-17.5)>.01)throw new Error('Kitchen pass-through height must be 17.5 inches.');
@@ -195,7 +200,8 @@ function bed(x,z,length,width,mat,headAtStart){
 const bedGroup=new THREE.Group();fixtures.add(bedGroup);
 const b=(...args)=>box(...args.slice(0,6),args[6]||material,bedGroup);
 const t=2,headH=40,headX=x+(headAtStart?-1:1)*(length/2-1),footX=x+(headAtStart?1:-1)*(length/2-1),sideZ=[z-width/2+1,z+width/2-1];
-b(length,3,width,x,17,z,trim);b(length-3,7,width-2,x,22,z,mat);
+// The frame runs between the posts instead of through them, so their outer faces don't flicker.
+b(length-t*2,3,width,x,17,z,trim);b(length-3,7,width-2,x,22,z,mat);
 for(const bz of sideZ){b(t,headH-t,t,headX,(headH-t)/2,bz);b(t,18,t,footX,9,bz);}
 b(t,t,width,headX,headH-t/2,z);b(t,t,width-t*2,headX,26.5,z);
 // A curved pillow and a subdivided blanket make the bed feel occupied.
@@ -657,7 +663,7 @@ function isCloseup(){return closeupView!==null;}
 function updateBackControl(){
 backToRoom.hidden=!isCloseup()||laptopOpen||resumeOpen||photoOpen;
 const label=closeupView==='desk'?'Back to desk':'Back to room';
-if(backToRoom.dataset.label!==label){backToRoom.dataset.label=label;backToRoom.innerHTML=label+' <span aria-hidden="true">↗</span>';}
+if(backToRoom.dataset.label!==label){backToRoom.dataset.label=label;backToRoom.textContent=label;}
 }
 function returnToRoom(){if(laptopOpen||resumeOpen||photoOpen)return;activate(closeupView==='desk'?'details':'angle');}
 backToRoom.addEventListener('click',returnToRoom);

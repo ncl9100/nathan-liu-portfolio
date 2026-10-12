@@ -1,14 +1,12 @@
 // Room: the 3D drafting-sheet view of the room (scene, camera, intro, hotspots, captions).
 //
 // Listens for:  room:go {view}                 move the camera (nav)
-//               room:open-resume {opener}      move to the résumé, then open the viewer (nav)
-//               room:open-app {name,opener}    move to the desk, then open a LiuOS app (nav)
 //               resume:opened / resume:closed  track the viewer; move the camera back on close
 //               laptop:opened / laptop:closed  pause while LiuOS covers the room
 //               laptop:screen {canvas,...}     show LiuOS's picture on the 3D laptop screen
 // Announces:    room:view {view}               where the camera is (nav highlights)
 //               resume:open / resume:close     ask the viewer to open or close
-//               laptop:open / laptop:close / laptop:open-app / laptop:screen-request
+//               laptop:open / laptop:close / laptop:screen-request
 
 import { DRAFTING_CONFIG } from './settings.js';
 import { LIUOS_CONFIG } from '../liuos/settings.js'; // only for the 3D screen's brightness
@@ -465,11 +463,9 @@ hideCaption();
 const reduced=reducedMotion();
 function tick(now){if(cameraMove!==move)return;const t=reduced?1:Math.min((now-time)/900,1);const k=t*t*(3-2*t);yaw=start.yaw+(p.yaw-start.yaw)*k;pitch=start.pitch+(p.pitch-start.pitch)*k;radius=start.radius+((['angle','front','desk'].includes(view)?fittedRadius(p.radius):p.radius)-start.radius)*k;camera.fov=start.fov+((p.fov||38)-start.fov)*k;camera.updateProjectionMatrix();target.lerpVectors(start.target,destination,k);if(t===1){moving=false;showCaption(arrivalCaption(view));}render();if(t<1)animation=requestAnimationFrame(tick);else{const callback=move.onArrive,action=queuedCameraAction;cameraMove=null;queuedCameraAction=null;animation=0;if(callback)callback();if(action)activate(action);}}animation=requestAnimationFrame(tick);
 }
-// Requests from the nav. The room owns the camera, so it decides how to get there.
+// Requests from the nav (room:go). The room owns the camera, so it decides how to get there.
 const announceView=view=>document.dispatchEvent(new CustomEvent('room:view',{detail:{view}}));
 document.addEventListener('room:go',({detail:{view}})=>{if(laptopOpen)document.dispatchEvent(new CustomEvent('laptop:close'));if(resumeOpen)document.dispatchEvent(new CustomEvent('resume:close'));navigate(view);});
-document.addEventListener('room:open-resume',({detail:{opener}})=>{if(laptopOpen)document.dispatchEvent(new CustomEvent('laptop:close'));openResume(opener);});
-document.addEventListener('room:open-app',({detail:{name,opener}})=>{if(resumeOpen)document.dispatchEvent(new CustomEvent('resume:close'));const launch=()=>document.dispatchEvent(new CustomEvent('laptop:open-app',{detail:{name,opener}}));if(laptopOpen)launch();else navigate('desk',launch);});
 function screenHover(active){screenFace.material.color.setScalar(active?LIUOS_CONFIG.screen.hoverBrightness:LIUOS_CONFIG.screen.brightness);}
 document.addEventListener('keydown',event=>{if(event.key==='Escape'&&moving&&!laptopOpen&&!resumeOpen){event.preventDefault();cancelCameraMove();pointer=null;render();}});
 

@@ -35,8 +35,7 @@ summary{cursor:pointer}
 .tabs button[aria-pressed=true]{background:#254c43}
 .controls{flex-wrap:wrap;justify-content:center;width:max-content}
 .hint{background:#fff9;border-radius:15px;padding:6px 12px;width:max-content;max-width:90vw}
-:root{--paper-center:#f5f1e8;--paper-edge:#ded7ca;--drawing-ink:#655e52;--drawing-rule:#aaa091;--drawing-serif:Georgia,'Times New Roman',serif;color:var(--drawing-ink)}
-body,#stage{background:radial-gradient(ellipse at 48% 43%,var(--paper-center) 0%,var(--paper-center) 20%,var(--paper-edge) 100%)}
+#stage{background:radial-gradient(ellipse at 48% 43%,var(--paper-center) 0%,var(--paper-center) 20%,var(--paper-edge) 100%)}
 #stage{min-height:0;overflow:hidden}
 h1{font-family:var(--drawing-serif);font-weight:400;letter-spacing:-.7px}
 .measurements>summary{color:var(--drawing-ink)}

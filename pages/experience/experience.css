@@ -1,0 +1,38 @@
+/* Experience page: a vertical timeline drawn like a dimension line, with a dot for each job. */
+
+.list-page { width: min(860px, 100%); margin: 0 auto; padding: 110px 16px 48px; display: grid; gap: 22px; }
+.list-page > .sheet-header { padding: 0 0 6px; border-bottom: 1px solid var(--drawing-rule); }
+
+.timeline { list-style: none; margin: 0; padding: 0; position: relative; }
+/* The line runs down the left of the entries. */
+.timeline::before { content: ""; position: absolute; left: 7px; top: 8px; bottom: 8px; width: 1px; background: var(--drawing-rule); }
+
+.timeline-item { position: relative; padding: 0 0 34px 38px; }
+.timeline-item:last-child { padding-bottom: 6px; }
+/* A dot on the line for each job. */
+.timeline-item::before {
+  content: ""; position: absolute; left: 1px; top: 4px;
+  width: 11px; height: 11px; border-radius: 50%;
+  background: var(--paper-center); border: 2px solid #332c21;
+}
+
+.timeline-dates { margin: 0 0 6px; font: 12px/1.3 Inter, "Segoe UI", sans-serif; letter-spacing: .12em; text-transform: uppercase; color: var(--drawing-ink); }
+.timeline-body {
+  border: 1px solid var(--drawing-rule);
+  background: color-mix(in srgb, var(--paper-center) 90%, transparent);
+  padding: 18px 22px;
+}
+.timeline-role { margin: 0; font: 400 24px var(--drawing-serif); color: #332c21; }
+.timeline-org { margin: 4px 0 12px; font: 15px var(--drawing-serif); color: var(--drawing-ink); }
+
+.timeline-bullets { margin: 0 0 14px; padding-left: 20px; display: grid; gap: 8px; font: 15px/1.55 var(--drawing-serif); color: #3d362b; }
+
+.timeline-tags { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.timeline-tags li { font: 12px/1 Inter, "Segoe UI", sans-serif; color: var(--drawing-ink); border: 1px solid var(--drawing-rule); padding: 5px 8px; }
+
+@media (max-width: 500px) {
+  .list-page { padding-top: 90px; }
+  .timeline-item { padding-left: 28px; }
+  .timeline-body { padding: 14px 16px; }
+  .timeline-role { font-size: 21px; }
+}

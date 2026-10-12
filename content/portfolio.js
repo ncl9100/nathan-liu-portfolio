@@ -20,6 +20,8 @@ export const profile = {
   }
 };
 
+// Projects, newest first. The Projects page shows them in this order; keep it newest first.
+// "image" is a path in assets/projects/. A "Live demo" or "Live site" link is what clicking the card opens.
 export const projects = [
   {
     "id": "hottakes",
@@ -35,7 +37,7 @@ export const projects = [
       "Streamlit",
       "Claude API"
     ],
-    "image": "",
+    "image": "assets/projects/hottakes.png",
     "imageTodo": "TODO · HotTakes project image",
     "links": [
       {
@@ -54,6 +56,7 @@ export const projects = [
       "room-portfolio"
     ],
     "title": "Personal Room / LiuOS",
+    "date": "Oct. 2026",
     "summary": "A 3D model of my room built with three.js, with a custom in-browser OS for my work.",
     "description": "An interactive room with camera navigation, discoverable objects, and a custom desktop for exploring my portfolio.",
     "role": "Designed and built it.",
@@ -62,13 +65,16 @@ export const projects = [
       "JavaScript",
       "HTML/CSS"
     ],
-    "image": "",
+    "image": "assets/projects/personal-room.png",
     "imageTodo": "TODO · Website project image",
     "links": [
       {
         "label": "GitHub",
-        "url": "",
-        "todo": "TODO · Website GitHub URL"
+        "url": "https://github.com/ncl9100/nathan-liu-portfolio"
+      },
+      {
+        "label": "Live site",
+        "url": "/"
       }
     ]
   },
@@ -90,7 +96,7 @@ export const projects = [
       "Tailwind CSS",
       "Vercel"
     ],
-    "image": "",
+    "image": "assets/projects/marginguard.png",
     "imageTodo": "TODO · MarginGuard project image",
     "links": [
       {

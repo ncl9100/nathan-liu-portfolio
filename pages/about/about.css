@@ -1,0 +1,35 @@
+/* About page: headshot on the left, typed-out bio on the right. Photo on top on phones. */
+
+.about-page { width: min(980px, 100%); margin: 0 auto; padding: 90px 16px 48px; display: grid; gap: 22px; }
+.about-page > .sheet-header { padding: 0 0 6px; border-bottom: 1px solid var(--drawing-rule); }
+
+.about-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr); gap: 32px; align-items: start; }
+
+.about-photo { margin: 0; padding: 10px; border: 1px solid var(--drawing-rule); background: color-mix(in srgb, var(--paper-center) 85%, transparent); }
+.about-photo img { display: block; width: 100%; aspect-ratio: 4 / 5; object-fit: cover; object-position: center 30%; }
+
+.about-text { display: grid; gap: 14px; cursor: pointer; }
+.about-typed p { margin: 0 0 16px; font: 17px/1.65 var(--drawing-serif); color: #332c21; }
+.about-typed p:last-child { margin-bottom: 0; }
+/* Not-yet-typed text keeps its space but is invisible. */
+.about-typed .untyped { color: transparent; }
+/* A blinking cursor right after the typed text. */
+.about-typed .typing span:first-child::after { content: "▍"; margin-left: 1px; color: var(--drawing-ink); animation: cursor-blink 1s steps(1) infinite; }
+@keyframes cursor-blink { 50% { opacity: 0; } }
+
+.about-skip {
+  justify-self: start; min-height: 40px; padding: 0 14px;
+  font: 14px var(--drawing-serif); color: var(--drawing-ink);
+  background: transparent; border: 1px solid var(--drawing-rule); border-radius: 0;
+}
+.about-skip:hover { background: #b4a68b24; }
+
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+@media (max-width: 700px) {
+  .about-layout { grid-template-columns: 1fr; gap: 20px; }
+  .about-photo { width: min(280px, 100%); justify-self: center; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .about-typed .typing span:first-child::after { animation: none; }
+}

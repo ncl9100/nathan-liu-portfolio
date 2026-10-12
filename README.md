@@ -126,26 +126,6 @@ Scene units are inches. `DRAFTING_CONFIG` is room-only. Career pages do not have
 
 ---
 
-## Decisions I can walk through
-
-These are the choices I would start with in an interview.
-
-**A portfolio as a place.** A list of projects tells you what I shipped. A room tells you how I notice things — the title block, the measured stools, the dishes in the sink. The 3D model is the argument; LiuOS and the pages are how you get the facts.
-
-**No build step, on purpose.** A bundler would hide the file graph. Here, a component is a folder you can open. The cost is that we cannot tree-shake Three.js and we fetch HTML at runtime, so the site has to be served over HTTP. I accepted that trade for a codebase I can explain without a config file.
-
-**Announce, don't import.** Direct calls would make the room depend on LiuOS and LiuOS depend on the room. Events keep a one-way story: the room does not know how the desktop works; LiuOS does not know a camera exists. The failure mode is a silent no-op if a listener is late, which is why the screen has an explicit request event.
-
-**Measured vs estimated.** I did not photogrammetry the dorm. I measured what I could and estimated the rest from photos, and I left that distinction in the code. A few invariants (`15 × 15 × 31` stools, `17.5"` pass-through) throw if they break. That is closer to how I treat data at the eLab than a pretty mesh from a marketplace.
-
-**Keep the room cheap while LiuOS is open.** The room stops rendering when the laptop dialog covers it. The live wallpaper shader stays on the visible LiuOS surface and pauses when a maximized window covers it, or when the tab is hidden, or when the visitor asked for reduced motion. Water does not use `transmission` — that re-rendered the whole room and took seconds to compile — so the stream is a tinted cylinder with a time uniform instead.
-
-**One résumé, three files.** Changing the résumé means updating the PDF, the desk texture (`resume.png`), and `assets/resume/resume.html`. Painful on purpose: there is no generated pipeline, so I cannot forget that recruiters see all three.
-
-**Compatibility as a constraint, not a polish pass.** The seated photo view picks a different eye height and FOV on narrow screens so the pile still fits. Overview and floor-plan radii scale with aspect ratio. Callouts move on small viewports so they do not sit on the laptop glass. If a motion cannot be skipped, it is not shipped.
-
----
-
 ## Room internals (the 3D side)
 
 The scene is authored in code, not imported from Blender.
@@ -168,11 +148,3 @@ LiuOS is a `<dialog>` that thinks it is an operating system.
 - **Apps read the content file.** Projects, Experience, About, Contact, Résumé, Terminal. The AI guide is a labeled placeholder — not a backend.
 - **Wallpaper is a module.** `createWallpaper(THREE, config, motionPreference, colors)` returns `mount` / `setState` / `dispose`. The default shader is ruled paper that drifts; an alternate mode is graph paper. Replacing the file is how you would restyle the OS background without touching the window manager.
 
----
-
-## What this is not
-
-- Not a game engine and not a walkable character (that is a later idea, not started).
-- Not a CMS. Facts change in `content/portfolio.js`.
-- Not a Three.js tutorial repo. The interesting part is the component contract and the drafting-sheet constraints, not a spinning cube.
-- Not connected to an AI backend. The guide app is honest about that.

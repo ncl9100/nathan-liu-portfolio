@@ -367,10 +367,15 @@ body:has(#laptop-window[open]){overflow:hidden}
   .os-bezel{padding:0 4px 8px}
   #laptop-window .lock-screen,#laptop-window .os-desktop{height:auto;max-height:none;border-radius:20px}
   .os-window,.os-window.os-maximized{left:0!important;top:0!important;width:100%!important;height:calc(100% - var(--os-dock-height))!important;padding-bottom:0;border-radius:0}
-  .os-dock{bottom:0;padding:0 8px;gap:6px;width:100%;max-width:none;height:var(--os-dock-height)}
-  #laptop-window .os-dock button{width:34px;height:34px;min-width:34px;min-height:34px;padding:6px}
-  .os-weather-label,.os-battery span{display:none}
-  .os-tray-right{gap:6px}
+  /* Weather, battery, and the date don't fit beside seven apps. Keep the system button,
+     search, a sideways-scrolling app row, and the time. */
+  .os-tray-left,.os-battery,#laptop-window #desktop-clock-date{display:none}
+  .os-dock{bottom:0;grid-template-columns:minmax(0,1fr) auto;padding:0 6px;gap:4px;width:100%;max-width:none;height:var(--os-dock-height)}
+  .os-dock-center{justify-content:flex-start;overflow:hidden;gap:0}
+  .os-pinned{flex:1 1 auto;min-width:0;overflow-x:auto;scrollbar-width:none}
+  .os-pinned::-webkit-scrollbar{display:none}
+  .os-tray-right{gap:0}
+  #laptop-window .os-dock button{width:36px;height:36px;min-width:36px;min-height:36px;padding:6px}
   #laptop-window .os-widget{top:16px}
   #laptop-window .desktop-icons{top:200px;bottom:calc(var(--os-dock-height) + 12px)}
 }

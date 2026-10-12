@@ -591,7 +591,7 @@ function dampParallax(now){parallaxFrame=0;if(document.hidden||laptopOpen||reduc
 function requestParallax(){if(!parallaxFrame){parallaxTime=performance.now();parallaxFrame=requestAnimationFrame(dampParallax);}}
 // Overview sway: a slow side-to-side orbit added to yaw. Any input freezes it in place; it eases back in after idleMs.
 const sway={offset:0,phase:0,rate:0,last:0,frame:0,timer:0,hovering:false,lastInput:0};
-function swayAllowed(){return DRAFTING_CONFIG.sway.enabled&&introDone&&currentView==='angle'&&!moving&&!pointer&&!sway.hovering&&!laptopOpen&&!resumeOpen&&!document.hidden&&!reducedMotion();}
+function swayAllowed(){return DRAFTING_CONFIG.sway.enabled&&introDone&&currentView==='angle'&&!moving&&!pointer&&!touchGesture&&!sway.hovering&&!laptopOpen&&!resumeOpen&&!document.hidden&&!reducedMotion();}
 function stopSway(){clearTimeout(sway.timer);cancelAnimationFrame(sway.frame);sway.timer=sway.frame=sway.last=0;sway.rate=0;}
 function scheduleSway(){stopSway();if(swayAllowed())sway.timer=setTimeout(()=>sway.frame=requestAnimationFrame(swayTick),Math.max(0,sway.lastInput+DRAFTING_CONFIG.sway.idleMs-performance.now()));}
 function noteInput(){sway.lastInput=performance.now();scheduleSway();}
@@ -602,7 +602,8 @@ motionPreference.addEventListener('change',()=>{resetParallax();if(motionPrefere
 document.addEventListener('visibilitychange',()=>{if(document.hidden)resetParallax();scheduleSway();});
 
 let target=new THREE.Vector3(150,12,70),yaw=0.55,pitch=0.85,radius=600;
-function render(){if(document.hidden||laptopOpen)return;document.body.dataset.roomView=currentView;camera.position.set(target.x+radius*Math.sin(yaw+sway.offset+parallax.x)*Math.cos(pitch+parallax.y),target.y+radius*Math.sin(pitch+parallax.y),target.z+radius*Math.cos(yaw+sway.offset+parallax.x)*Math.cos(pitch+parallax.y));camera.lookAt(target);updateBackControl();updateWalls();renderer.render(scene,camera);updateHotspots();updateDimensionLabels();}
+function placeCamera(){camera.position.set(target.x+radius*Math.sin(yaw+sway.offset+parallax.x)*Math.cos(pitch+parallax.y),target.y+radius*Math.sin(pitch+parallax.y),target.z+radius*Math.cos(yaw+sway.offset+parallax.x)*Math.cos(pitch+parallax.y));camera.lookAt(target);camera.updateMatrixWorld();}
+function render(){if(document.hidden||laptopOpen)return;document.body.dataset.roomView=currentView;placeCamera();updateBackControl();updateWalls();renderer.render(scene,camera);updateHotspots();updateDimensionLabels();}
 function fittedRadius(value){return value*Math.max(1,DRAFTING_CONFIG.camera.mobileFitAspect/camera.aspect);}
 function resize(){renderer.setSize(stage.clientWidth,stage.clientHeight);camera.aspect=stage.clientWidth/stage.clientHeight;if(['angle','front','desk'].includes(currentView))radius=fittedRadius(presets[currentView].radius);camera.updateProjectionMatrix();render();}window.addEventListener('resize',resize);
 const presets={resume:{yaw:0,pitch:1.48,radius:25,target:[163.75,30.1,17.2],fov:40},details:{yaw:-.15,pitch:.2,radius:130,target:[154.75,48,10]},angle:{yaw:.55,pitch:.85,radius:600,target:[150,12,70]},front:{yaw:0,pitch:Math.PI/2-.001,radius:560,target:[156,0,73]},side:{yaw:Math.PI/2,pitch:.4,radius:48,target:[215,38,119],fov:65},fridge:{yaw:-.45,pitch:.18,radius:145,target:[284,47,80]},desk:{yaw:0,pitch:.27,radius:29,target:[149.75,34,12]},bed:{yaw:-Math.PI/2,pitch:.15,radius:60,target:[130,34,19.5]},otherBed:lookFrom([126,44,122],[148,3,13],62)};
@@ -618,9 +619,12 @@ Object.defineProperty(presets,'seated',{enumerable:true,get:()=>camera.aspect<.8
 let animation=0,moving=false,currentView='angle';
 const hint=document.querySelector('.hint');let captionTimer=0,captionHideTimer=0;
 const defaultCaption='Click around. Most things in here do something.';
+let touchExplore=false;
 const viewCaptions={angle:defaultCaption,front:'The floor plan. Click an object to explore.',desk:'You’re at your desk. Click the laptop to open LiuOS.',bed:'You’re on your bed. Drag to look around.',otherBed:'Your roommate’s bed. Drag to look around.',side:'You’re in the kitchen. Drag to look around.',fridge:'The fridge. Drag to look around.',seated:'Pull up a stool. Click a photo to look closer.',details:'Still at the desk. Click the laptop, or wander.',resume:'Your resume, up close.',zoom:'A closer look. Click outside the room to step back.'};
+function applyTouchCaptions(){if(touchExplore)return;touchExplore=true;viewCaptions.angle=DRAFTING_CONFIG.interaction.touchCaption;viewCaptions.front='The floor plan. Pinch to zoom, swipe to move, or twist to turn.';}
+if(matchMedia('(pointer: coarse)').matches)applyTouchCaptions();
 function hideCaption(){clearTimeout(captionTimer);clearTimeout(captionHideTimer);hint.classList.remove('caption-visible');captionHideTimer=setTimeout(()=>hint.hidden=true,reducedMotion()?0:250);}
-function showCaption(message=defaultCaption,duration=DRAFTING_CONFIG.interaction.captionMs){hideCaption();clearTimeout(captionHideTimer);hint.hidden=false;hint.textContent=message;hint.classList.add('caption-visible');captionTimer=setTimeout(hideCaption,duration);}
+function showCaption(message=defaultCaption,duration=DRAFTING_CONFIG.interaction.captionMs){if(touchExplore)message=message===defaultCaption&&!isCloseup()?DRAFTING_CONFIG.interaction.touchCaption:message.replaceAll('Click','Tap').replaceAll('Drag to look around','Twist two fingers to turn');hideCaption();clearTimeout(captionHideTimer);hint.hidden=false;hint.textContent=message;hint.classList.add('caption-visible');captionTimer=setTimeout(hideCaption,duration);}
 
 const hotspotPositions={desk:[154.75,39,25],laptop:[149.75,38.1,12.35],resume:[163.75,31,17.2]};
 const hotspotButtons=[...document.querySelectorAll('[data-destination]')];
@@ -676,7 +680,7 @@ function tick(now){if(cameraMove!==move)return;const t=reduced?1:Math.min((now-t
 const announceView=view=>document.dispatchEvent(new CustomEvent('room:view',{detail:{view}}));
 document.addEventListener('room:go',({detail:{view}})=>{if(laptopOpen)document.dispatchEvent(new CustomEvent('laptop:close'));if(resumeOpen)document.dispatchEvent(new CustomEvent('resume:close'));if(photoOpen)document.dispatchEvent(new CustomEvent('photo:close'));navigate(view);});
 function screenHover(active){screenFace.material.color.setScalar(active?LIUOS_CONFIG.screen.hoverBrightness:LIUOS_CONFIG.screen.brightness);}
-document.addEventListener('keydown',event=>{if(event.key==='Escape'&&moving&&!laptopOpen&&!resumeOpen&&!photoOpen){event.preventDefault();cancelCameraMove();pointer=null;render();}});
+document.addEventListener('keydown',event=>{if(event.key==='Escape'&&moving&&!laptopOpen&&!resumeOpen&&!photoOpen){event.preventDefault();cancelCameraMove();pointer=null;touch=null;touchGesture=false;render();}});
 
 // Clicking the résumé paper zooms the camera in on it, then opens the résumé viewer.
 // Closing it always goes back to the shelves view ("details"), where the desk is in view.
@@ -733,30 +737,59 @@ obj=obj.parent;
 }
 function toggleLamp(){lampOn=!lampOn;cancelAnimationFrame(lampFadeFrame);const from=lampLight.intensity,to=lampOn?1800:0,started=performance.now();lampLight.visible=true;function frame(now){const t=reducedMotion()?1:Math.min(1,(now-started)/DRAFTING_CONFIG.interaction.lampFadeMs),k=t*t*(3-2*t);lampLight.intensity=from+(to-from)*k;emitterMat.emissiveIntensity=lampLight.intensity/900;if(t===1)lampLight.visible=lampOn;render();if(t<1)lampFadeFrame=requestAnimationFrame(frame);}lampFadeFrame=requestAnimationFrame(frame);}
 let pointer=null;
-stage.addEventListener('pointerdown',event=>{if(!introDone){finishIntro();render();return;}resetParallax();noteInput();pointer={id:event.pointerId,x:event.clientX,y:event.clientY,startX:event.clientX,startY:event.clientY,started:performance.now(),dragged:false};stage.setPointerCapture(event.pointerId);});
+// Fingers use touch events, not pointer events. On an iPhone the second finger often never
+// arrives as a pointer, so a pinch or swipe would start and then do nothing. Each event
+// lists every finger still down. One finger slides the room. Two fingers pinch to zoom,
+// and twisting them turns the camera so you can see the other side.
+let touch=null,touchGesture=false;
+const _axisX=new THREE.Vector3(),_axisY=new THREE.Vector3(),_planeHit=new THREE.Vector3(),_planeHit2=new THREE.Vector3();
+function cameraBlocked(){return laptopOpen||resumeOpen||photoOpen;}
+function clampLookTarget(){const pad=DRAFTING_CONFIG.interaction.panPadding;target.x=Math.max(-pad,Math.min(305+pad,target.x));target.y=Math.max(0,Math.min(room.height-24,target.y));target.z=Math.max(-pad,Math.min(kitchenEndZ+pad,target.z));}
+function panByPixels(dx,dy){if(!dx&&!dy)return;camera.updateMatrixWorld();_axisX.setFromMatrixColumn(camera.matrixWorld,0);_axisY.setFromMatrixColumn(camera.matrixWorld,1);const distance=Math.max(camera.position.distanceTo(target),1),worldPerPixel=2*Math.tan(camera.fov*Math.PI/360)*distance/Math.max(stage.clientHeight,1);target.addScaledVector(_axisX,-dx*worldPerPixel);target.addScaledVector(_axisY,dy*worldPerPixel);clampLookTarget();}
+function lookPointAt(clientX,clientY,out){camera.updateMatrixWorld();const bounds=stage.getBoundingClientRect();mouse.set((clientX-bounds.left)/bounds.width*2-1,1-(clientY-bounds.top)/bounds.height*2);raycaster.setFromCamera(mouse,camera);camera.getWorldDirection(_axisY);const denom=_axisY.dot(raycaster.ray.direction);if(Math.abs(denom)<1e-5)return null;const travel=_axisY.dot(_axisX.copy(target).sub(raycaster.ray.origin))/denom;if(travel<0)return null;return raycaster.ray.at(travel,out);}
+// Keep the spot under the pinch still while the camera moves in or out.
+function zoomAbout(clientX,clientY,next){placeCamera();const before=lookPointAt(clientX,clientY,_planeHit)?.clone();radius=next;placeCamera();if(!before)return;const after=lookPointAt(clientX,clientY,_planeHit2);if(!after)return;target.add(before).sub(after);clampLookTarget();}
+function clampedRadius(next,delta,allowExit=true){const minR=DRAFTING_CONFIG.interaction.minRadius,now=performance.now();if(isCloseup()){const cfg=DRAFTING_CONFIG.interaction,base=closeupView==='desk'?fittedRadius(presets[closeupView].radius):presets[closeupView].radius,limit=base*cfg.zoomLimitRatio;if(allowExit&&delta>0&&next>=limit){if(now-lastZoomOut>cfg.zoomExitWindowMs)zoomExitDelta=0;zoomExitDelta+=delta;lastZoomOut=now;if(zoomExitDelta>=cfg.zoomExitDelta)return null;}else if(allowExit)zoomExitDelta=0;return Math.max(minR,Math.min(limit,next));}return Math.max(minR,Math.min(DRAFTING_CONFIG.camera.maxRadius,next));}
+function beginDirecting(){bakeSway();cancelCameraMove();currentView='custom';clearHighlight();announceView('custom');}
+function activateHit(event){if(laptopOpen)return;const hit=firstHit(event),selected=pick(event,hit);if(selected){renderer.domElement.focus({preventScroll:true});if(selected.photo!==undefined)openPhoto(selected.photo);else activate(selected.view);
+ // Touch has no hover, so a tap shows the dish tag briefly instead.
+ if(selected.dishes&&event.pointerType!=='mouse'){showDishTag(event);dishTagTimer=setTimeout(()=>dishTag.hidden=true,DRAFTING_CONFIG.dishes.tapTagMs);}}else if(hit)zoomInto(hit.point);else if(currentView!=='angle')returnToRoom();}
+function touchPoints(event){return [...event.touches].map(point=>({x:point.clientX,y:point.clientY}));}
+function wrapTurn(delta){while(delta>Math.PI)delta-=2*Math.PI;while(delta<-Math.PI)delta+=2*Math.PI;return delta;}
+function baselineTouch(points){touch.fingers=points.length;if(points.length>=2){touch.pinched=true;touch.dist=Math.max(1,Math.hypot(points[0].x-points[1].x,points[0].y-points[1].y));touch.midX=(points[0].x+points[1].x)/2;touch.midY=(points[0].y+points[1].y)/2;touch.angle=Math.atan2(points[1].y-points[0].y,points[1].x-points[0].x);}else if(points.length===1){touch.x=points[0].x;touch.y=points[0].y;}}
+function moveTouch(points){if(!touch)return;if(cameraBlocked()){touch.moved=true;baselineTouch(points);return;}if(points.length>=2){const dist=Math.max(1,Math.hypot(points[0].x-points[1].x,points[0].y-points[1].y)),midX=(points[0].x+points[1].x)/2,midY=(points[0].y+points[1].y)/2,angle=Math.atan2(points[1].y-points[0].y,points[1].x-points[0].x),turn=wrapTurn(angle-(touch.angle||0));if(touch.fingers<2){baselineTouch(points);return;}if(!touch.moved&&Math.abs(dist-touch.dist)<8&&Math.hypot(midX-touch.midX,midY-touch.midY)<8&&Math.abs(turn)<.06)return;if(!touch.moved)beginDirecting();touch.moved=true;const nextRaw=radius*(touch.dist/dist),next=clampedRadius(nextRaw,Math.log(Math.max(nextRaw,1e-4)/radius)/.001,false);panByPixels(midX-touch.midX,midY-touch.midY);if(Math.abs(next-radius)>1e-4)zoomAbout(midX,midY,next);yaw+=turn;touch.dist=dist;touch.midX=midX;touch.midY=midY;touch.angle=angle;touch.fingers=2;render();return;}if(touch.fingers!==1){baselineTouch(points);return;}if(!touch.moved&&Math.hypot(points[0].x-touch.startX,points[0].y-touch.startY)<DRAFTING_CONFIG.interaction.clickPixels)return;if(!touch.moved)beginDirecting();touch.moved=true;panByPixels(points[0].x-touch.x,points[0].y-touch.y);touch.x=points[0].x;touch.y=points[0].y;touch.fingers=1;render();}
+function onTouchStart(event){event.preventDefault();if(!introDone){finishIntro();render();return;}applyTouchCaptions();resetParallax();noteInput();const points=touchPoints(event);if(!points.length)return;if(!touch)touch={started:performance.now(),startX:points[0].x,startY:points[0].y,moved:false,pinched:false,fingers:0};touchGesture=true;baselineTouch(points);}
+function onTouchMove(event){event.preventDefault();if(touch)moveTouch(touchPoints(event));}
+function onTouchEnd(event){const points=touchPoints(event);if(points.length){if(touch){touch.moved=true;baselineTouch(points);}return;}const finger=event.changedTouches[0],tap=touch&&!touch.moved&&!touch.pinched&&finger&&Math.hypot(finger.clientX-touch.startX,finger.clientY-touch.startY)<DRAFTING_CONFIG.interaction.clickPixels&&performance.now()-touch.started<DRAFTING_CONFIG.interaction.clickMs;touch=null;touchGesture=false;noteInput();if(tap)activateHit(finger);}
+function onTouchCancel(){touch=null;touchGesture=false;noteInput();}
+stage.addEventListener('pointerdown',event=>{
+if(event.pointerType==='touch')return;
+if(!introDone){finishIntro();render();return;}
+resetParallax();noteInput();
+pointer={id:event.pointerId,x:event.clientX,y:event.clientY,startX:event.clientX,startY:event.clientY,started:performance.now(),dragged:false};try{stage.setPointerCapture(event.pointerId);}catch{/* Dragging still works while the pointer stays over the model. */}
+});
 stage.addEventListener('pointermove',event=>{
-if(!pointer){if(event.pointerType==='touch'){clearHighlight();return;}if(moving||!introDone)return;if(event.pointerType==='mouse'&&currentView==='angle'&&DRAFTING_CONFIG.parallax.enabled&&!reducedMotion()&&matchMedia('(hover: hover) and (pointer: fine)').matches){parallax.targetX=(event.clientX/stage.clientWidth-.5)*2*DRAFTING_CONFIG.parallax.yaw;parallax.targetY=(event.clientY/stage.clientHeight-.5)*2*DRAFTING_CONFIG.parallax.pitch;requestParallax();}const selected=pick(event);clearHighlight();if(selected){if(selected.view==='laptop')screenHover(true);if(selected.dishes)showDishTag(event);stage.style.cursor='pointer';hoverOutline.box.setFromObject(selected.root);hoverOutline.visible=true;}render();return;}
+if(event.pointerType==='touch')return;
+if(!pointer){if(moving||!introDone)return;if(event.pointerType==='mouse'&&currentView==='angle'&&DRAFTING_CONFIG.parallax.enabled&&!reducedMotion()&&matchMedia('(hover: hover) and (pointer: fine)').matches){parallax.targetX=(event.clientX/stage.clientWidth-.5)*2*DRAFTING_CONFIG.parallax.yaw;parallax.targetY=(event.clientY/stage.clientHeight-.5)*2*DRAFTING_CONFIG.parallax.pitch;requestParallax();}const selected=pick(event);clearHighlight();if(selected){if(selected.view==='laptop')screenHover(true);if(selected.dishes)showDishTag(event);stage.style.cursor='pointer';hoverOutline.box.setFromObject(selected.root);hoverOutline.visible=true;}render();return;}
 if(pointer.id!==event.pointerId)return;
 if(Math.hypot(event.clientX-pointer.startX,event.clientY-pointer.startY)<DRAFTING_CONFIG.interaction.clickPixels&&!pointer.dragged)return;
 if(!pointer.dragged){bakeSway();cancelCameraMove();}pointer.dragged=true;currentView='custom';clearHighlight();yaw-=(event.clientX-pointer.x)*.007;pitch=Math.max(-.1,Math.min(1.569,pitch+(event.clientY-pointer.y)*.007));pointer.x=event.clientX;pointer.y=event.clientY;announceView('custom');render();
 });
-stage.addEventListener('pointerup',event=>{const click=pointer&&pointer.id===event.pointerId&&!pointer.dragged&&Math.hypot(event.clientX-pointer.startX,event.clientY-pointer.startY)<DRAFTING_CONFIG.interaction.clickPixels&&performance.now()-pointer.started<DRAFTING_CONFIG.interaction.clickMs;pointer=null;noteInput();if(click&&!laptopOpen){const hit=firstHit(event),selected=pick(event,hit);if(selected){renderer.domElement.focus({preventScroll:true});if(selected.photo!==undefined)openPhoto(selected.photo);else activate(selected.view);
- // Touch has no hover, so a tap shows the dish tag briefly instead.
- if(selected.dishes&&event.pointerType!=='mouse'){showDishTag(event);dishTagTimer=setTimeout(()=>dishTag.hidden=true,DRAFTING_CONFIG.dishes.tapTagMs);}}else if(hit)zoomInto(hit.point);else if(currentView!=='angle')returnToRoom();}});
+stage.addEventListener('pointerup',event=>{if(event.pointerType==='touch')return;const click=pointer&&pointer.id===event.pointerId&&!pointer.dragged&&Math.hypot(event.clientX-pointer.startX,event.clientY-pointer.startY)<DRAFTING_CONFIG.interaction.clickPixels&&performance.now()-pointer.started<DRAFTING_CONFIG.interaction.clickMs;pointer=null;noteInput();if(click)activateHit(event);});
 // Clicking empty space inside the room moves in closer on that spot. Close-ups switch to the
 // overview's angle; otherwise the current angle is kept.
 function zoomInto(point){if(laptopOpen||resumeOpen||photoOpen)return;const keep=!closeupView||closeupView==='zoom',a=presets.angle;
 presets.zoom={yaw:keep?yaw+sway.offset:a.yaw,pitch:keep?pitch:a.pitch,radius:fittedRadius(a.radius)/DRAFTING_CONFIG.interaction.clickZoom,target:[point.x,Math.min(point.y,40),point.z]};
 if(moving){queuedCameraAction='zoom';return;}navigate('zoom');}
-for(const event of ['pointercancel','lostpointercapture'])stage.addEventListener(event,()=>{pointer=null;noteInput();});
+stage.addEventListener('pointercancel',event=>{if(event.pointerType==='touch')return;pointer=null;noteInput();});
+stage.addEventListener('lostpointercapture',event=>{if(event.pointerType==='touch')return;pointer=null;noteInput();});
 // Touch fires pointerleave after every tap; skipping it keeps the tapped dish tag up.
 stage.addEventListener('pointerleave',event=>{parallax.targetX=parallax.targetY=0;requestParallax();if(event.pointerType!=='touch')clearHighlight();render();});
-function zoomRoom(event){event.preventDefault();noteInput();if(moving||laptopOpen)return;const delta=event.deltaY*(event.deltaMode===1?16:event.deltaMode===2?stage.clientHeight:1),now=performance.now();
-if(isCloseup()){const cfg=DRAFTING_CONFIG.interaction,base=closeupView==='desk'?fittedRadius(presets[closeupView].radius):presets[closeupView].radius,limit=base*cfg.zoomLimitRatio,next=radius*Math.exp(delta*.001);
-if(delta>0&&next>=limit){if(now-lastZoomOut>cfg.zoomExitWindowMs)zoomExitDelta=0;zoomExitDelta+=delta;lastZoomOut=now;if(zoomExitDelta>=cfg.zoomExitDelta){returnToRoom();return;}}else zoomExitDelta=0;
-cancelCameraMove();radius=Math.max(18,Math.min(limit,next));render();return;}
-cancelCameraMove();radius=Math.max(18,Math.min(DRAFTING_CONFIG.camera.maxRadius,radius*Math.exp(delta*.001)));render();}
+function zoomRoom(event){event.preventDefault();noteInput();if(moving||laptopOpen)return;const delta=event.deltaY*(event.deltaMode===1?16:event.deltaMode===2?stage.clientHeight:1),next=clampedRadius(radius*Math.exp(delta*.001),delta);if(next==null){returnToRoom();return;}cancelCameraMove();radius=next;render();}
 stage.addEventListener('wheel',zoomRoom,{passive:false});
+for(const type of ['gesturestart','gesturechange','gestureend'])stage.addEventListener(type,event=>event.preventDefault(),{passive:false});
+renderer.domElement.style.touchAction='none';
+for(const [type,handler] of [['touchstart',onTouchStart],['touchmove',onTouchMove],['touchend',onTouchEnd],['touchcancel',onTouchCancel]])stage.addEventListener(type,handler,{passive:false});
 renderer.domElement.addEventListener('webglcontextlost',event=>{event.preventDefault();status.textContent='Graphics connection lost. Reload this page to restore the model.';status.hidden=false;});
 screenHover(false);document.dispatchEvent(new CustomEvent('laptop:screen-request'));applyIntro(0);resize();
 // Compile every shader now, while loading, so the first faucet click doesn't stall. compile() skips

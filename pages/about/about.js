@@ -3,6 +3,7 @@
 // "reduce motion" see the full text right away. Screen readers always get the full text.
 
 import { profile } from '../../content/portfolio.js';
+import { reveal } from '../reveal.js';
 
 const paragraphs = profile.about;
 const typed = document.getElementById('about-typed');
@@ -57,3 +58,6 @@ else typeParagraph(0);
 
 skip.addEventListener('click', event => { event.stopPropagation(); showAll(); });
 document.querySelector('.about-text').addEventListener('click', () => { if (!finished) showAll(); });
+
+// Fade the whole page in on load, like the other pages.
+reveal(document.querySelectorAll('.page > *'));

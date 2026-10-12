@@ -50,7 +50,19 @@
 #laptop-window .answer-row button{padding:10px 13px;border-radius:var(--os-radius);background:var(--os-paperEdge);border-color:var(--os-accent)}
 .os-puzzle-actions{display:flex;justify-content:space-between;margin-top:5px}
 #laptop-window #answer-message{text-align:left;font-size:var(--os-small);min-height:18px;margin:5px 0 0}
-.os-puzzle{border-top:1px solid var(--os-border);margin-top:12px}
+/* "Know the password?" popup: dims the lock screen, then fades in while growing from 96%. */
+#laptop-window .lock-screen.puzzle-open{overflow:hidden}
+.os-puzzle-backdrop{position:absolute;inset:0;z-index:5;display:grid;place-items:center;padding:16px;background:var(--os-backdrop);opacity:0;transition:opacity 200ms ease}
+.os-puzzle-backdrop[hidden]{display:none}
+.os-puzzle-backdrop.is-open{opacity:1}
+.os-puzzle{position:relative;width:min(340px,100%);max-height:100%;overflow:auto;padding:24px 24px 16px;text-align:left;background:var(--os-base);border:1px solid var(--os-border);box-shadow:0 18px 40px var(--os-shadow);transform:scale(.96);transition:transform 200ms ease}
+.os-puzzle-backdrop.is-open .os-puzzle{transform:none}
+.os-puzzle.is-wrong{animation:os-shake 300ms ease-out}
+.os-puzzle.is-correct{animation:os-puzzle-pop 380ms ease-out;border-color:var(--os-accent)}
+@keyframes os-puzzle-pop{50%{transform:scale(1.03)}}
+#laptop-window .lock-screen .os-puzzle h3{font-size:var(--os-section);margin:0 36px 0 0}
+#laptop-window .os-puzzle-close{position:absolute;top:4px;right:4px;width:44px;height:44px;padding:0;display:grid;place-items:center;border:0;background:transparent;color:var(--os-muted);font-size:16px}
+#laptop-window .os-puzzle-close:hover{color:var(--os-text);background:var(--os-tint)}
 .os-signin-foot{margin:14px 0 0!important;font-size:var(--os-small)!important}
 .os-signin.is-wrong{animation:os-shake 300ms ease-out}
 .os-signin.is-correct .avatar{animation:os-celebrate 380ms ease-out;box-shadow:0 0 0 7px color-mix(in srgb,var(--os-accent) 10%,transparent)}
@@ -111,7 +123,8 @@
 .os-window-actions .os-icon{width:14px;height:14px}
 .os-window-content{padding:24px;overflow:auto;flex:1;font-size:var(--os-small);line-height:1.7}
 .os-window-content h3{font-weight:400;font-size:22px;letter-spacing:-.5px;margin:0 0 13px}
-.os-window-content p{color:var(--os-muted);margin:0 0 18px}
+/* :not(:where(...)) keeps these off the shared résumé sheet without making the selectors any stronger. */
+.os-window-content p:not(:where(.resume-sheet *)){color:var(--os-muted);margin:0 0 18px}
 .os-todo{font-family:var(--os-labelFont);text-transform:uppercase;font-size:var(--os-small);letter-spacing:.12em;padding:5px 8px;display:inline-block;color:var(--os-accent);border:1px solid var(--os-border);border-radius:var(--os-radius);margin-bottom:15px}
 .os-window.os-maximized{left:12px!important;top:52px!important;width:calc(100% - 24px)!important;height:calc(100% - 137px)!important;max-height:none;max-width:none}
 .os-dock{position:absolute;bottom:17px;left:50%;transform:translateX(-50%);z-index:20;display:flex;gap:5px;align-items:center;padding:7px;border:1px solid var(--os-border);border-radius:var(--os-radius);background:var(--os-base);box-shadow:0 14px 30px var(--os-shadow);max-width:calc(100% - 24px)}
@@ -168,8 +181,8 @@
 .os-project-links{display:flex;gap:8px;flex-wrap:wrap}
 #laptop-window .os-app-link{display:inline-flex;align-items:center;color:var(--os-accent);padding:8px 11px;border:1px solid var(--os-border);border-radius:var(--os-radius);font-size:var(--os-small);text-decoration:none;background:transparent;transition:background var(--os-transition),border-color var(--os-transition)}
 #laptop-window .os-app-link:hover{background:var(--os-tint);border-color:var(--os-accent)}
-.os-window-content p a{color:var(--os-text);text-decoration-color:var(--os-border);text-underline-offset:4px}
-.os-window-content p a:hover{text-decoration-color:currentColor}
+.os-window-content p:not(:where(.resume-sheet *)) a{color:var(--os-text);text-decoration-color:var(--os-border);text-underline-offset:4px}
+.os-window-content p:not(:where(.resume-sheet *)) a:hover{text-decoration-color:currentColor}
 .os-window-content h4{font-size:var(--os-small);font-weight:400;margin:18px 0 7px;color:var(--os-text)}
 .os-resume-content{padding:12px;display:flex;flex-direction:column;gap:10px}
 .os-resume-toolbar{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:var(--os-small);flex-wrap:wrap}
@@ -195,7 +208,8 @@
 .os-resume-zoom output{min-width:40px;text-align:center;font-size:var(--os-small);font-variant-numeric:tabular-nums}
 #laptop-window .os-resume-zoom button{padding:5px 8px;min-height:30px;font-size:var(--os-small)}
 .os-resume-viewport{flex:1;min-height:0;overflow:auto;padding:14px;background:var(--os-paperEdge);scrollbar-width:thin;scrollbar-color:var(--os-muted) transparent}
-.os-resume-paper{margin:0 auto 14px;box-shadow:0 4px 16px var(--os-shadow);background:white;flex:none}
+/* The résumé page. Its text is sized relative to this box's width (css/resume-sheet.css), so zooming = widening it. */
+.os-resume-paper{margin:0 auto 14px;box-shadow:0 4px 16px var(--os-shadow);background:white;flex:none;container-type:inline-size}
 #laptop-window .os-resume-paper img{display:block;width:100%;max-width:none;height:auto;aspect-ratio:17/22;object-fit:contain;flex:none;image-rendering:auto}
 #laptop-window .os-resume-viewport details{display:block;margin:0;color:var(--os-muted)}
 .os-resume-viewport summary{padding:6px 0}
@@ -269,14 +283,14 @@ body:has(#laptop-window[open]){overflow:hidden}
 #laptop-window .os-dock button{width:44px;height:44px;min-width:44px;min-height:44px;padding:10px}
 .os-dock{width:max-content}
 .os-pinned{min-width:0;overflow-x:auto;scrollbar-width:thin;scrollbar-color:var(--os-muted) transparent}
+/* Dock launch bounce. The pinned strip scrolls sideways, which also clips upward, so it gets headroom above the icons (the negative margin keeps the dock the same size). */
+.os-pinned{padding-top:18px;margin-top:-18px}
+#laptop-window .os-dock button.os-launching .os-icon{animation:os-dock-bounce var(--launch-ms,700ms) ease-out}
+@keyframes os-dock-bounce{0%,40%,80%,100%{transform:translateY(0)}20%{transform:translateY(-14px)}60%{transform:translateY(-7px)}}
 .os-dock-clock{flex-shrink:0}
 #laptop-window .os-contact-copy{font-size:var(--os-small)}
 #laptop-window .os-terminal-form input{width:calc(100% - 158px)}
 #laptop-window #reveal-signin{inset:4px;width:calc(100% - 8px);height:calc(100% - 8px)}
-#laptop-window .resume-text{color:#17211f}
-#laptop-window .resume-text p{color:inherit}
-#laptop-window .resume-text h3{font-size:16px}
-#laptop-window .resume-text h4{font-size:16px}
 #laptop-window .os-resume-paper{background:none;box-shadow:none}
 @media(max-width:600px){
   .os-dock{gap:2px;padding:5px;width:calc(100% - 14px)}

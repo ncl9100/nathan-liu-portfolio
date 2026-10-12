@@ -9,12 +9,23 @@
 }
 
 .contact-row dt {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   font: 11px/1.2 Inter, "Segoe UI", sans-serif;
   letter-spacing: .14em;
   text-transform: uppercase;
 }
 
 .contact-list { margin: 0; }
+
+/* The official email, LinkedIn, and GitHub marks, filled in ink. */
+.contact-icon {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
 .contact-row {
   display: grid;
   grid-template-columns: 110px 1fr;

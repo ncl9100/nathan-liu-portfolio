@@ -11,6 +11,10 @@ for (const style of ['400 11px', 'italic 400 11px', '700 11px', 'italic 700 11px
 const markup = await fetch(new URL('viewer.html', import.meta.url)).then(response => response.text());
 document.body.insertAdjacentHTML('beforeend', markup);
 
+// The résumé itself is a shared file (LiuOS shows the same one).
+const sheet = await fetch(new URL('../assets/resume/resume.html', import.meta.url)).then(response => response.text());
+document.querySelector('#resume-window .sheet-frame').innerHTML = sheet;
+
 const dialog = document.getElementById('resume-window');
 const closeButton = document.getElementById('close-resume');
 const announce = name => document.dispatchEvent(new CustomEvent(name));

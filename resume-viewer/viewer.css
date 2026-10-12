@@ -1,11 +1,5 @@
 /* Résumé viewer: the zoomed-in desk stays visible behind a web copy of the LaTeX résumé. */
 
-/* Computer Modern, the LaTeX font (declared here because the package's own CSS uses an invalid font-style). */
-@font-face { font-family: "CMU Serif"; font-style: normal; font-weight: 400; font-display: swap; src: url("https://cdn.jsdelivr.net/npm/computer-modern@0.1.2/fonts/cmu-serif-500-roman.ttf") format("truetype"); }
-@font-face { font-family: "CMU Serif"; font-style: italic; font-weight: 400; font-display: swap; src: url("https://cdn.jsdelivr.net/npm/computer-modern@0.1.2/fonts/cmu-serif-500-italic.ttf") format("truetype"); }
-@font-face { font-family: "CMU Serif"; font-style: normal; font-weight: 700; font-display: swap; src: url("https://cdn.jsdelivr.net/npm/computer-modern@0.1.2/fonts/cmu-serif-700-roman.ttf") format("truetype"); }
-@font-face { font-family: "CMU Serif"; font-style: italic; font-weight: 700; font-display: swap; src: url("https://cdn.jsdelivr.net/npm/computer-modern@0.1.2/fonts/cmu-serif-700-italic.ttf") format("truetype"); }
-
 /* ---- The view: full screen, lightly dimmed so the desk shows through */
 #resume-window {
   width: 100vw; height: 100dvh; max-width: none; max-height: none;
@@ -36,55 +30,9 @@
 .viewer-primary { background: var(--paper-edge); border-color: #332c21; }
 .viewer-primary:hover { background: color-mix(in srgb, var(--paper-edge) 70%, var(--drawing-rule)); }
 
-/* ---- The paper. Sizes are LaTeX points scaled to the page: 612pt = the sheet's width (8.5in). */
+/* ---- The paper frame (the sheet's own styles are in css/resume-sheet.css) */
 .sheet-frame { container-type: inline-size; box-shadow: 0 14px 40px #2b221633; }
-.resume-sheet {
-  --pt: calc(100cqw / 612);
-  min-height: calc(792 * var(--pt)); /* letter paper: 11in tall */
-  padding: calc(36 * var(--pt));    /* 0.5in margins */
-  background: #fff; color: #000;
-  font: 400 calc(11 * var(--pt)) / 1.236 "CMU Serif", "Latin Modern Roman", "Times New Roman", serif;
-}
-.resume-sheet a { color: inherit; text-decoration: underline; text-decoration-thickness: calc(.4 * var(--pt)); text-underline-offset: calc(2 * var(--pt)); }
-.resume-sheet a.r-quiet { text-decoration: none; } /* \href with hidelinks: clickable but looks like plain text */
-.r-sep { font-weight: 400; font-style: normal; }
 
-/* Heading: \textbf{\Huge \scshape Nathan Liu} and the \small contact line */
-.r-heading { text-align: center; }
-/* Computer Modern has no bold small caps, so LaTeX prints \scshape in bold as plain bold. Match that. */
-.r-heading h1 { margin: 0; font-size: calc(24.88 * var(--pt)); line-height: 1.2; font-weight: 700; }
-.r-heading p { margin: calc(1 * var(--pt)) 0 0; font-size: calc(10 * var(--pt)); line-height: 1.2; }
-
-/* \section: \large \scshape with a rule underneath */
-.resume-sheet h2 {
-  margin: calc(10 * var(--pt)) 0 calc(4 * var(--pt));
-  padding-bottom: calc(1 * var(--pt));
-  border-bottom: calc(.4 * var(--pt)) solid #000;
-  font-size: calc(12 * var(--pt)); font-weight: 400; font-variant: small-caps; line-height: 1.2;
-}
-
-/* \resumeSubheading: indented 0.15in, rows 0.97\textwidth wide, right column flush right */
-.r-entry { padding-left: calc(10.8 * var(--pt)); margin-bottom: calc(3 * var(--pt)); }
-.r-row { display: flex; justify-content: space-between; gap: calc(8 * var(--pt)); width: calc(523.8 * var(--pt)); max-width: 100%; }
-.r-row.r-sub { font-size: calc(10 * var(--pt)); line-height: 1.2; }
-.r-project .r-row > span:first-child { font-size: calc(10 * var(--pt)); } /* \small#1 in \resumeProjectHeading */
-.r-edu { margin-bottom: 0; }
-.r-small { margin: calc(2 * var(--pt)) 0 0; font-size: calc(10 * var(--pt)); line-height: 1.2; }
-
-/* \resumeItem lists: \small text with a tiny bullet */
-.resume-sheet ul { list-style: none; margin: calc(1 * var(--pt)) 0 calc(1 * var(--pt)); padding-left: calc(17 * var(--pt)); }
-.resume-sheet li { position: relative; font-size: calc(10 * var(--pt)); line-height: 1.2; margin-bottom: calc(.5 * var(--pt)); }
-.resume-sheet li::before { content: "•"; position: absolute; left: calc(-9 * var(--pt)); font-size: calc(9 * var(--pt)); }
-
-/* Technical skills */
-.r-skills { margin: 0; padding-left: calc(10.8 * var(--pt)); font-size: calc(10 * var(--pt)); line-height: 1.2; }
-
-/* Phones: an exact copy would shrink the text to ~7px, so keep the styling but use readable sizes and let lines rewrap. */
-@container (max-width: 560px) {
-  .resume-sheet { --pt: 1.25px; min-height: 0; padding: 18px 16px; }
-  .r-row { flex-wrap: wrap; width: auto; }
-  .r-row > :last-child { margin-left: auto; }
-}
 @media (max-width: 600px) {
   .viewer-column { margin-top: 64px; width: calc(100% - 20px); }
 }

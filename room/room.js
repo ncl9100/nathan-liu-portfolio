@@ -343,10 +343,19 @@ document.addEventListener('visibilitychange',()=>{cancelAnimationFrame(waterFram
 const refrigerator=kb(29,63,25,289.5,31.5,74.5,white);
 const fridgeTrim=kb(.8,.4,24,274.6,43,74.5,silver);
 kb(23,35,32,292.5,17.5,103,cabinet);kb(24,1.5,32,292,35.75,103,white);
-kb(26,35,26,291,17.5,132,white);kb(.6,17,19,277.6,16,132,dark);
-for(const x of [285,297])for(const z of [126,137]){
-const ring=new THREE.Mesh(new THREE.TorusGeometry(3,.35,6,18),dark);ring.rotation.x=Math.PI/2;ring.position.set(x,35.6,z);kitchenObjects.add(ring);
+// Avanti stove: white body, oven window, five front knobs, and four matching grates.
+kb(26,35,26,291,17.5,132,white);
+kb(2,8,26,302,39,132,white);
+kb(.5,20,22,277.7,18,132,white);
+kb(.08,8,12,277.42,19.2,132,dark);
+kb(.45,.4,16,277.3,25.2,132,dark);
+for(let i=0;i<5;i++){const knob=new THREE.Mesh(new THREE.CylinderGeometry(.42,.42,.35,16),white);knob.rotation.z=Math.PI/2;knob.position.set(277.4,31.6,122.4+i*4.8);knob.castShadow=true;kitchenObjects.add(knob);}
+textSurface('avanti',4.2,1.1,277.4,10.6,132,kitchenObjects,'#4a4a4a').rotation.y=-Math.PI/2;
+function grate(x,z){
+ const ring=new THREE.Mesh(new THREE.TorusGeometry(3,.12,6,24),dark);ring.rotation.x=Math.PI/2;ring.position.set(x,35.58,z);kitchenObjects.add(ring);
+ kb(5.6,.1,.16,x,35.58,z,dark);kb(.16,.1,5.6,x,35.58,z,dark);
 }
+for(const x of [285,297])for(const z of [126,137])grate(x,z);
 // Open shelf niche at the entrance end, matching the new reference photos.
 upper(15,1,8,296.5,74.5,66);upper(15,1,8,296.5,93.5,66);
 upper(15,20,.8,296.5,84,62.4);upper(15,20,.8,296.5,84,69.6);
@@ -475,23 +484,40 @@ const popCollection=labelTexture(450,700,'#c62a2e',ctx=>{ctx.fillStyle='#3a1a14'
 let bookZ=-3.2;
 for(const [w,h,t,x,color,cover] of [[4.3,6.2,.95,-17.6,'#c8202e',keepCalm],[4.5,7,.7,-17.3,'#c62a2e',popCollection],[4.6,7.1,.45,-17.15,'#a8282a'],[4.6,6.9,.3,-17.05,'#2346a0'],[4.7,7.2,.5,-16.95,'#d4473a']]){book(w,h,t,x,bookZ-t/2,color,cover);bookZ-=t+.03;}
 const monkey=new THREE.Group();desk.add(monkey);ellipsoid(monkey,15,80,-7,2.4,3.3,1.9,brown);ellipsoid(monkey,15,80,-5.5,1.65,2.3,.55,cream);ellipsoid(monkey,15,84.4,-7,2.15,2.2,1.8,brown);ellipsoid(monkey,15,84.1,-5.45,1.6,1.5,.65,cream);for(const x of [12.7,17.3]){ellipsoid(monkey,x,84.4,-7,.7,.8,.5,cream);ellipsoid(monkey,x,78.7,-6,.8,2,.8,brown);ellipsoid(monkey,x,75.8,-4.9,1.1,.65,1.6,cream);}for(const x of [14.4,15.6])ellipsoid(monkey,x,84.7,-4.84,.18,.2,.12,black);textSurface('⌣',1.2,.6,15,83.4,-4.74,monkey,'#4c3827');for(const x of [13.6,16.4])ellipsoid(monkey,x,77,-6,.8,1.5,.8,brown);
-// Sink-side counter: appliances near the passage, soap and sponge by the basin.
-kb(12,11,17,216,42,76,dark);kb(.2,7,12,222.1,42,74.5,black);textSurface('MICROWAVE',8,2,222.24,46,76,kitchenObjects,'#b8bdc3').rotation.y=Math.PI/2;
+// Toshiba microwave on the sink-side counter, door facing into the kitchen. Stays near the passage
+// so it does not sit on the photo pile. No cord, wipes, or utensil cup.
+const microwave=new THREE.Group();microwave.position.set(216,42,76);kitchenObjects.add(microwave);
+box(12,11,17,0,0,0,dark,microwave);
+// Door and panel face into the kitchen (+x), the side you see from the room and the kitchen view.
+const mwGlass=new THREE.Mesh(new THREE.PlaneGeometry(10.4,9.4),new THREE.MeshPhysicalMaterial({color:'#141518',metalness:.55,roughness:.18}));mwGlass.rotation.y=Math.PI/2;mwGlass.position.set(6.02,.15,-2.4);microwave.add(mwGlass);
+box(.35,7.2,.45,6.28,.1,2.55,silver,microwave);
+const mwPanel=labelTexture(256,512,'#111216',ctx=>{
+ ctx.fillStyle='#3ad0ff';ctx.font=font(600,42,'Consolas,"Courier New",monospace');ctx.fillText('0:00',0,70);
+ ctx.fillStyle='#6a6e74';for(let r=0;r<6;r++)for(let c=0;c<2;c++)disc(ctx,-28+c*56,150+r*52,7,'#2a2d32');
+});
+const mwFace=new THREE.Mesh(new THREE.PlaneGeometry(5.2,9.6),new THREE.MeshStandardMaterial({map:mwPanel,roughness:.4}));mwFace.rotation.y=Math.PI/2;mwFace.position.set(6.02,.1,5.6);microwave.add(mwFace);
+textSurface('TOSHIBA',3.4,.7,6.04,-4.3,-4.6,microwave,'#c8ccd0').rotation.y=Math.PI/2;
 cylinder(kitchenObjects,2.2,6,214,39.5,91,new THREE.MeshPhysicalMaterial({color:'#cedee0',transparent:true,opacity:.55,roughness:.2,metalness:.15}));cylinder(kitchenObjects,2.3,.45,214,42.7,91,black);
 cylinder(kitchenObjects,.9,3.5,205,38.3,sinkZ+13,solid('#9aba96'));kb(1.3,.2,.45,205,40.3,sinkZ+13,white);kb(2,.6,3,218,36.8,sinkZ+13,solid('#d5c359'));
 for(let i=0;i<5;i++){cylinder(kitchenObjects,.75,2.5,205,37.8,94+i*2.1,solid(['#6c845d','#793529','#a89670','#87976d','#493c30'][i]));cylinder(kitchenObjects,.8,.3,205,39.2,94+i*2.1,black);}
 cylinder(kitchenObjects,1.7,7,205,40,86,white);cylinder(kitchenObjects,.2,8,205,40.5,86,silver);
-// Friends-and-family photos in a loose pile on the open counter between the oil bottles and the sink.
-// A seeded random keeps the pile the same on every visit. Each print sits a hair above the one before
-// so overlaps never flicker. The 3D prints use small thumbnails; the pop-up loads the full photo.
+// Friends-and-family photos scattered over the open counter between the glass, the oil bottles, and the
+// sink. Each print stays at least a few inches from the others, so only a few corners overlap. A seeded
+// random keeps the layout the same on every visit. Each print sits a hair above the one before so
+// overlaps never flicker. The 3D prints use small thumbnails; the pop-up loads the full photo.
 const photoPile=new THREE.Group();photoPile.name='Photo pile';fixtures.add(photoPile);
 const photoFolder=new URL('../assets/photos/friends-family/web/',import.meta.url);
-function sizePrint({border,face},aspect){const long=4.6,w=aspect>=1?long:long*aspect,d=aspect>=1?long/aspect:long;face.scale.set(w,d,1);border.scale.set(w+.35,1,d+.35);}
+function sizePrint({border,face},aspect){const long=4.2,w=aspect>=1?long:long*aspect,d=aspect>=1?long/aspect:long;face.scale.set(w,d,1);border.scale.set(w+.35,1,d+.35);}
 const photoPrints=[];{
  let seed=11;const random=()=>(seed=seed*16807%2147483647)/2147483647;
  const photoBorder=new THREE.MeshStandardMaterial({color:'#f7f4ec',roughness:.9});
+ // Open counter: after the glass, a few inches short of the sink rim, clear of the oil bottles.
+ const spots=[];
+ for(const x of [206.8,212.2,217.6,222.8])for(const z of [97,101.7,106.4,111.1,115.8])if(x>209||z>104)spots.push([x,z]);
+ for(let i=spots.length-1;i>0;i--){const j=Math.floor(random()*(i+1));[spots[i],spots[j]]=[spots[j],spots[i]];}
  photos.forEach((photo,index)=>{
-  const print=new THREE.Group();print.position.set(206+random()*16,36.5+index*.02,106.5+random()*12);print.rotation.y=(random()-.5)*1.4;print.name='Photo '+(index+1);photoPile.add(print);
+  const [x,z]=spots[index];
+  const print=new THREE.Group();print.position.set(x+(random()-.5)*.7,36.5+index*.012,z+(random()-.5)*.7);print.rotation.y=(random()-.5)*.65;print.name='Photo '+(index+1);photoPile.add(print);
   const border=new THREE.Mesh(new THREE.BoxGeometry(1,.015,1),photoBorder);border.position.y=.0075;border.receiveShadow=true;print.add(border);
   const face=new THREE.Mesh(new THREE.PlaneGeometry(1,1),new THREE.MeshStandardMaterial({color:'#d9d3c6',roughness:.55}));face.rotation.x=-Math.PI/2;face.position.y=.016;print.add(face);
   const entry={print,border,face,src:new URL(photo.file,photoFolder).href,thumb:new URL('thumbs/'+photo.file,photoFolder).href,caption:photo.caption};
@@ -576,8 +602,9 @@ const presets={resume:{yaw:0,pitch:1.48,radius:25,target:[163.75,30.1,17.2],fov:
 function lookFrom(eye,look,fov){const d=new THREE.Vector3(...eye).sub(new THREE.Vector3(...look)),r=d.length();return {yaw:Math.atan2(d.x,d.z),pitch:Math.asin(d.y/r),radius:r,target:look,fov};}
 // Sitting on a stool, looking at the photo pile. Narrower screens sit up taller and use a wider lens
 // so the whole pile still fits.
-const photoPileCenter=[214,36.5,112.5];
-Object.defineProperty(presets,'seated',{enumerable:true,get:()=>camera.aspect<.8?lookFrom([196,53,112],photoPileCenter,66):camera.aspect<1.2?lookFrom([193,50,112],photoPileCenter,54):lookFrom([191,48,112],photoPileCenter,40)});
+// Sit just behind a stool seat so a strip of it stays in the bottom of the frame.
+const photoPileCenter=[213,36.5,106];
+Object.defineProperty(presets,'seated',{enumerable:true,get:()=>camera.aspect<.8?lookFrom([185,50,106],photoPileCenter,76):camera.aspect<1.2?lookFrom([185,48,106],photoPileCenter,58):lookFrom([185,47,106],photoPileCenter,44)});
 let animation=0,moving=false,currentView='angle';
 const hint=document.querySelector('.hint');let captionTimer=0,captionHideTimer=0;
 const defaultCaption='Click around. Most things in here do something.';

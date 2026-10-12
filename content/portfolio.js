@@ -1,4 +1,4 @@
-// Facts about Nathan: profile, projects, and experience.
+// Facts about Nathan: profile, projects, experience, and kitchen-counter photos.
 // Single source of truth. LiuOS reads this now; the nav pages will read it too.
 // LiuOS-specific wording and settings stay in LIUOS_CONFIG in index.html.
 
@@ -158,6 +158,25 @@ export const experience = [
   }
 ];
 
-// Room.js imports this for the kitchen-counter photo pile. Empty on main until that
-// feature ships; a missing export crashes the whole 3D room on load.
-export const photos = [];
+// Friends-and-family photos scattered on the kitchen counter. "file" is in
+// assets/photos/friends-family/web/ (smaller copies of the originals one folder up).
+// An empty caption shows no caption.
+export const photos = [
+  { "file": "photo-01.jpg", "caption": "" },
+  { "file": "photo-02.jpg", "caption": "" },
+  { "file": "photo-03.jpg", "caption": "" },
+  { "file": "photo-04.jpg", "caption": "" },
+  { "file": "photo-05.jpg", "caption": "" },
+  { "file": "photo-06.jpg", "caption": "" },
+  { "file": "photo-07.jpg", "caption": "" },
+  { "file": "photo-08.jpg", "caption": "" },
+  { "file": "photo-09.jpg", "caption": "" },
+  { "file": "photo-10.jpg", "caption": "" },
+  { "file": "photo-11.jpg", "caption": "" },
+  { "file": "photo-12.jpg", "caption": "" },
+  { "file": "photo-13.jpg", "caption": "" },
+  { "file": "photo-14.jpg", "caption": "" },
+  { "file": "photo-15.jpg", "caption": "" },
+  { "file": "photo-16.jpg", "caption": "" },
+  { "file": "photo-17.jpg", "caption": "" }
+];

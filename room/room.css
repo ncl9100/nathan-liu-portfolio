@@ -52,6 +52,8 @@ h1{font-family:var(--drawing-serif);font-weight:400;letter-spacing:-.7px}
 .hotspot::before{display:none}
 .hotspot:hover{color:var(--inkStrong);background:var(--paperHover)}
 .callout-title{display:block;font:15px var(--drawing-serif)}
+#dish-tag{position:fixed;z-index:5;pointer-events:none;white-space:nowrap;padding:5px 8px;border-bottom:1px solid var(--drawing-rule);background:color-mix(in srgb,var(--paper-center) 91%,transparent);color:var(--drawing-ink);font:14px var(--drawing-serif)}
+#dish-tag[hidden]{display:none}
 .callout-action{display:block;font-size:11px;letter-spacing:.025em;margin-top:3px}
 .hotspot:disabled{cursor:default}
 .title-block{position:absolute;left:24px;bottom:116px;width:218px;border:1px solid var(--drawing-rule);z-index:2;pointer-events:none;font-family:var(--drawing-serif);background:color-mix(in srgb,var(--paper-center) 52%,transparent)}

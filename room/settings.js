@@ -8,6 +8,9 @@ export const DRAFTING_CONFIG = {
   dimensions:{offset:22,tick:4,labelOffset:11,inchesToMeters:.0254,precision:2},
   intro:{enabled:true,duration:2700,grid:[0,850],dimensions:[350,1300],room:[650,1850],callouts:[1900,2200],calloutStagger:100,calloutEndStagger:100,rise:14},
   parallax:{enabled:true,yaw:.018,pitch:.012,damping:9,epsilon:.00005},
+  // Overview sway after the visitor goes idle. amplitude is in radians (.12 is about 7 degrees);
+  // much more and the camera crosses the kitchen's outer wall, which then pops into view.
+  sway:{enabled:true,idleMs:4000,amplitude:.12,periodSeconds:20,rampSeconds:1.5,maxFps:30},
   camera:{pixelRatioCap:2,far:3000,mobileFitAspect:.95,maxRadius:1800},
   // Callout title and label offset in px from its point: [title, x, y].
   callouts:{desk:['Desk',-65,-68],resume:['Résumé',55,47],laptop:['Laptop',0,-42]},

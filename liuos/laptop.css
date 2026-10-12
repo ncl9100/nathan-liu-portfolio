@@ -1,64 +1,53 @@
 /* LiuOS: the laptop desktop (lock screen, sign-in, desktop, windows, dock, apps). */
 
-.lock-screen{background:radial-gradient(ellipse at 20% 20%,#46789c,#233f69 65%,#172c46);color:white;text-align:center;padding:40px 24px;min-height:430px}
-.lock-screen h3{font-size:25px;font-weight:500}
-.avatar{font-size:32px;background:#ffffff24;border-radius:50%;width:66px;height:66px;margin:auto;display:grid;place-items:center}
-.lock-screen p{font-size:13px;color:#d3e3f1}
-.lock-screen label{display:block;margin:24px 0 12px;font-size:15px}
+.lock-screen{text-align:center}
+.avatar{display:grid;place-items:center}
+.lock-screen label{display:block}
 .answer-row{display:flex;justify-content:center;gap:7px}
-.answer-row input{min-width:0;width:240px;padding:12px;border:1px solid #b2c2d0;border-radius:7px;font:inherit}
-.lock-screen button{color:white;background:#ffffff16}
-.answer-row button{background:#fafbfe;color:#203a57}
 #answer-message{min-height:20px}
-.os-desktop{position:relative;min-height:480px;height:min(65dvh,590px);background:radial-gradient(ellipse at 80% 20%,#75c8e0 0,transparent 45%),radial-gradient(ellipse at 55% 90%,#5175d8 0,transparent 45%),linear-gradient(120deg,#1d426b,#2c7b9d);overflow:hidden;color:white}
-.desktop-icons{position:absolute;top:22px;left:15px;display:grid;gap:14px}
-.desktop-icons button{color:white;width:88px;white-space:normal;text-shadow:0 1px 3px #123}
-.desktop-icons span{display:block;font-size:31px;margin-bottom:6px}
-#workspace-content{padding:20px 26px;font-size:14px;line-height:1.7}
-#workspace-content h3{font-size:25px;font-weight:500;margin:0 0 10px}
-.start-menu{position:absolute;bottom:62px;left:50%;transform:translateX(-50%);width:260px;background:#f4f8fbea;color:#233e56;padding:22px;border-radius:12px;box-shadow:0 12px 40px #1238}
+.os-desktop{position:relative;overflow:hidden}
+.desktop-icons{position:absolute;display:grid}
+.desktop-icons span{display:block}
+.start-menu{position:absolute;left:50%;transform:translateX(-50%);box-shadow:0 14px 30px var(--os-shadow)}
 .start-menu button{display:block;width:100%;text-align:left}
-.start-menu h3{font-size:15px}
-@media(max-width:600px){
-  .lock-screen{padding:25px 15px}
-  .os-desktop{min-height:420px}
-}
-#laptop-window{--os-accent:#89ded0;--os-text:#edf6f7;--os-muted:#a4b7c1;--os-base:#0b1c2a;--os-glass:#d0eff50d;--os-border:#d0eff526;--os-blur:22px;--os-radius:14px;--os-transition:300ms;font-family:var(--os-font);color:var(--os-text);background:var(--os-bezel);border:1px solid var(--os-border);border-radius:22px;padding:12px;width:min(980px,96vw);max-height:94dvh;box-shadow:0 28px 100px #07101988;overflow:hidden}
+#laptop-window{font-family:var(--os-font);color:var(--os-text);background:var(--os-bezel);border:1px solid var(--os-bezel);border-radius:0;padding:12px;width:min(980px,96vw);max-height:94dvh;box-shadow:0 28px 100px #332c2155;overflow:hidden}
 #laptop-window::backdrop{background:var(--os-backdrop);backdrop-filter:blur(9px)}
-#laptop-window button,#laptop-window input{font:inherit;font-size:var(--os-small);border:1px solid var(--os-border);border-radius:var(--os-radius);color:var(--os-text);background:var(--os-glass);transition:background var(--os-transition),border-color var(--os-transition),opacity var(--os-transition);padding:11px 16px}
-#laptop-window button:hover{background:color-mix(in srgb,var(--os-accent) 12%,transparent);border-color:color-mix(in srgb,var(--os-accent) 45%,transparent)}
-#laptop-window button:active{background:color-mix(in srgb,var(--os-accent) 22%,transparent)}
+#laptop-window button,#laptop-window input{font:inherit;font-size:var(--os-small);border:1px solid var(--os-border);border-radius:var(--os-radius);color:var(--os-text);background:transparent;transition:background var(--os-transition),border-color var(--os-transition),opacity var(--os-transition);padding:11px 16px}
+#laptop-window input{background:var(--os-field)}
+#laptop-window button:hover{background:var(--os-tint);border-color:var(--os-accent)}
+#laptop-window button:active{background:color-mix(in srgb,var(--os-accent) 18%,transparent)}
 #laptop-window button:disabled{opacity:.45;cursor:default}
-#laptop-window .os-primary{background:var(--os-accent);color:var(--os-base);font-weight:600;border-color:transparent;width:100%}
-#laptop-window .os-primary:hover{background:color-mix(in srgb,var(--os-accent) 85%,white)}
+#laptop-window .os-primary{background:var(--os-paperEdge);color:var(--os-text);border-color:var(--os-accent);width:100%}
+#laptop-window .os-primary:hover{background:color-mix(in srgb,var(--os-paperEdge) 70%,var(--os-border))}
 .os-bezel{position:absolute;top:20px;left:28px;right:28px;z-index:8;display:flex;justify-content:space-between;align-items:center;pointer-events:none}
 .os-bezel>*{pointer-events:auto}
-.os-brand{font-size:var(--os-small);letter-spacing:.06em;font-weight:600;display:flex;align-items:center;gap:8px}
-.os-mark{width:16px;height:16px;display:inline-grid;place-items:center;border:1px solid var(--os-accent);border-radius:5px;color:var(--os-accent);font-size:var(--os-small)}
+.os-brand{font-family:var(--os-labelFont);font-size:var(--os-small);letter-spacing:.12em;text-transform:uppercase;font-weight:600;display:flex;align-items:center;gap:8px}
+.os-mark{width:16px;height:16px;display:inline-grid;place-items:center;border:1px solid var(--os-accent);border-radius:0;color:var(--os-accent);font-size:var(--os-small);letter-spacing:0}
 .os-camera{position:absolute;left:50%;top:-8px;width:4px;height:4px;background:var(--os-camera);border-radius:50%;pointer-events:none}
-#laptop-window #close-laptop{font-size:var(--os-small);padding:5px 8px;background:transparent;border-color:transparent;color:var(--os-muted);border-radius:7px}
-#laptop-window .lock-screen{position:relative;min-height:0;height:min(76dvh,640px);padding:0;overflow:auto;background:radial-gradient(ellipse at 80% 80%,var(--os-wallpaperTeal) 0,transparent 58%),radial-gradient(ellipse at 12% 15%,var(--os-wallpaperBlue) 0,transparent 60%),var(--os-base);border-radius:14px;text-align:center;isolation:isolate}
+#laptop-window #close-laptop{font-size:var(--os-small);padding:5px 8px;background:transparent;border-color:transparent;color:var(--os-muted);border-radius:0}
+#laptop-window .lock-screen{position:relative;min-height:0;height:min(76dvh,640px);padding:0;overflow:auto;background:radial-gradient(ellipse at 48% 43%,var(--os-base) 0%,var(--os-base) 20%,var(--os-paperEdge) 100%);border-radius:0;text-align:center;isolation:isolate}
 .os-lock-curtain{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;padding-top:clamp(70px,14vh,130px);transition:transform 480ms cubic-bezier(.2,.7,.2,1),opacity 360ms;z-index:2}
-#laptop-window #reveal-signin{position:absolute;inset:0;width:100%;height:100%;border:0;background:none;border-radius:14px;padding:0}
+#laptop-window #reveal-signin{position:absolute;inset:0;width:100%;height:100%;border:0;background:none;border-radius:0;padding:0}
 #laptop-window #reveal-signin:hover{background:none}
-.os-clock{font-size:clamp(64px,12vw,100px);font-weight:300;letter-spacing:-5px;line-height:1.1;font-variant-numeric:tabular-nums;pointer-events:none}
+.os-clock{font-size:clamp(64px,12vw,100px);font-weight:400;letter-spacing:-2px;line-height:1.1;font-variant-numeric:tabular-nums;pointer-events:none}
+.os-date,.os-continue,.os-lock-wordmark{font-family:var(--os-labelFont);text-transform:uppercase;letter-spacing:.12em}
 .os-date{font-size:14px;margin-top:12px;color:var(--os-muted);pointer-events:none}
-.os-continue{position:absolute;bottom:62px;font-size:var(--os-small);color:var(--os-muted);letter-spacing:.02em;pointer-events:none}
+.os-continue{position:absolute;bottom:62px;font-size:var(--os-small);color:var(--os-muted);pointer-events:none}
 .os-continue span{display:block;color:var(--os-accent);font-size:22px;margin-bottom:12px}
-.os-signin{position:relative;width:min(340px,calc(100% - 40px));margin:76px auto 28px;padding:27px 26px 20px;background:var(--os-glass);backdrop-filter:blur(var(--os-blur));border:1px solid var(--os-border);border-radius:var(--os-radius);opacity:0;transform:translateY(25px);transition:opacity 360ms,transform 480ms cubic-bezier(.2,.7,.2,1);visibility:hidden}
+.os-signin{position:relative;width:min(340px,calc(100% - 40px));margin:76px auto 28px;padding:27px 26px 20px;background:var(--os-base);border:1px solid var(--os-border);border-radius:var(--os-radius);box-shadow:0 14px 30px var(--os-shadow);opacity:0;transform:translateY(25px);transition:opacity 360ms,transform 480ms cubic-bezier(.2,.7,.2,1);visibility:hidden}
 .signin-revealed .os-lock-curtain{opacity:0;transform:translateY(-90px);pointer-events:none}
 .signin-revealed .os-signin{opacity:1;transform:none;visibility:visible}
 #laptop-window .avatar{width:62px;height:62px;background:color-mix(in srgb,var(--os-accent) 12%,transparent);border:1px solid var(--os-border);color:var(--os-accent);font-size:19px;font-weight:400;letter-spacing:.04em;border-radius:50%;margin:auto}
-#laptop-window .lock-screen h3{font-size:24px;letter-spacing:-.6px;font-weight:500;margin:16px 0 6px}
+#laptop-window .lock-screen h3{font-size:24px;letter-spacing:-.5px;font-weight:400;margin:16px 0 6px}
 #laptop-window .lock-screen p{font-size:var(--os-small);line-height:1.6;color:var(--os-muted)}
 #laptop-window .signin-caption{margin:0 0 22px}
-#laptop-window .os-link{border-color:transparent;background:transparent;font-size:var(--os-small);padding:7px 4px;color:var(--os-muted)}
-#laptop-window .os-link:hover{color:var(--os-accent);background:none;border-color:transparent}
+#laptop-window .os-link{border-color:transparent;background:transparent;font-size:var(--os-small);padding:7px 4px;color:var(--os-muted);text-decoration:underline;text-decoration-color:var(--os-border);text-underline-offset:4px}
+#laptop-window .os-link:hover{color:var(--os-accent);background:none;border-color:transparent;text-decoration-color:currentColor}
 .os-puzzle-toggle{margin-top:12px}
 #laptop-window .lock-screen label{font-size:var(--os-small);text-align:left;margin:16px 0 9px;line-height:1.5}
 .answer-row{gap:7px}
-#laptop-window .answer-row input{width:100%;padding:10px;min-width:0;background:var(--os-field);border-radius:10px}
-#laptop-window .answer-row button{padding:10px 13px;border-radius:10px}
+#laptop-window .answer-row input{width:100%;padding:10px;min-width:0;background:var(--os-field);border-radius:var(--os-radius)}
+#laptop-window .answer-row button{padding:10px 13px;border-radius:var(--os-radius);background:var(--os-paperEdge);border-color:var(--os-accent)}
 .os-puzzle-actions{display:flex;justify-content:space-between;margin-top:5px}
 #laptop-window #answer-message{text-align:left;font-size:var(--os-small);min-height:18px;margin:5px 0 0}
 .os-puzzle{border-top:1px solid var(--os-border);margin-top:12px}
@@ -66,10 +55,10 @@
 .os-signin.is-wrong{animation:os-shake 300ms ease-out}
 .os-signin.is-correct .avatar{animation:os-celebrate 380ms ease-out;box-shadow:0 0 0 7px color-mix(in srgb,var(--os-accent) 10%,transparent)}
 .os-signin.is-unlocking{opacity:0;transform:translateY(-8px)}
-#laptop-window .os-desktop{height:min(76dvh,640px);min-height:0;border-radius:14px;color:var(--os-text)}
+#laptop-window .os-desktop{height:min(76dvh,640px);min-height:0;border-radius:0;color:var(--os-text)}
 #laptop-window .os-desktop.os-entering{animation:os-desktop-in 360ms ease-out}
-#laptop-window .taskbar,#laptop-window .start-menu,#laptop-window .app-window,#laptop-window .app-titlebar{color:var(--os-text);background:color-mix(in srgb,var(--os-base) 75%,transparent);border-color:var(--os-border);backdrop-filter:blur(var(--os-blur));border-radius:var(--os-radius)}
-#laptop-window .taskbar{border-radius:0 0 14px 14px;border-top:1px solid var(--os-border)}
+#laptop-window .taskbar,#laptop-window .start-menu,#laptop-window .app-window,#laptop-window .app-titlebar{color:var(--os-text);background:var(--os-base);border-color:var(--os-border);border-radius:var(--os-radius)}
+#laptop-window .taskbar{border-radius:0;border-top:1px solid var(--os-border)}
 #laptop-window .taskbar button{font-size:var(--os-small);padding:8px 10px}
 #laptop-window .taskbar-search{width:100px}
 #laptop-window .tray{color:var(--os-muted)}
@@ -81,9 +70,9 @@
 @keyframes os-celebrate{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
 @keyframes os-desktop-in{from{opacity:0;transform:scale(.985)}to{opacity:1;transform:scale(1)}}
 @media(max-width:500px){
-  #laptop-window{width:calc(100vw - 12px);padding:7px;border-radius:17px;max-height:96dvh}
+  #laptop-window{width:calc(100vw - 12px);padding:7px;max-height:96dvh}
   .os-bezel{left:20px;right:20px;top:17px}
-  #laptop-window .lock-screen,#laptop-window .os-desktop{height:86dvh;max-height:calc(96dvh - 16px);border-radius:11px}
+  #laptop-window .lock-screen,#laptop-window .os-desktop{height:86dvh;max-height:calc(96dvh - 16px)}
   .os-signin{margin-top:80px;padding:24px 22px 18px}
   .os-clock{font-size:76px}
   .os-lock-curtain{padding-top:130px}
@@ -95,50 +84,50 @@
   #laptop-window *,#laptop-window *::before,#laptop-window *::after{animation:none!important;transition:none!important}
   .os-signin,.signin-revealed .os-lock-curtain{transform:none}
 }
-.os-lock-wordmark{font-size:var(--os-small);letter-spacing:.12em;color:var(--os-muted);margin-top:25px;pointer-events:none}
-#laptop-window .os-desktop{background:radial-gradient(ellipse at 80% 80%,var(--os-wallpaperTeal),transparent 58%),radial-gradient(ellipse at 12% 15%,var(--os-wallpaperBlue),transparent 60%),var(--os-base);isolation:isolate}
+.os-lock-wordmark{font-size:var(--os-small);color:var(--os-muted);margin-top:25px;pointer-events:none}
+#laptop-window .os-desktop{background:radial-gradient(ellipse at 48% 43%,var(--os-base) 0%,var(--os-base) 20%,var(--os-paperEdge) 100%);isolation:isolate}
 #laptop-window .desktop-icons{top:76px;left:24px;display:grid;grid-template-columns:repeat(2,82px);gap:16px 12px;z-index:1}
 #laptop-window .desktop-icons button{width:82px;min-height:80px;padding:8px 4px;border:1px solid transparent;background:transparent;text-shadow:none;white-space:normal;font-size:var(--os-small);line-height:1.4;display:flex;flex-direction:column;align-items:center;gap:7px}
-#laptop-window .desktop-icons button:hover,#laptop-window .desktop-icons button.os-selected{background:var(--os-glass);border-color:var(--os-border)}
+#laptop-window .desktop-icons button:hover,#laptop-window .desktop-icons button.os-selected{background:var(--os-tint);border-color:var(--os-border)}
 #laptop-window .desktop-icons button>span{font-size:inherit;margin-bottom:0}
-.os-app-icon{display:grid;place-items:center;width:43px;height:43px;border:1px solid var(--os-border);border-radius:12px;background:color-mix(in srgb,var(--os-accent) 8%,transparent);color:var(--os-accent)}
+.os-app-icon{display:grid;place-items:center;width:43px;height:43px;border:1px solid var(--os-border);border-radius:var(--os-radius);background:var(--os-base);color:var(--os-accent)}
 .os-icon{display:block;width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
 #laptop-window .desktop-icons .os-app-icon{font-size:inherit;margin:0;display:grid}
-.os-widget{position:absolute;right:24px;top:76px;width:238px;padding:18px 19px;border:1px solid var(--os-border);border-radius:var(--os-radius);background:var(--os-glass);backdrop-filter:blur(var(--os-blur));z-index:1}
-.widget-overline{font-size:var(--os-small);letter-spacing:.15em;color:var(--os-muted)}
-.os-widget h3{font-size:22px;font-weight:500;letter-spacing:-.6px;margin:9px 0 4px}
+.os-widget{position:absolute;right:24px;top:76px;width:238px;padding:18px 19px;border:1px solid var(--os-border);border-radius:var(--os-radius);background:var(--os-base);box-shadow:0 14px 30px var(--os-shadow);z-index:1}
+.widget-overline{font-family:var(--os-labelFont);font-size:var(--os-small);letter-spacing:.12em;text-transform:uppercase;color:var(--os-muted)}
+.os-widget h3{font-size:22px;font-weight:400;letter-spacing:-.5px;margin:9px 0 4px}
 .os-widget p{font-size:var(--os-small);margin:0 0 14px;color:var(--os-text)}
 .os-widget small{font-size:var(--os-small);line-height:1.6;display:block;color:var(--os-muted)}
 .os-window-layer{position:absolute;inset:0;pointer-events:none;z-index:3}
-.os-window{position:absolute;pointer-events:auto;display:flex;flex-direction:column;min-width:260px;max-width:calc(100% - 24px);max-height:calc(100% - 140px);background:color-mix(in srgb,var(--os-base) 85%,transparent);border:1px solid var(--os-border);border-radius:var(--os-radius);backdrop-filter:blur(var(--os-blur));box-shadow:0 15px 45px #0004;overflow:hidden;animation:os-window-in var(--os-window-animation) ease-out}
-.os-window.os-focused{border-color:color-mix(in srgb,var(--os-accent) 50%,transparent);box-shadow:0 20px 60px #0005}
+.os-window{position:absolute;pointer-events:auto;display:flex;flex-direction:column;min-width:260px;max-width:calc(100% - 24px);max-height:calc(100% - 140px);background:var(--os-base);border:1px solid var(--os-border);border-radius:var(--os-radius);box-shadow:0 14px 30px var(--os-shadow);overflow:hidden;animation:os-window-in var(--os-window-animation) ease-out}
+.os-window.os-focused{border-color:var(--os-accent);box-shadow:0 18px 40px #4a3f2e38}
 .os-window.os-closing{animation:os-window-out var(--os-window-animation) ease-in forwards;pointer-events:none}
-.os-window-titlebar{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--os-border);background:var(--os-glass);padding:8px 9px 8px 14px;min-height:43px;cursor:grab;touch-action:none;user-select:none}
+.os-window-titlebar{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--os-border);background:var(--os-tint);padding:8px 9px 8px 14px;min-height:43px;cursor:grab;touch-action:none;user-select:none}
 .os-window-titlebar:active{cursor:grabbing}
-.os-window-title{display:flex;align-items:center;gap:9px;font-size:var(--os-small);font-weight:500}
+.os-window-title{display:flex;align-items:center;gap:9px;font-size:var(--os-small);font-weight:400}
 .os-window-title .os-icon{width:16px;height:16px;color:var(--os-accent)}
 .os-window-actions{display:flex;gap:3px}
-#laptop-window .os-window-actions button{width:27px;height:27px;min-width:0;padding:5px;border-color:transparent;border-radius:7px;display:grid;place-items:center}
+#laptop-window .os-window-actions button{width:27px;height:27px;min-width:0;padding:5px;border-color:transparent;border-radius:var(--os-radius);display:grid;place-items:center}
 .os-window-actions .os-icon{width:14px;height:14px}
 .os-window-content{padding:24px;overflow:auto;flex:1;font-size:var(--os-small);line-height:1.7}
-.os-window-content h3{font-weight:500;font-size:22px;letter-spacing:-.5px;margin:0 0 13px}
+.os-window-content h3{font-weight:400;font-size:22px;letter-spacing:-.5px;margin:0 0 13px}
 .os-window-content p{color:var(--os-muted);margin:0 0 18px}
-.os-todo{font-size:var(--os-small);letter-spacing:.08em;padding:5px 8px;display:inline-block;color:var(--os-accent);border:1px solid var(--os-border);border-radius:6px;margin-bottom:15px}
+.os-todo{font-family:var(--os-labelFont);text-transform:uppercase;font-size:var(--os-small);letter-spacing:.12em;padding:5px 8px;display:inline-block;color:var(--os-accent);border:1px solid var(--os-border);border-radius:var(--os-radius);margin-bottom:15px}
 .os-window.os-maximized{left:12px!important;top:52px!important;width:calc(100% - 24px)!important;height:calc(100% - 137px)!important;max-height:none;max-width:none}
-.os-dock{position:absolute;bottom:17px;left:50%;transform:translateX(-50%);z-index:20;display:flex;gap:5px;align-items:center;padding:7px;border:1px solid var(--os-border);border-radius:18px;background:color-mix(in srgb,var(--os-base) 66%,transparent);backdrop-filter:blur(var(--os-blur));max-width:calc(100% - 24px)}
+.os-dock{position:absolute;bottom:17px;left:50%;transform:translateX(-50%);z-index:20;display:flex;gap:5px;align-items:center;padding:7px;border:1px solid var(--os-border);border-radius:var(--os-radius);background:var(--os-base);box-shadow:0 14px 30px var(--os-shadow);max-width:calc(100% - 24px)}
 .os-pinned{display:flex;gap:4px}
-#laptop-window .os-dock button{position:relative;width:38px;height:42px;padding:8px;display:grid;place-items:center;border-color:transparent;border-radius:11px;background:transparent;flex-shrink:0}
+#laptop-window .os-dock button{position:relative;width:38px;height:42px;padding:8px;display:grid;place-items:center;border-color:transparent;border-radius:var(--os-radius);background:transparent;flex-shrink:0}
 #laptop-window .os-dock button.os-running::after{content:'';position:absolute;bottom:2px;width:4px;height:4px;border-radius:50%;background:var(--os-accent)}
-#laptop-window .os-dock button.os-active{background:color-mix(in srgb,var(--os-accent) 14%,transparent);border-color:var(--os-border)}
-#laptop-window .os-dock button.os-minimized::after{background:var(--os-muted)}
-.os-dock-clock{font-size:var(--os-small);color:var(--os-muted);min-width:62px;text-align:center;padding:0 5px;font-variant-numeric:tabular-nums;white-space:nowrap}
-#laptop-window .start-menu{bottom:86px;left:50%;z-index:25;width:230px;background:color-mix(in srgb,var(--os-base) 86%,transparent)}
-#laptop-window .start-menu h3{font-size:var(--os-small);font-weight:500;margin:4px 8px 14px;color:var(--os-muted)}
-.os-search{position:absolute;bottom:86px;left:50%;transform:translateX(-50%);width:min(360px,calc(100% - 30px));padding:18px;border:1px solid var(--os-border);border-radius:var(--os-radius);background:color-mix(in srgb,var(--os-base) 86%,transparent);backdrop-filter:blur(var(--os-blur));z-index:25}
+#laptop-window .os-dock button.os-active{background:var(--os-paperEdge);border-color:var(--os-accent)}
+#laptop-window .os-dock button.os-minimized::after{background:var(--os-border)}
+.os-dock-clock{font-family:var(--os-labelFont);font-size:var(--os-small);color:var(--os-muted);min-width:62px;text-align:center;padding:0 5px;font-variant-numeric:tabular-nums;white-space:nowrap}
+#laptop-window .start-menu{bottom:86px;left:50%;z-index:25;width:230px;background:var(--os-base)}
+#laptop-window .start-menu h3{font-size:var(--os-small);font-weight:400;margin:4px 8px 14px;color:var(--os-text)}
+.os-search{position:absolute;bottom:86px;left:50%;transform:translateX(-50%);width:min(360px,calc(100% - 30px));padding:18px;border:1px solid var(--os-border);border-radius:var(--os-radius);background:var(--os-base);box-shadow:0 14px 30px var(--os-shadow);z-index:25}
 .os-search label{display:block;font-size:var(--os-small);color:var(--os-muted);margin:0 0 10px}
 #laptop-window .os-search input{width:100%;background:var(--os-field)}
 #os-search-results{display:grid;gap:4px;margin-top:12px;max-height:215px;overflow:auto}
-#laptop-window #os-search-results button{display:flex;align-items:center;gap:12px;text-align:left;border-color:transparent;border-radius:9px;padding:9px;background:transparent}
+#laptop-window #os-search-results button{display:flex;align-items:center;gap:12px;text-align:left;border-color:transparent;border-radius:var(--os-radius);padding:9px;background:transparent}
 .os-search-empty{font-size:var(--os-small);color:var(--os-muted);margin:12px 0}
 .os-sr-only{position:absolute;width:1px;height:1px;margin:-1px;clip-path:inset(50%);overflow:hidden;white-space:nowrap}
 @keyframes os-window-in{from{opacity:0;transform:translateY(7px) scale(.985)}to{opacity:1;transform:none}}
@@ -148,11 +137,11 @@
   .os-widget{right:16px;top:72px;width:calc(100% - 122px);max-width:225px;padding:15px}
   .os-widget h3{font-size:20px}
   .os-widget small{font-size:var(--os-small)}
-  .os-window,.os-window.os-maximized{left:0!important;top:48px!important;width:100%!important;height:calc(100% - 48px)!important;max-width:none;max-height:none;min-width:0;border-radius:0 0 11px 11px;padding-bottom:86px}
+  .os-window,.os-window.os-maximized{left:0!important;top:48px!important;width:100%!important;height:calc(100% - 48px)!important;max-width:none;max-height:none;min-width:0;border-radius:0;padding-bottom:86px}
   .os-window-titlebar{cursor:default}
   .os-window-content{padding:21px}
-  .os-dock{bottom:14px;padding:5px;gap:2px;border-radius:15px;max-width:calc(100% - 14px)}
-  #laptop-window .os-dock button{width:29px;height:39px;padding:5px;border-radius:9px}
+  .os-dock{bottom:14px;padding:5px;gap:2px;max-width:calc(100% - 14px)}
+  #laptop-window .os-dock button{width:29px;height:39px;padding:5px}
   .os-pinned{gap:1px}
   .os-dock-clock{min-width:45px;font-size:var(--os-small);padding:0 2px}
   .os-dock .os-icon{width:18px;height:18px}
@@ -168,18 +157,20 @@
 .os-project-list{display:grid;gap:7px}
 #laptop-window .os-project-list button{display:flex;align-items:center;text-align:left;gap:13px;padding:12px;width:100%}
 .os-project-list strong,.os-project-list small{display:block}
-.os-project-list strong{font-size:var(--os-small);font-weight:500}
+.os-project-list strong{font-size:var(--os-small);font-weight:400}
 .os-project-list small{font-size:var(--os-small);color:var(--os-muted);margin-top:3px}
-.os-project-image{min-height:105px;display:grid;place-items:center;background:linear-gradient(135deg,var(--os-wallpaperBlue),var(--os-wallpaperTeal));border:1px solid var(--os-border);border-radius:9px;color:var(--os-muted);font-size:var(--os-small);margin-bottom:15px;overflow:hidden}
+.os-project-image{min-height:105px;display:grid;place-items:center;background:#e9e3d6;border:1px solid var(--os-border);border-radius:var(--os-radius);color:var(--os-muted);font-size:var(--os-small);margin-bottom:15px;overflow:hidden}
 .os-project-image img{width:100%;height:auto;display:block}
 .os-tech{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:15px}
-.os-tech span{font-size:var(--os-small);border:1px solid var(--os-border);padding:3px 8px;border-radius:20px}
+.os-tech span{font-size:var(--os-small);border:1px solid var(--os-border);padding:3px 8px;border-radius:var(--os-radius)}
 .os-contact-list{display:grid;gap:9px}
-.os-contact-missing{color:var(--os-muted);font-size:var(--os-small);border:1px dashed var(--os-border);padding:10px;border-radius:8px}
+.os-contact-missing{color:var(--os-muted);font-size:var(--os-small);border:1px dashed var(--os-border);padding:10px;border-radius:var(--os-radius)}
 .os-project-links{display:flex;gap:8px;flex-wrap:wrap}
-#laptop-window .os-app-link{display:inline-flex;align-items:center;color:var(--os-accent);padding:8px 11px;border:1px solid var(--os-border);border-radius:8px;font-size:var(--os-small);text-decoration:none;background:var(--os-glass)}
-#laptop-window .os-app-link:hover{background:color-mix(in srgb,var(--os-accent) 15%,transparent)}
-.os-window-content h4{font-size:var(--os-small);font-weight:500;margin:18px 0 7px}
+#laptop-window .os-app-link{display:inline-flex;align-items:center;color:var(--os-accent);padding:8px 11px;border:1px solid var(--os-border);border-radius:var(--os-radius);font-size:var(--os-small);text-decoration:none;background:transparent;transition:background var(--os-transition),border-color var(--os-transition)}
+#laptop-window .os-app-link:hover{background:var(--os-tint);border-color:var(--os-accent)}
+.os-window-content p a{color:var(--os-text);text-decoration-color:var(--os-border);text-underline-offset:4px}
+.os-window-content p a:hover{text-decoration-color:currentColor}
+.os-window-content h4{font-size:var(--os-small);font-weight:400;margin:18px 0 7px;color:var(--os-text)}
 .os-resume-content{padding:12px;display:flex;flex-direction:column;gap:10px}
 .os-resume-toolbar{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:var(--os-small);flex-wrap:wrap}
 .os-resume-content object{width:100%;min-height:320px;border:0;background:#fff}
@@ -187,7 +178,7 @@
 #laptop-window .os-resume-content details{display:block;margin:0;color:var(--os-muted)}
 .os-resume-content img,.os-resume-content details{flex-shrink:0}
 .os-resume-content summary{font-size:var(--os-small);cursor:pointer;color:var(--os-accent)}
-.os-terminal{display:flex;flex-direction:column;padding:17px;background:#06121b;line-height:1.7}
+.os-terminal{display:flex;flex-direction:column;padding:17px;background:var(--os-base);line-height:1.7}
 .os-terminal-output{flex:1;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;font-size:var(--os-small);color:var(--os-text)}
 .os-terminal-output>div{margin-bottom:7px}
 .os-terminal-form{margin-top:12px;font-size:var(--os-small);color:var(--os-accent)}
@@ -199,12 +190,12 @@
   .os-terminal-cursor{animation:none}
 }
 #laptop-window .os-resume-content{padding:0;gap:0;overflow:hidden;min-height:0}
-#laptop-window .os-resume-toolbar{flex-shrink:0;padding:10px 12px;border-bottom:1px solid var(--os-border);gap:8px;background:var(--os-glass)}
+#laptop-window .os-resume-toolbar{flex-shrink:0;padding:10px 12px;border-bottom:1px solid var(--os-border);gap:8px;background:var(--os-tint)}
 .os-resume-zoom{display:flex;align-items:center;gap:4px}
 .os-resume-zoom output{min-width:40px;text-align:center;font-size:var(--os-small);font-variant-numeric:tabular-nums}
 #laptop-window .os-resume-zoom button{padding:5px 8px;min-height:30px;font-size:var(--os-small)}
-.os-resume-viewport{flex:1;min-height:0;overflow:auto;padding:14px;background:#081722;scrollbar-width:thin;scrollbar-color:var(--os-muted) transparent}
-.os-resume-paper{margin:0 auto 14px;box-shadow:0 4px 16px #0003;background:white;flex:none}
+.os-resume-viewport{flex:1;min-height:0;overflow:auto;padding:14px;background:var(--os-paperEdge);scrollbar-width:thin;scrollbar-color:var(--os-muted) transparent}
+.os-resume-paper{margin:0 auto 14px;box-shadow:0 4px 16px var(--os-shadow);background:white;flex:none}
 #laptop-window .os-resume-paper img{display:block;width:100%;max-width:none;height:auto;aspect-ratio:17/22;object-fit:contain;flex:none;image-rendering:auto}
 #laptop-window .os-resume-viewport details{display:block;margin:0;color:var(--os-muted)}
 .os-resume-viewport summary{padding:6px 0}
@@ -238,13 +229,13 @@ body:has(#laptop-window[open]){overflow:hidden}
 .os-project-list small{line-height:1.55}
 .os-project-badge{color:var(--os-accent)!important}
 .os-experience-timeline{border-left:1px solid var(--os-border);padding-left:18px;display:grid;gap:18px}
-#laptop-window .os-experience-card{display:block;margin:0;border:1px solid var(--os-border);border-radius:12px;background:var(--os-glass);color:var(--os-muted);font:inherit;position:relative}
+#laptop-window .os-experience-card{display:block;margin:0;border:1px solid var(--os-border);border-radius:var(--os-radius);background:transparent;color:var(--os-muted);font:inherit;position:relative}
 .os-experience-card::before{content:'';position:absolute;left:-23px;top:23px;width:8px;height:8px;border-radius:50%;background:var(--os-accent)}
 .os-experience-card summary{padding:18px;cursor:pointer;list-style:none}
 .os-experience-card summary::after{content:'+';position:absolute;right:14px;top:16px;color:var(--os-accent)}
 .os-experience-card[open] summary::after{content:'−'}
 .os-experience-card summary strong,.os-experience-role,.os-experience-card summary small{display:block;padding-right:12px}
-.os-experience-card summary strong{color:var(--os-text);font-size:14px}
+.os-experience-card summary strong{color:var(--os-text);font-size:14px;font-weight:400}
 .os-experience-role{color:var(--os-accent)}
 .os-experience-card summary p{margin:12px 0}
 .os-experience-card ul{padding:0 30px 18px 36px;margin:0;line-height:1.7}
@@ -256,7 +247,7 @@ body:has(#laptop-window[open]){overflow:hidden}
 .os-contact-row{display:flex;align-items:center;gap:8px}
 .os-contact-row .os-app-link{flex:1;display:flex;align-items:center;gap:14px;min-width:0}
 .os-contact-text{display:grid;gap:3px;min-width:0}
-.os-contact-text strong{font-size:12px}
+.os-contact-text strong{font-size:12px;font-weight:400}
 .os-contact-text>span{font-size:12px;overflow-wrap:anywhere;color:var(--os-muted)}
 #laptop-window .os-contact-copy{padding:7px 10px;font-size:11px}
 .os-window-content.os-contact-content{padding:16px}
@@ -272,7 +263,8 @@ body:has(#laptop-window[open]){overflow:hidden}
 #laptop-window .widget-overline,#laptop-window .os-breadcrumb,#laptop-window .os-tech span,#laptop-window .os-todo,#laptop-window small,#laptop-window time:not(.os-clock),#laptop-window .os-dock-clock,#laptop-window #close-laptop,#laptop-window .os-signin-foot,#laptop-window .os-continue,#laptop-window #answer-message,#laptop-window .os-mark,#laptop-window .os-link{font-size:var(--os-small)!important}
 #laptop-window .os-experience-card ul{line-height:var(--os-bodyLineHeight)}
 #laptop-window .os-widget small,#laptop-window .os-project-list small:not(.os-project-badge){font-size:var(--os-body)!important}
-#laptop-window .os-project-badge{display:inline-block;margin-top:8px;padding:6px 9px;border-radius:6px;background:var(--os-accent);color:var(--os-base)!important;font-size:var(--os-body)!important;font-weight:600;line-height:1.5;letter-spacing:0}
+#laptop-window .os-project-badge{display:inline-block;margin-top:8px;padding:4px 8px;border:1px solid var(--os-accent);border-radius:var(--os-radius);background:transparent;color:var(--os-text)!important;font-family:var(--os-labelFont);font-size:var(--os-small)!important;font-weight:400;line-height:1.3;letter-spacing:0}
+#laptop-window .os-window-content>.os-project-badge{margin:0 0 14px}
 #laptop-window .os-window-actions button{width:32px;height:32px;min-width:32px;padding:8px}
 #laptop-window .os-dock button{width:44px;height:44px;min-width:44px;min-height:44px;padding:10px}
 .os-dock{width:max-content}

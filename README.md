@@ -18,7 +18,7 @@ index.html is a shell that loads one folder per component. Each folder has its o
 |---|---|
 | `room/` | The 3D room (scene, camera, intro, hotspots). Look and motion settings are in `room/settings.js`. |
 | `liuos/` | LiuOS, the laptop desktop. OS settings (colors, apps, puzzle, wording) are in `liuos/settings.js`. |
-| `resume-viewer/` | The in-room résumé: a web copy of the LaTeX résumé, opened from the paper on the desk. |
+| `resume-viewer/` | The in-room résumé pop-up, opened from the paper on the desk. The résumé itself is `assets/resume/resume.html` (shared with LiuOS). |
 | `nav/` | The bar across the top, shared by every page. |
 | `pages/` | The career pages: `about/`, `experience/`, `projects/`, `contact/`. Shared styles in `pages.css`. |
 | `content/portfolio.js` | Profile, projects, and experience. Edit these facts here; LiuOS and the pages read them from this file. Keep projects newest first. |

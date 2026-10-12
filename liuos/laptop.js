@@ -16,6 +16,8 @@ const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
 const reducedMotion = () => motionPreference.matches;
 
 const markup = await fetch(new URL('laptop.html', import.meta.url)).then(response => response.text());
+// The résumé shown in the Resume app: the shared web copy (the in-room viewer shows the same file).
+const resumeSheet = await fetch(new URL('../assets/resume/resume.html', import.meta.url)).then(response => response.text());
 document.body.insertAdjacentHTML('beforeend', markup);
 
 const osElement=document.getElementById('laptop-window');osElement.style.setProperty('--os-window-animation',LIUOS_CONFIG.windows.animationMs+'ms');
@@ -114,7 +116,7 @@ function renderResume(parent){
  const toolbar=osNode('div',undefined,'os-resume-toolbar');const zoomControls=osNode('div',undefined,'os-resume-zoom');zoomControls.setAttribute('role','group');zoomControls.setAttribute('aria-label','Resume zoom');
  const less=osNode('button','−'),more=osNode('button','+'),fit=osNode('button','Fit width'),percent=osNode('output','100%');less.setAttribute('aria-label','Zoom out resume');more.setAttribute('aria-label','Zoom in resume');percent.setAttribute('aria-live','polite');zoomControls.append(less,percent,more,fit);toolbar.append(zoomControls,osLink('Download PDF',source,'Liu_Nathan_Resume.pdf'));
  const viewport=osNode('div',undefined,'os-resume-viewport');viewport.tabIndex=0;viewport.setAttribute('role','region');viewport.setAttribute('aria-label','Resume page; scroll to read');
- const paper=osNode('div',undefined,'os-resume-paper');paper.append(document.getElementById('resume-text-template').content.cloneNode(true));viewport.append(paper);
+ const paper=osNode('div',undefined,'os-resume-paper');paper.innerHTML=resumeSheet;viewport.append(paper);
  let zoom=1;function update(){const width=Math.min(cfg.pageMaxWidth,Math.max(1,viewport.clientWidth-28));paper.style.width=Math.round(width*zoom)+'px';percent.value=Math.round(zoom*100)+'%';percent.textContent=percent.value;less.disabled=zoom<=cfg.minZoom;more.disabled=zoom>=cfg.maxZoom;}
  less.addEventListener('click',()=>{zoom=Math.max(cfg.minZoom,zoom-cfg.zoomStep);update();});more.addEventListener('click',()=>{zoom=Math.min(cfg.maxZoom,zoom+cfg.zoomStep);update();});fit.addEventListener('click',()=>{zoom=1;update();viewport.scrollLeft=0;});
  parent.append(toolbar,viewport);const observer=new ResizeObserver(update);observer.observe(viewport);return {onFocus:update,onClose:()=>observer.disconnect()};

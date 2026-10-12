@@ -36,11 +36,12 @@ showcases my experience. Audience: recruiters and hiring managers for ML / data 
 - Career pages live in `pages/<name>/index.html` with their own `.css` and `.js`. Shared page
   styles are in `pages/pages.css` and the scroll fade-in is `pages/reveal.js`. Every page sets
   `<body data-page="...">` (the nav uses it) and ends with a "Back to the room" button.
-- Shared styles: `css/base.css` (including the drafting-paper theme). Shared files: `assets/`
+- Shared styles: `css/base.css` (including the drafting-paper theme) and `css/resume-sheet.css` (the résumé). Shared files: `assets/`
   (project screenshots in `assets/projects/`).
 - CSS order matters: `nav/nav.css` loads last on purpose (see the comment in `index.html`).
-- `resume-viewer/viewer.html` is a hand-made web copy of my LaTeX résumé (Jake's template, set in
-  Computer Modern). When the résumé changes, update the PDF, `resume.png` (the desk texture), and this copy.
+- `assets/resume/resume.html` is a hand-made web copy of my LaTeX résumé (Jake's template, set in
+  Computer Modern), styled by `css/resume-sheet.css`. Both the in-room résumé viewer and LiuOS show this
+  one file. When the résumé changes, update the PDF, `resume.png` (the desk texture), and this copy.
 - Three.js is imported by URL in both `room/room.js` and `liuos/laptop.js`. The URLs must match
   exactly so the browser loads it once. If you change the version, change it in both files.
 

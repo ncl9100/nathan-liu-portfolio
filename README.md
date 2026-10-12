@@ -1,8 +1,6 @@
-# Nathan Liu — room portfolio
+# Nathan Liu: room portfolio
 
 A measured 3D model of my NYU dorm, drawn like an architectural drafting sheet. Click around the room, sit at the desk, and open **LiuOS**, a custom in-browser desktop for my work.
-
-This is not a scroll of project cards with a headshot on top. I wanted a portfolio that feels like a place you can walk into!
 
 **Repo:** [ncl9100/nathan-liu-portfolio](https://github.com/ncl9100/nathan-liu-portfolio)
 

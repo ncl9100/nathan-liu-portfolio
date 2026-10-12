@@ -367,19 +367,79 @@ const paperFace=new THREE.Mesh(new THREE.PlaneGeometry(8.5,11),new THREE.MeshBas
 
 box(3.7,5.7,2.8,-16,53.35,-7,solid('#d8c48c'));textSurface('TISSUES',3.2,1.2,-16,53.4,-5.56,desk,'#9e7552');
 const tissue=new THREE.PlaneGeometry(2.5,3,5,5);for(let i=0;i<tissue.attributes.position.count;i++)tissue.attributes.position.setZ(i,.25*Math.sin(i*2));tissue.computeVertexNormals();const tissueMesh=new THREE.Mesh(tissue,new THREE.MeshStandardMaterial({color:'#faf8ed',side:THREE.DoubleSide,roughness:1}));tissueMesh.position.set(-16,56.9,-7);tissueMesh.rotation.x=-.5;desk.add(tissueMesh);
-mug(desk,-9,50.5,-7);textSurface('NYU',1.7,1.6,-9,52,-5.76,desk,'#644b83');mug(desk,2,50.5,-7);
+mug(desk,2,50.5,-7);
 box(.25,4.3,.3,1.8,55,-7,solid('#1c7b97'));box(.35,.8,.35,1.8,57.5,-7,white);box(.9,3,.45,2.5,54.8,-7.2,solid('#9a2832'));textSurface('paste',.8,.9,2.5,55,-6.94,desk,'#fff');
-// A printed band wrapped around a tub; the text is centered on the side facing the desk chair.
-function wrapLabel(lines,r,h,x,y,z,color,bg){
- const c=document.createElement('canvas');c.width=1024;c.height=Math.round(1024*h/(2*Math.PI*r));const ctx=c.getContext('2d');ctx.fillStyle=bg;ctx.fillRect(0,0,c.width,c.height);ctx.fillStyle=color;ctx.textAlign='center';ctx.textBaseline='middle';
- // Text stays within the front quarter of the wrap, where the curve barely foreshortens it.
- const size=Math.min(c.height*.75/lines.length,1024*.27/(.72*Math.max(...lines.map(l=>l.length))));ctx.font=`700 ${size}px "Segoe UI",Arial,sans-serif`;lines.forEach((line,i)=>ctx.fillText(line,512,c.height/2+(i-(lines.length-1)/2)*size*1.1));
- const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=renderer.capabilities.getMaxAnisotropy();
- const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,48,1,true,-Math.PI,2*Math.PI),new THREE.MeshStandardMaterial({map:t,roughness:.7}));m.position.set(x,y,z);desk.add(m);return m;
+// Desk props from photos: NYU mug, Orgain and Nutricost tubs, Keep Calm book stack.
+// Wrapped labels are canvas textures; draw() runs with x=0 at the side facing the chair, y=0 at the top.
+function labelTexture(width,height,bg,draw){const c=document.createElement('canvas');c.width=width;c.height=height;const ctx=c.getContext('2d');ctx.fillStyle=bg;ctx.fillRect(0,0,width,height);ctx.textAlign='center';ctx.textBaseline='middle';ctx.lineJoin='round';ctx.lineCap='round';ctx.save();ctx.translate(width/2,0);draw(ctx);ctx.restore();
+ const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=renderer.capabilities.getMaxAnisotropy();return t;}
+const font=(weight,size,family='Arial,sans-serif')=>`${weight} ${size}px ${family}`;
+function disc(ctx,x,y,r,fill,stroke,width){ctx.beginPath();ctx.arc(x,y,r,0,2*Math.PI);if(fill){ctx.fillStyle=fill;ctx.fill();}if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=width;ctx.stroke();}}
+// A labeled tub standing on the bottom shelf; thetaStart -PI puts the label's center at the front.
+function tub(r,h,x,z,map,lidColor,lidHeight){const y=50.5;
+ const body=new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,64,1,false,-Math.PI,2*Math.PI),[new THREE.MeshStandardMaterial({map,roughness:.45}),white,white]);body.position.set(x,y+h/2,z);body.castShadow=body.receiveShadow=true;desk.add(body);
+ cylinder(desk,r*.9,.3,x,y+h+.15,z,white);cylinder(desk,r*.97,lidHeight,x,y+h+.3+lidHeight/2,z,solid(lidColor,.5));}
+
+const orgainGreen='#4caa3c';
+tub(2.6,7.4,11,-7,labelTexture(2048,930,'#f7f6f1',ctx=>{
+ ctx.fillStyle=orgainGreen;ctx.fillRect(-1024,108,2048,10);ctx.fillRect(-235,96,470,72);
+ ctx.fillStyle='#fff';ctx.font=font(700,36);ctx.fillText('PLANT-BASED PROTEIN',0,133);
+ ctx.fillStyle=orgainGreen;ctx.font=font(600,96);ctx.fillText('Orgain',0,238);
+ ctx.fillStyle='#1d1d1b';ctx.font=font(900,104,'"Arial Black",Arial,sans-serif');ctx.fillText('Organic',0,355);ctx.fillText('Protein',0,468);
+ ctx.font=font(700,40);ctx.fillText('PROTEIN POWDER',0,548);
+ ctx.fillStyle=orgainGreen;ctx.beginPath();ctx.moveTo(-1024,780);ctx.quadraticCurveTo(0,650,1024,780);ctx.lineTo(1024,930);ctx.lineTo(-1024,930);ctx.fill();
+ for(const [cx,r,fill,big,small] of [[-170,62,'#1e8fd6','150','CALORIES'],[0,78,orgainGreen,'21g','PLANT PROTEIN'],[165,58,'#e5378b','<1g','SUGAR']]){disc(ctx,cx,655,r,fill,'#fff',6);ctx.fillStyle='#fff';ctx.font=font(900,r*.72);ctx.fillText(big,cx,642);ctx.font=font(700,r*.24);ctx.fillText(small,cx,655+r*.45);}
+ for(const [bx,by,bw,bh,color] of [[-170,770,130,80,'#4a2a1a'],[-90,800,120,70,'#5d3420'],[-150,760,60,30,'#6e4129']]){ctx.fillStyle=color;ctx.fillRect(bx,by,bw,bh);}
+ disc(ctx,175,800,40,'#fff',orgainGreen,5);ctx.fillStyle=orgainGreen;ctx.font=font(800,19);ctx.fillText('USDA',175,790);ctx.font=font(700,13);ctx.fillText('ORGANIC',175,810);
+ ctx.fillStyle='#fff';ctx.font=font(600,22);ctx.fillText('Vegan • No Soy Ingredients • Gluten Free • Non-GMO',0,900);
+}),'#5cc04a',.9);
+
+tub(1.65,5,17,-7,labelTexture(2048,988,'#f4f3ee',ctx=>{
+ ctx.fillStyle='#16213b';ctx.beginPath();ctx.moveTo(330,988);ctx.quadraticCurveTo(360,500,520,0);ctx.lineTo(760,0);ctx.lineTo(760,988);ctx.fill();
+ ctx.fillStyle='#1d1d1b';ctx.font=font(800,62);ctx.fillText('nutricost',70,140);ctx.fillStyle='#555';ctx.font=font(500,26);ctx.fillText('PERFORMANCE',110,188);
+ ctx.fillStyle='#222';ctx.font=font(900,80);ctx.fillText('CREATINE',0,320);ctx.fillText('MONOHYDRATE',0,410);
+ ctx.fillStyle='#2456a6';ctx.font=font(800,28);ctx.fillText('MICRONIZED  CREATINE  MONOHYDRATE',0,475);
+ ctx.fillStyle='#222';ctx.font=font(900,50);for(const [tx,big,small] of [[-190,'5G','PER SERVING'],[0,'100','SERVINGS'],[190,'500G','PER CONTAINER']]){ctx.font=font(900,50);ctx.fillText(big,tx,575);ctx.font=font(600,17);ctx.fillText(small,tx,615);}
+ ctx.fillRect(-96,545,4,80);ctx.fillRect(92,545,4,80);
+ ctx.font=font(900,38);ctx.fillText('UNFLAVORED',-110,860);ctx.font=font(500,17);ctx.fillText('NET WT. 17.9 OZ (1.1 LB) (500 G) · DIETARY SUPPLEMENT',-110,900);
+}),'#111',.65);
+
+function nyuMug(x,z){const r=1.65,h=4.6,y=50.5,purple='#4b2577';
+ const map=labelTexture(2048,906,'#fafaf7',ctx=>{
+  ctx.strokeStyle=purple;ctx.fillStyle=purple;ctx.lineWidth=7;
+  for(let i=0;i<=24;i++){const t=i/24;for(const [px,py] of [[-340+680*t,70],[-340+680*t,265]])disc(ctx,px,py,20,'#efedf3');}for(let i=0;i<=8;i++)for(const px of [-340,340])disc(ctx,px,70+195*i/8,20,'#efedf3');
+  ctx.fillStyle='#efedf3';ctx.fillRect(-340,70,680,195);
+  ctx.fillStyle=purple;ctx.font=font(500,92,'"Segoe Print","Bradley Hand","Comic Sans MS",cursive');ctx.fillText('NEW YORK',0,128);ctx.fillText('UNIVERSITY.',0,222);
+  ctx.beginPath();ctx.moveTo(-330,330);ctx.lineTo(-330,480);ctx.moveTo(-400,345);ctx.lineTo(-260,345);ctx.moveTo(-370,470);ctx.lineTo(-290,470);ctx.stroke();for(const sx of [-400,-260]){ctx.beginPath();ctx.moveTo(sx,345);ctx.lineTo(sx-28,410);ctx.lineTo(sx+28,410);ctx.closePath();ctx.stroke();}
+  for(const [fx,fy] of [[-190,330],[-180,430]])for(let k=0;k<4;k++)disc(ctx,fx+Math.cos(k*Math.PI/2)*20,fy+Math.sin(k*Math.PI/2)*20,18,purple);
+  ctx.beginPath();ctx.moveTo(-60,300);ctx.lineTo(-30,420);ctx.moveTo(-90,440);ctx.lineTo(10,440);ctx.moveTo(-40,380);ctx.quadraticCurveTo(30,380,20,460);ctx.stroke();disc(ctx,-10,520,26,null,purple,7);ctx.beginPath();ctx.moveTo(-10,494);ctx.quadraticCurveTo(-90,470,-60,400);ctx.stroke();
+  ctx.font=font(900,190,'Georgia,serif');ctx.fillText('N',200,420);ctx.fillText('Y',270,400);
+  ctx.font=font(900,150,'Georgia,serif');ctx.fillText('NYU',-345,690);
+  ctx.strokeRect(-160,590,140,110);for(let i=1;i<5;i++){ctx.beginPath();ctx.moveTo(-160+i*28,590);ctx.lineTo(-160+i*28,700);ctx.stroke();}ctx.beginPath();ctx.moveTo(-160,645);ctx.lineTo(-20,645);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(0,820);ctx.lineTo(0,610);ctx.lineTo(170,610);ctx.lineTo(170,820);ctx.moveTo(40,820);ctx.lineTo(40,720);ctx.arc(85,720,45,Math.PI,0);ctx.lineTo(130,820);ctx.moveTo(-10,610);ctx.lineTo(180,610);ctx.lineTo(180,580);ctx.lineTo(-10,580);ctx.closePath();ctx.stroke();
+  ctx.strokeRect(200,540,200,280);for(let row=0;row<6;row++)for(let col=0;col<5;col++)ctx.fillRect(215+col*38,555+row*44,20,24);
+  ctx.font=font(500,38,'"Segoe Print","Bradley Hand","Comic Sans MS",cursive');ctx.fillText('Washington',-110,790);ctx.fillText('Square',-110,835);ctx.fillText('NYU Bookstore',300,862);
+ });
+ const glaze=new THREE.MeshStandardMaterial({color:'#fafaf7',roughness:.25});
+ const body=new THREE.Mesh(new THREE.CylinderGeometry(r,r*.97,h,64,1,true,-Math.PI,2*Math.PI),new THREE.MeshStandardMaterial({map,roughness:.25}));body.position.set(x,y+h/2,z);body.castShadow=body.receiveShadow=true;desk.add(body);
+ const inside=new THREE.Mesh(new THREE.CylinderGeometry(r-.12,r-.12,h-.3,48,1,true),new THREE.MeshStandardMaterial({color:'#e9e6df',roughness:.3,side:THREE.BackSide}));inside.position.set(x,y+h/2+.15,z);desk.add(inside);
+ const rim=new THREE.Mesh(new THREE.TorusGeometry(r-.06,.06,8,64),glaze);rim.rotation.x=Math.PI/2;rim.position.set(x,y+h,z);desk.add(rim);
+ cylinder(desk,r-.12,.05,x,y+.35,z,glaze);cylinder(desk,r*.97,.05,x,y+.025,z,glaze);
+ const handle=new THREE.Mesh(new THREE.TorusGeometry(1.05,.24,12,32,Math.PI),glaze);handle.rotation.z=-Math.PI/2;handle.scale.y=1.25;handle.position.set(x+r-.15,y+h*.55,z);handle.castShadow=true;desk.add(handle);
 }
-cylinder(desk,2.5,7.2,11,54.1,-7,white);cylinder(desk,2.55,.55,11,57.9,-7,solid('#629341'));wrapLabel(['PROTEIN','POWDER'],2.53,4.4,11,54.1,-7,'#3d643a','#f0efe7');
-cylinder(desk,1.65,5.2,17,53.1,-7,white);cylinder(desk,1.7,.4,17,55.9,-7,black);wrapLabel(['CREATINE'],1.68,2.6,17,53.1,-7,'#303638','#efeee8');
-for(let i=0;i<5;i++){const colors=['#a52b29','#d4c8aa','#24395e','#855266','#b8b4a8'];box(.7,6+(i%2),4,-16+i*.85,66+(i%2)*.5,-7,solid(colors[i]));}textSurface('KEEP CALM',.68,3,-16,66,-4.97,desk,'#f2ddad');
+nyuMug(-9,-7);
+
+// Books stand with covers facing out, front to back, in the shelf's left corner; the Keep Calm
+// cover is the only one in full view. Spines are on the left, page edges on the right.
+function book(w,h,t,x,z,color,cover){const g=new THREE.Group();g.position.set(x,63,z);desk.add(g);const mat=solid(color,.75);
+ box(w,h,.07,0,h/2,t/2-.035,mat,g);box(w,h,.07,0,h/2,-t/2+.035,mat,g);box(.1,h,t,-w/2+.05,h/2,0,mat,g);box(w-.15,h-.16,t-.14,.025,h/2,0,solid('#efe3c4',.95),g);
+ if(cover){const face=new THREE.Mesh(new THREE.PlaneGeometry(w-.08,h-.08),new THREE.MeshStandardMaterial({map:cover,roughness:.75}));face.position.set(0,h/2,t/2+.003);g.add(face);}}
+const keepCalm=labelTexture(430,620,'#c8202e',ctx=>{ctx.fillStyle='#f4ece4';
+ ctx.fillRect(-48,128,96,16);ctx.beginPath();ctx.moveTo(-48,128);for(let i=0;i<=4;i++){ctx.lineTo(-48+i*24,i%2?100:80);if(i<4)ctx.lineTo(-36+i*24,118);}ctx.lineTo(48,128);ctx.fill();for(let i=0;i<=4;i++)disc(ctx,-48+i*24,i%2?96:76,6,'#f4ece4');
+ ctx.font=font(600,72,'"Gill Sans","Segoe UI",Arial,sans-serif');ctx.fillText('KEEP',0,225);ctx.fillText('CALM',0,312);ctx.font=font(600,40,'"Gill Sans","Segoe UI",Arial,sans-serif');ctx.fillText('AND',0,380);ctx.font=font(600,72,'"Gill Sans","Segoe UI",Arial,sans-serif');ctx.fillText('CARRY',0,450);ctx.fillText('ON',0,537);});
+const popCollection=labelTexture(450,700,'#c62a2e',ctx=>{ctx.fillStyle='#3a1a14';ctx.font=font(500,44,'"Gill Sans","Segoe UI",Arial,sans-serif');ctx.fillText('POP COLLECTION',0,42);});
+let bookZ=-3.2;
+for(const [w,h,t,x,color,cover] of [[4.3,6.2,.95,-17.6,'#c8202e',keepCalm],[4.5,7,.7,-17.3,'#c62a2e',popCollection],[4.6,7.1,.45,-17.15,'#a8282a'],[4.6,6.9,.3,-17.05,'#2346a0'],[4.7,7.2,.5,-16.95,'#d4473a']]){book(w,h,t,x,bookZ-t/2,color,cover);bookZ-=t+.03;}
 const monkey=new THREE.Group();desk.add(monkey);ellipsoid(monkey,15,80,-7,2.4,3.3,1.9,brown);ellipsoid(monkey,15,80,-5.5,1.65,2.3,.55,cream);ellipsoid(monkey,15,84.4,-7,2.15,2.2,1.8,brown);ellipsoid(monkey,15,84.1,-5.45,1.6,1.5,.65,cream);for(const x of [12.7,17.3]){ellipsoid(monkey,x,84.4,-7,.7,.8,.5,cream);ellipsoid(monkey,x,78.7,-6,.8,2,.8,brown);ellipsoid(monkey,x,75.8,-4.9,1.1,.65,1.6,cream);}for(const x of [14.4,15.6])ellipsoid(monkey,x,84.7,-4.84,.18,.2,.12,black);textSurface('⌣',1.2,.6,15,83.4,-4.74,monkey,'#4c3827');for(const x of [13.6,16.4])ellipsoid(monkey,x,77,-6,.8,1.5,.8,brown);
 // Sink-side counter: appliances near the passage, soap and sponge by the basin.
 kb(12,11,17,216,42,76,dark);kb(.2,7,12,222.1,42,74.5,black);textSurface('MICROWAVE',8,2,222.24,46,76,kitchenObjects,'#b8bdc3').rotation.y=Math.PI/2;

@@ -39,14 +39,14 @@ for (const project of projects) {
   body.append(element('h2', 'card-title', project.title));
   if (project.badge) body.append(element('span', 'card-badge', project.badge));
   body.append(element('p', 'card-summary', project.summary));
-  body.append(element('span', 'card-visit', live.url === '/' ? 'Open the room ↗' : 'Visit site ↗'));
+  body.append(element('span', 'card-visit', live.url === '/' ? 'Open the room' : 'Visit site'));
 
   main.append(frame, body);
   card.append(main);
 
   // A link can't sit inside another link, so GitHub is its own link below the main one.
   if (github) {
-    const footer = element('a', 'card-github', 'GitHub repo ↗');
+    const footer = element('a', 'card-github', 'GitHub repo');
     footer.href = github.url;
     footer.target = '_blank';
     footer.rel = 'noopener';

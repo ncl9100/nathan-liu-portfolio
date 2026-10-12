@@ -34,7 +34,7 @@
 }
 .card-github:hover { background: #b4a68b24; }
 
-/* Hover is a desktop bonus: lift the card and zoom the screenshot slightly. Phones still see "Visit site ↗". */
+/* Hover is a desktop bonus: lift the card and zoom the screenshot slightly. Phones still see "Visit site". */
 @media (hover: hover) {
   .project-card:has(.card-main:hover) { transform: translateY(-4px); box-shadow: 0 14px 30px #4a3f2e22; }
   .card-main:hover .card-image img { transform: scale(1.03); }

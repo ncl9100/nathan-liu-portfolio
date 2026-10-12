@@ -90,6 +90,8 @@ try{const wallpaperModule=await import(LIUOS_CONFIG.wallpaper.module);wallpaperC
 window.addEventListener('pagehide',event=>{if(!event.persisted)wallpaperController?.dispose();});
 const osWindows=new Map();let nextWindowZ=10,selectedDesktopIcon=null;
 // App builders use DOM text nodes for user-editable content.
+// Desktop "Currently" card: my newest role (first in the experience list) and my school, from content/portfolio.js.
+{const now=LIUOS_CONFIG.experience[0];document.getElementById('widget-role').textContent=now.role;document.getElementById('widget-org').textContent=now.organization;document.getElementById('widget-education').textContent=LIUOS_CONFIG.profile.education;}
 function osNode(tag,text,className){const el=document.createElement(tag);if(text!==undefined)el.textContent=text;if(className)el.className=className;return el;}
 function osTodo(parent,text){parent.append(osNode('span',text,'os-todo'));}
 function osLink(label,url,download){const a=osNode('a',label,'os-app-link');a.href=url;if(download)a.download=download;else{a.target='_blank';a.rel='noopener noreferrer';}return a;}

@@ -200,6 +200,35 @@ for(const [root,name] of [[yourBed,'Your bed'],[otherBed,'Other bed']]){root.nam
 // x=50 leaves a 1-inch gap to the dresser (x 8-28) and 9 inches to the roommate's bed.
 const otherDesk=desk.clone();otherDesk.position.set(50,0,123);otherDesk.rotation.y=Math.PI;scene.add(otherDesk);
 const otherChair=chair.clone();otherChair.position.set(50,0,123);otherChair.rotation.y=Math.PI;scene.add(otherChair);
+// Roommate's caps on his middle shelf, from photos. Logos are simplified drawings painted into the
+// crown's texture: the canvas wraps the whole crown, so x=256 is the front and y=0 the button.
+function capLogo(ctx,draw){ctx.save();ctx.translate(256,140);ctx.scale(1.2,1);ctx.lineJoin='round';draw(ctx);ctx.restore();}
+function cap(x,color,draw,brimColor=color){
+ const c=document.createElement('canvas');c.width=1024;c.height=256;const ctx=c.getContext('2d');ctx.fillStyle=color;ctx.fillRect(0,0,1024,256);capLogo(ctx,draw);
+ const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=renderer.capabilities.getMaxAnisotropy();
+ const group=new THREE.Group();group.position.set(x,63,-7.3);group.rotation.y=.4;otherDesk.add(group);
+ const crown=new THREE.Mesh(new THREE.SphereGeometry(1,48,16,0,2*Math.PI,0,Math.PI/2),new THREE.MeshStandardMaterial({map:t,roughness:.9}));crown.scale.set(3.6,4.2,3.8);group.add(crown);
+ const brim=new THREE.Mesh(new THREE.CylinderGeometry(1,1,1,32,1,false,-Math.PI/2,Math.PI),solid(brimColor,.85));brim.scale.set(3.6,.18,6.6);brim.position.set(0,.3,0);brim.rotation.x=.05;group.add(brim);
+ const button=new THREE.Mesh(new THREE.SphereGeometry(.3,12,8),solid(color,.9));button.position.y=4.15;group.add(button);
+ for(const m of [crown,brim,button]){m.castShadow=true;m.receiveShadow=true;}
+}
+const capSpacing=7.8;
+cap(-2*capSpacing,'#a6192e',ctx=>{ctx.fillStyle='#fff';ctx.strokeStyle='#111';ctx.lineWidth=8;ctx.beginPath();ctx.arc(0,0,62,0,2*Math.PI);ctx.fill();ctx.stroke();
+ ctx.fillStyle='#c8102e';ctx.strokeStyle='#111';ctx.lineWidth=5;for(const hx of [-34,-12]){ctx.beginPath();ctx.moveTo(hx,-28);ctx.lineTo(hx+6,-52);ctx.lineTo(hx+14,-28);ctx.closePath();ctx.fill();ctx.stroke();}
+ ctx.font='italic 900 82px Arial,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.strokeText('NJ',0,8);ctx.fillText('NJ',0,8);});
+cap(-capSpacing,'#1b2a5a',ctx=>{ctx.font='900 118px Georgia,serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.strokeStyle='#fff';ctx.lineWidth=7;ctx.fillStyle='#ff5910';
+ for(const [letter,lx] of [['N',-22],['Y',24]]){ctx.strokeText(letter,lx,0);ctx.fillText(letter,lx,0);}});
+cap(0,'#1aa39a',ctx=>{ctx.fillStyle='#f26a24';ctx.strokeStyle='#fff';ctx.lineWidth=6;ctx.beginPath();ctx.arc(10,-6,44,0,2*Math.PI);ctx.fill();ctx.stroke();
+ for(let i=0;i<9;i++){const a=-Math.PI+i*Math.PI/8;ctx.beginPath();ctx.moveTo(10+Math.cos(a)*50,-6+Math.sin(a)*50);ctx.lineTo(10+Math.cos(a)*66,-6+Math.sin(a)*66);ctx.stroke();}
+ ctx.lineCap='round';ctx.strokeStyle='#fff';ctx.lineWidth=30;ctx.beginPath();ctx.moveTo(-72,26);ctx.quadraticCurveTo(-10,-46,70,10);ctx.stroke();ctx.strokeStyle='#008e97';ctx.lineWidth=20;ctx.stroke();
+ ctx.fillStyle='#008e97';ctx.beginPath();ctx.moveTo(-6,-18);ctx.lineTo(4,-50);ctx.lineTo(20,-16);ctx.closePath();ctx.fill();});
+cap(capSpacing,'#1d428a',ctx=>{ctx.fillStyle='#f58426';ctx.strokeStyle='#111';ctx.lineWidth=4;ctx.beginPath();ctx.arc(0,0,56,0,2*Math.PI);ctx.fill();ctx.stroke();
+ ctx.beginPath();ctx.moveTo(0,-56);ctx.lineTo(0,56);ctx.moveTo(-56,0);ctx.lineTo(56,0);ctx.moveTo(-34,-44);ctx.quadraticCurveTo(-10,0,-34,44);ctx.moveTo(34,-44);ctx.quadraticCurveTo(10,0,34,44);ctx.stroke();
+ ctx.rotate(-.18);ctx.font='italic 900 40px Arial,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.strokeStyle='#1d428a';ctx.lineWidth=8;ctx.fillStyle='#fff';ctx.strokeText('KNICKS',0,2);ctx.fillText('KNICKS',0,2);});
+cap(2*capSpacing,'#0b2ca0',ctx=>{ctx.font='italic 900 36px Arial,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.strokeStyle='#fff';ctx.lineWidth=5;ctx.fillStyle='#fa4616';
+ ctx.strokeText('FLORIDA',0,-26);ctx.fillText('FLORIDA',0,-26);
+ ctx.fillStyle='#0b2ca0';ctx.strokeStyle='#fa4616';ctx.lineWidth=6;ctx.beginPath();ctx.ellipse(0,28,30,20,0,0,2*Math.PI);ctx.fill();ctx.stroke();
+ ctx.fillStyle='#fa4616';ctx.beginPath();ctx.ellipse(0,28,18,8,0,0,2*Math.PI);ctx.fill();},'#0b2ca0');
 for(const z of [17,108]){rb(20,45,24,18,22.5,z);for(let i=0;i<5;i++)rb(.7,7.7,22,28.4,5+i*8.5,z,trim);}
 // Four identical measured stools, arranged in a photo-based cluster beside the kitchen.
 const stoolDimensions={width:15,depth:15,height:31};

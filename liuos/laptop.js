@@ -22,7 +22,7 @@ const osElement=document.getElementById('laptop-window');osElement.style.setProp
 for(const [name,value] of Object.entries(LIUOS_CONFIG.colors))osElement.style.setProperty('--os-'+name,value);
 for(const [name,value] of Object.entries(LIUOS_CONFIG.typography))document.documentElement.style.setProperty('--os-'+name,name==='bodyLineHeight'?String(value):value+'px');
 document.documentElement.style.setProperty('--focus-accent',LIUOS_CONFIG.colors.accent);
-for(const [name,value] of Object.entries({font:LIUOS_CONFIG.font,blur:LIUOS_CONFIG.blur+'px',radius:LIUOS_CONFIG.radius+'px',transition:LIUOS_CONFIG.transitionMs+'ms'}))osElement.style.setProperty('--os-'+name,value);
+for(const [name,value] of Object.entries({font:LIUOS_CONFIG.font,labelFont:LIUOS_CONFIG.labelFont,blur:LIUOS_CONFIG.blur+'px',radius:LIUOS_CONFIG.radius+'px',transition:LIUOS_CONFIG.transitionMs+'ms'}))osElement.style.setProperty('--os-'+name,value);
 
 const laptopDialog=document.getElementById('laptop-window');let laptopReturnFocus=null,laptopPowered=true,laptopUnlocked=false;
 // The in-room screen keeps a static wallpaper frame and minute-based clock updates.
@@ -35,7 +35,7 @@ function drawScreen(force=false){const now=new Date(),minute=Math.floor(now.getT
  const ctx=screenContext,w=screenCanvas.width,h=screenCanvas.height,c=LIUOS_CONFIG.colors;ctx.clearRect(0,0,w,h);ctx.fillStyle=laptopPowered?c.base:c.bezel;ctx.fillRect(0,0,w,h);
  if(laptopPowered){
  const blob=(x,y,rx,ry,color)=>{ctx.save();ctx.translate(x*w,y*h);ctx.scale(rx*w,ry*h);const g=ctx.createRadialGradient(0,0,0,0,0,1);g.addColorStop(0,color);g.addColorStop(1,color+'00');ctx.fillStyle=g;ctx.fillRect(-4,-4,8,8);ctx.restore();};
- blob(.8,.8,.8,.8,c.wallpaperTeal);blob(.12,.15,.9,.9,c.wallpaperBlue);
+ blob(.8,.8,.8,.8,c.paperEdge);blob(.12,.15,.9,.9,c.border);
  ctx.textAlign='center';ctx.fillStyle=c.text;const clock=localClock(now);ctx.font=`300 ${Math.round(w*.135)}px ${LIUOS_CONFIG.font}`;ctx.fillText(clock.time,w*.5,h*.43);
  ctx.fillStyle=c.muted;ctx.font=`400 ${Math.round(w*.022)}px ${LIUOS_CONFIG.font}`;ctx.fillText(clock.date,w*.5,h*.53);
  ctx.font=`600 ${Math.round(w*.019)}px ${LIUOS_CONFIG.font}`;ctx.fillText('LiuOS',w*.5,h*.64);

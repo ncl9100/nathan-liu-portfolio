@@ -5,7 +5,7 @@ export function createWallpaper(THREE,config,motionPreference,colors){
  renderer.setPixelRatio(1);renderer.domElement.className='os-wallpaper-canvas';renderer.domElement.setAttribute('aria-hidden','true');
  const scene=new THREE.Scene(),camera=new THREE.Camera();
  const rgb=value=>new THREE.Color(value).convertLinearToSRGB();
- const uniforms={uTime:{value:0},uCursor:{value:new THREE.Vector2()},uAspect:{value:1},uAlternate:{value:0},uBase:{value:rgb(colors.base)},uBlue:{value:rgb(colors.wallpaperBlue)},uTeal:{value:rgb(colors.wallpaperTeal)}};
+ const uniforms={uTime:{value:0},uCursor:{value:new THREE.Vector2()},uAspect:{value:1},uAlternate:{value:0},uBase:{value:rgb(colors.base)},uBlue:{value:rgb(colors.border)},uTeal:{value:rgb(colors.paperEdge)}};
  const material=new THREE.ShaderMaterial({uniforms,depthTest:false,depthWrite:false,toneMapped:false,
  vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=vec4(position.xy,0.,1.);}',
  fragmentShader:`precision mediump float;

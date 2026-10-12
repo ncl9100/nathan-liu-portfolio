@@ -3,9 +3,9 @@
 import { profile, projects, experience } from '../content/portfolio.js';
 
 export const LIUOS_CONFIG={
- colors:{accent:'#89ded0',text:'#edf6f7',muted:'#a4b7c1',base:'#0b1c2a',glass:'#d0eff50d',border:'#d0eff526',wallpaperTeal:'#174b50',wallpaperBlue:'#284560',bezel:'#10151b',backdrop:'#07111d80',field:'#04132140',camera:'#587082'},
+ colors:{accent:'#332c21',text:'#332c21',muted:'#655e52',base:'#f5f1e8',paperEdge:'#ded7ca',tint:'#b4a68b24',border:'#aaa091',shadow:'#4a3f2e22',bezel:'#332c21',backdrop:'#332c2166',field:'#f5f1e8',camera:'#655e52'},
  typography:{small:12,body:14,title:16,section:22,large:28,bodyLineHeight:1.5},
- font:'"Segoe UI",sans-serif',blur:22,radius:14,transitionMs:300,
+ font:'Georgia,"Times New Roman",serif',labelFont:'Inter,"Segoe UI",sans-serif',blur:0,radius:0,transitionMs:300,
  puzzle:{answers:['python'],hint:'Named after a comedy group; also a kind of snake.',celebrationMs:380},
  apps:[{id:'projects',title:'Projects',icon:'folder'},{id:'experience',title:'Experience',icon:'briefcase'},{id:'terminal',title:'Terminal',icon:'terminal'},{id:'resume',title:'Résumé',icon:'document'},{id:'about',title:'About me',icon:'person'},{id:'contact',title:'Contact',icon:'mail'},{id:'guide',title:'AI guide',icon:'spark'}],
  profile:{...profile,avatarSelector:"#signin-panel .avatar img",aboutHeading:"About Nathan"},

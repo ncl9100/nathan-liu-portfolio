@@ -3,10 +3,10 @@
 // LiuOS doesn't know the room exists. It talks only through announcements:
 //   Listens for:  laptop:open {opener}       open the laptop (the room checks the camera first)
 //                 laptop:close               close it
-//                 laptop:open-app {name}     open straight into an app (used by the nav)
+//                 laptop:open-app {name}     open straight into an app (nothing sends this right now)
 //                 laptop:screen-request      repaint and send the screen picture
 //   Announces:    laptop:opened / laptop:closed
-//                 laptop:apps-changed {active}            which app window is in front
+//                 laptop:apps-changed {active}            which app window is in front (no listener right now)
 //                 laptop:screen {canvas,redrawn,powered}  the picture for the 3D laptop screen
 
 import { LIUOS_CONFIG } from './settings.js';

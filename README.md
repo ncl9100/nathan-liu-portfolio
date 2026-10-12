@@ -20,7 +20,7 @@ index.html is a shell that loads one folder per component. Each folder has its o
 | `liuos/` | LiuOS, the laptop desktop. OS settings (colors, apps, puzzle, wording) are in `liuos/settings.js`. |
 | `resume-viewer/` | The résumé pop-up. |
 | `nav/` | The bar across the top, shared by every page. |
-| `pages/` | The career pages: `experience/`, `projects/`, `contact/`. Shared styles in `pages.css`. |
+| `pages/` | The career pages: `about/`, `experience/`, `projects/`, `contact/`. Shared styles in `pages.css`. |
 | `content/portfolio.js` | Profile, projects, and experience. Edit these facts here; LiuOS and the pages read them from this file. Keep projects newest first. |
 | `css/base.css` | Styles shared across components. |
 | `assets/` | Portrait and résumé PDF/PNG. |

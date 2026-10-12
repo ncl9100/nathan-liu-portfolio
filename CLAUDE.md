@@ -11,10 +11,9 @@ showcases my experience. Audience: recruiters and hiring managers for ML / data 
   callouts, title block.
 - **LiuOS** (the laptop's desktop) — exists: lock screen, apps, windows, dock. Planned: redesign
   it to match my real laptop.
-- **Career content** — exists: the same nav on every page links to Experience, Projects, and
-  Contact pages (in `pages/`), and Résumé opens the PDF in a new tab. Planned: an About page, design
-  TBD (an animated character that speaks facts about me is one idea worth exploring); until then,
-  About opens LiuOS.
+- **Career content** — exists: the same nav on every page links to About, Experience, Projects,
+  and Contact pages (in `pages/`), and Résumé opens the PDF in a new tab. About shows my headshot
+  and types out my bio. Idea for later: an animated character that speaks facts about me.
 
 "Planned" items are context only. Don't start them, or build toward them, unless I ask.
 

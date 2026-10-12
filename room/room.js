@@ -470,7 +470,8 @@ function isCloseup(){return closeupView!==null;}
 function updateBackControl(){backToRoom.hidden=!isCloseup()||laptopOpen||resumeOpen;}
 function returnToRoom(){if(laptopOpen||resumeOpen)return;activate('angle');}
 backToRoom.addEventListener('click',returnToRoom);
-function arrivalCaption(view){if(closeupViews.has(view)&&!firstCloseupSeen){firstCloseupSeen=true;return DRAFTING_CONFIG.interaction.firstCloseupHint;}return viewCaptions[view]||defaultCaption;}
+// The roommate's-bed caption always shows; the one-time step-back hint waits for the next close-up.
+function arrivalCaption(view){if(closeupViews.has(view)&&view!=='otherBed'&&!firstCloseupSeen){firstCloseupSeen=true;return DRAFTING_CONFIG.interaction.firstCloseupHint;}return viewCaptions[view]||defaultCaption;}
 let cameraMove=null,queuedCameraAction=null;
 function cancelCameraMove(){cancelAnimationFrame(animation);animation=0;cameraMove=null;queuedCameraAction=null;if(moving)currentView='custom';moving=false;showCaption();announceView('custom');}
 

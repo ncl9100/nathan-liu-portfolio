@@ -11,6 +11,8 @@ export const DRAFTING_CONFIG = {
   // Overview sway after the visitor goes idle. amplitude is in radians (.12 is about 7 degrees);
   // much more and the camera crosses the kitchen's outer wall, which then pops into view.
   sway:{enabled:true,idleMs:4000,amplitude:.12,periodSeconds:20,rampSeconds:1.5,maxFps:30},
+  // Roommate's dishes in the sink: the hover tag's text, and how long the running faucet takes to clean them.
+  dishes:{dirty:'My roommate’s dirty dishes lol',clean:'Clean now. You’re welcome, roommate.',cleanSeconds:4,tapTagMs:2500},
   camera:{pixelRatioCap:2,far:3000,mobileFitAspect:.95,maxRadius:1800},
   // Callout title and label offset in px from its point: [title, x, y].
   callouts:{desk:['Desk',-65,-68],resume:['Resume',55,47],laptop:['Laptop',0,-42]},

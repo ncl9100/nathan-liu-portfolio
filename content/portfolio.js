@@ -157,3 +157,7 @@ export const experience = [
     ]
   }
 ];
+
+// Room.js imports this for the kitchen-counter photo pile. Empty on main until that
+// feature ships; a missing export crashes the whole 3D room on load.
+export const photos = [];

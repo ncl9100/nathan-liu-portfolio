@@ -6,16 +6,6 @@ A measured 3D model of my NYU dorm, drawn like an architectural drafting sheet. 
 
 ---
 
-## Why this exists
-
-Most student portfolios are interchangeable: a template, three cards, a résumé link. I live in a real room at Carlyle Court. I measured it. I wanted visitors — especially recruiters for ML and data roles — to land somewhere that is obviously mine.
-
-The visual language is an architect's sheet: ink on paper, a title block, dimension lines in meters, a floor-plan view. The room is built in inches as scene units, from a mix of tape-measure readings and photo estimates. Comments in the scene code say which is which, and a few pieces (the stools, the kitchen pass-through) assert their sizes at runtime so a later edit cannot silently drift.
-
-The laptop is a second layer. The career pages (About, Experience, Projects, Contact) are the fast path if someone does not want to orbit a 3D dorm. Same facts, two ways in.
-
----
-
 ## What you can do
 
 - **Walk the drawing.** An intro draws the grid, then the dimension lines, then the room. Drag to orbit, scroll to zoom, click an object to fly the camera there. A floor-plan view looks straight down. After a few seconds of idle, the overview sways slightly, like a sheet on a desk.

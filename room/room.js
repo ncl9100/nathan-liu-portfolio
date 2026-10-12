@@ -395,7 +395,8 @@ function updateDimensionLabels(){const show=['angle','front','custom'].includes(
 function applyIntro(time){introElapsed=time;gridUniforms.reveal.value=phase(time,DRAFTING_CONFIG.intro.grid)*(DRAFTING_CONFIG.grid.fadeEnd+DRAFTING_CONFIG.grid.revealOverscan);dimensionProgress=phase(time,DRAFTING_CONFIG.intro.dimensions);modelProgress=phase(time,DRAFTING_CONFIG.intro.room);modelRoot.visible=modelProgress>0;modelRoot.position.y=-(1-modelProgress)*DRAFTING_CONFIG.intro.rise;contactShadow.material.opacity=modelProgress*DRAFTING_CONFIG.shadow.opacity;
  for(const [material,original] of materialStates){const transparent=modelProgress<1||original.transparent;if(material.transparent!==transparent){material.transparent=transparent;material.needsUpdate=true;}material.opacity=original.opacity*modelProgress;}
  updateDimensionGeometry();}
-function finishIntro(){cancelAnimationFrame(introFrame);introDone=true;stage.dataset.intro='complete';applyIntro(DRAFTING_CONFIG.intro.duration);showCaption();}
+let welcomed=false;
+function finishIntro(){cancelAnimationFrame(introFrame);introDone=true;stage.dataset.intro='complete';applyIntro(DRAFTING_CONFIG.intro.duration);if(welcomed)showCaption();else{welcomed=true;showCaption(DRAFTING_CONFIG.interaction.welcomeCaption,DRAFTING_CONFIG.interaction.welcomeMs);}}
 function startDraftingIntro(){if(reducedMotion()){finishIntro();render();return;}stage.dataset.intro='running';const started=performance.now();function frame(now){applyIntro(Math.min(now-started,DRAFTING_CONFIG.intro.duration));if(now-started>=DRAFTING_CONFIG.intro.duration)finishIntro();render();if(!introDone)introFrame=requestAnimationFrame(frame);}introFrame=requestAnimationFrame(frame);}
 let parallaxFrame=0,parallaxTime=0;const parallax={x:0,y:0,targetX:0,targetY:0};
 function resetParallax(){cancelAnimationFrame(parallaxFrame);parallaxFrame=0;parallax.x=parallax.y=parallax.targetX=parallax.targetY=0;}
@@ -414,12 +415,12 @@ const hint=document.querySelector('.hint');let captionTimer=0,captionHideTimer=0
 const defaultCaption='Click around. Most things in here do something.';
 const viewCaptions={angle:defaultCaption,front:'The floor plan. Click an object to explore.',desk:'You’re at your desk. Click the laptop to open LiuOS.',bed:'You’re on your bed. Drag to look around.',side:'You’re in the kitchen. Drag to look around.',fridge:'The fridge. Drag to look around.',stools:'Four stools beside the kitchen.',details:'Your shelves and desk. Click the lamp or laptop.',resume:'Your résumé, up close.'};
 function hideCaption(){clearTimeout(captionTimer);clearTimeout(captionHideTimer);hint.classList.remove('caption-visible');captionHideTimer=setTimeout(()=>hint.hidden=true,reducedMotion()?0:250);}
-function showCaption(message=defaultCaption){hideCaption();clearTimeout(captionHideTimer);hint.hidden=false;hint.textContent=message;hint.classList.add('caption-visible');captionTimer=setTimeout(hideCaption,DRAFTING_CONFIG.interaction.captionMs);}
+function showCaption(message=defaultCaption,duration=DRAFTING_CONFIG.interaction.captionMs){hideCaption();clearTimeout(captionHideTimer);hint.hidden=false;hint.textContent=message;hint.classList.add('caption-visible');captionTimer=setTimeout(hideCaption,duration);}
 
-const hotspotPositions={desk:[154.75,39,25],details:[154.75,64,14],laptop:[149.75,38.1,12.35],resume:[163.75,31,17.2]};
+const hotspotPositions={desk:[154.75,39,25],laptop:[149.75,38.1,12.35],resume:[163.75,31,17.2]};
 const hotspotButtons=[...document.querySelectorAll('[data-destination]')];
 const leaders=new Map(),leaderSvg=document.getElementById('callout-lines');
-for(const button of hotspotButtons){const name=button.dataset.destination,[letter,title]=DRAFTING_CONFIG.callouts[name],action=button.textContent;button.replaceChildren();const heading=document.createElement('span'),detail=document.createElement('span');heading.className='callout-title';heading.textContent=letter+' / '+title;detail.className='callout-action';detail.textContent=action;button.append(heading,detail);const line=document.createElementNS('http://www.w3.org/2000/svg','polyline'),dot=document.createElementNS('http://www.w3.org/2000/svg','circle');dot.setAttribute('r','2');leaderSvg.append(line,dot);leaders.set(name,{line,dot});}
+for(const button of hotspotButtons){const name=button.dataset.destination,[title]=DRAFTING_CONFIG.callouts[name],action=button.textContent;button.replaceChildren();const heading=document.createElement('span'),detail=document.createElement('span');heading.className='callout-title';heading.textContent=title;detail.className='callout-action';detail.textContent=action;button.append(heading,detail);const line=document.createElementNS('http://www.w3.org/2000/svg','polyline'),dot=document.createElementNS('http://www.w3.org/2000/svg','circle');dot.setAttribute('r','2');leaderSvg.append(line,dot);leaders.set(name,{line,dot});}
 function updateHotspots(){
 for(const [index,button] of hotspotButtons.entries()){
 const name=button.dataset.destination,leader=leaders.get(name);if(name==='laptop')button.querySelector('.callout-action').textContent=laptopScreenPowered?'Open laptop':'Turn on laptop';
@@ -427,7 +428,7 @@ const available=(!moving||name==='laptop')&&modelProgress===1&&(name==='laptop'?
 button.hidden=!available;button.disabled=!introDone;leader.line.style.display=leader.dot.style.display=available?'':'none';if(!available)continue;
 const point=new THREE.Vector3(...hotspotPositions[name]).project(camera);
 if(point.z>1||point.z< -1||Math.abs(point.x)>.95||Math.abs(point.y)>.95){button.hidden=true;leader.line.style.display=leader.dot.style.display='none';continue;}
-let x=(point.x*.5+.5)*stage.clientWidth,y=(-point.y*.5+.5)*stage.clientHeight,small=stage.clientWidth<500,offset=small?[null,null,...DRAFTING_CONFIG.mobileCallouts[name]]:DRAFTING_CONFIG.callouts[name],lx=Math.max(52,Math.min(stage.clientWidth-52,x+offset[2])),ly=Math.max(165,Math.min(stage.clientHeight-(small?180:100),y+offset[3]));
+let x=(point.x*.5+.5)*stage.clientWidth,y=(-point.y*.5+.5)*stage.clientHeight,small=stage.clientWidth<500,offset=small?[null,...DRAFTING_CONFIG.mobileCallouts[name]]:DRAFTING_CONFIG.callouts[name],lx=Math.max(52,Math.min(stage.clientWidth-52,x+offset[1])),ly=Math.max(165,Math.min(stage.clientHeight-(small?180:100),y+offset[2]));
 if(name==='laptop'){
  // Project the actual glass bounds so the label never sits over screen content.
  const corners=[[-6.4,-3.35],[6.4,-3.35],[-6.4,3.35],[6.4,3.35]].map(([cx,cy])=>screenFace.localToWorld(new THREE.Vector3(cx,cy,0)).project(camera));

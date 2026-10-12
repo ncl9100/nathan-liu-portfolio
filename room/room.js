@@ -292,7 +292,8 @@ const waterGroup=new THREE.Group();kitchenObjects.add(waterGroup);waterGroup.vis
 const reflectionFaces=Array.from({length:6},(_,i)=>{const c=document.createElement('canvas');c.width=c.height=64;const cx=c.getContext('2d');const g=cx.createLinearGradient(0,0,64,64);g.addColorStop(0,'#f7faff');g.addColorStop(.42,'#889ba9');g.addColorStop(.5,'#ffffff');g.addColorStop(.68,'#b2c5d0');g.addColorStop(1,i===3?'#666f78':'#e4edf0');cx.fillStyle=g;cx.fillRect(0,0,64,64);return c;});
 const waterEnvironment=new THREE.CubeTexture(reflectionFaces);waterEnvironment.colorSpace=THREE.SRGBColorSpace;waterEnvironment.needsUpdate=true;
 sinkSteel.envMap=waterEnvironment;sinkSteel.envMapIntensity=.4;sinkSteel.needsUpdate=true;chrome.envMap=waterEnvironment;chrome.envMapIntensity=.8;chrome.needsUpdate=true;
-const waterMaterial=new THREE.MeshPhysicalMaterial({color:'#d1effa',metalness:0,roughness:.08,transparent:true,opacity:.75,transmission:.6,thickness:.16,ior:1.333,envMap:waterEnvironment,envMapIntensity:.55,clearcoat:1,depthWrite:false});
+// No transmission: it renders the whole room a second time every frame and took seconds to compile.
+const waterMaterial=new THREE.MeshPhysicalMaterial({color:'#d1effa',metalness:0,roughness:.08,transparent:true,opacity:.6,envMap:waterEnvironment,envMapIntensity:.7,clearcoat:1,depthWrite:false});
 const streamHeight=outlet.y-(sinkBottom+.27),waterTime={value:0};
 waterMaterial.onBeforeCompile=shader=>{shader.uniforms.waterTime=waterTime;shader.vertexShader='uniform float waterTime;\n'+shader.vertexShader;shader.vertexShader=shader.vertexShader.replace('#include <begin_vertex>','#include <begin_vertex>\n transformed.x += 0.035 * sin(position.y * 5.5 - waterTime * 18.0); transformed.z += 0.025 * cos(position.y * 7.0 - waterTime * 23.0);');};
 const stream=new THREE.Mesh(new THREE.CylinderGeometry(.14,.22,streamHeight,20,36,true),waterMaterial);stream.position.set(outlet.x,outlet.y-streamHeight/2,outlet.z);waterGroup.add(stream);
@@ -642,6 +643,10 @@ cancelCameraMove();radius=Math.max(18,Math.min(limit,next));render();return;}
 cancelCameraMove();radius=Math.max(18,Math.min(DRAFTING_CONFIG.camera.maxRadius,radius*Math.exp(delta*.001)));render();}
 stage.addEventListener('wheel',zoomRoom,{passive:false});
 renderer.domElement.addEventListener('webglcontextlost',event=>{event.preventDefault();status.textContent='Graphics connection lost. Reload this page to restore the model.';status.hidden=false;});
-screenHover(false);document.dispatchEvent(new CustomEvent('laptop:screen-request'));applyIntro(0);resize();status.hidden=true;startDraftingIntro();
+screenHover(false);document.dispatchEvent(new CustomEvent('laptop:screen-request'));applyIntro(0);resize();
+// Compile every shader now, while loading, so the first faucet click doesn't stall. compile() skips
+// hidden objects, and the intro hides the whole room until it starts rising.
+modelRoot.visible=waterGroup.visible=true;renderer.compile(scene,camera);waterGroup.visible=waterOn;applyIntro(0);
+status.hidden=true;startDraftingIntro();
 window.deskStudy={measured,estimated,room,scene,camera,renderer,refrigerator,aboveFridge,aboveCounter,aboveStove,fridgePartition};
 }catch(error){status.hidden=false;status.textContent='The 3D view could not load. Check your internet connection and WebGL support, then reload. ';console.error(error);}

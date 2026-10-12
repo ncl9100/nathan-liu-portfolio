@@ -22,7 +22,8 @@
 /* Heading: \textbf{\Huge \scshape Nathan Liu} and the \small contact line */
 .r-heading { text-align: center; }
 /* Computer Modern has no bold small caps, so LaTeX prints \scshape in bold as plain bold. Match that. */
-.r-heading h1 { margin: 0; font-size: calc(24.88 * var(--pt)); line-height: 1.2; font-weight: 700; }
+/* font-family and letter-spacing are reset because pages may style every h1 (the room sets Georgia). */
+.r-heading h1 { margin: 0; font-family: inherit; font-size: calc(24.88 * var(--pt)); line-height: 1.2; font-weight: 700; letter-spacing: normal; }
 .r-heading p { margin: calc(1 * var(--pt)) 0 0; font-size: calc(10 * var(--pt)); line-height: 1.2; }
 
 /* \section: \large \scshape with a rule underneath */

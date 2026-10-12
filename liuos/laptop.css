@@ -50,7 +50,19 @@
 #laptop-window .answer-row button{padding:10px 13px;border-radius:var(--os-radius);background:var(--os-paperEdge);border-color:var(--os-accent)}
 .os-puzzle-actions{display:flex;justify-content:space-between;margin-top:5px}
 #laptop-window #answer-message{text-align:left;font-size:var(--os-small);min-height:18px;margin:5px 0 0}
-.os-puzzle{border-top:1px solid var(--os-border);margin-top:12px}
+/* "Know the password?" popup: dims the lock screen, then fades in while growing from 96%. */
+#laptop-window .lock-screen.puzzle-open{overflow:hidden}
+.os-puzzle-backdrop{position:absolute;inset:0;z-index:5;display:grid;place-items:center;padding:16px;background:var(--os-backdrop);opacity:0;transition:opacity 200ms ease}
+.os-puzzle-backdrop[hidden]{display:none}
+.os-puzzle-backdrop.is-open{opacity:1}
+.os-puzzle{position:relative;width:min(340px,100%);max-height:100%;overflow:auto;padding:24px 24px 16px;text-align:left;background:var(--os-base);border:1px solid var(--os-border);box-shadow:0 18px 40px var(--os-shadow);transform:scale(.96);transition:transform 200ms ease}
+.os-puzzle-backdrop.is-open .os-puzzle{transform:none}
+.os-puzzle.is-wrong{animation:os-shake 300ms ease-out}
+.os-puzzle.is-correct{animation:os-puzzle-pop 380ms ease-out;border-color:var(--os-accent)}
+@keyframes os-puzzle-pop{50%{transform:scale(1.03)}}
+#laptop-window .lock-screen .os-puzzle h3{font-size:var(--os-section);margin:0 36px 0 0}
+#laptop-window .os-puzzle-close{position:absolute;top:4px;right:4px;width:44px;height:44px;padding:0;display:grid;place-items:center;border:0;background:transparent;color:var(--os-muted);font-size:16px}
+#laptop-window .os-puzzle-close:hover{color:var(--os-text);background:var(--os-tint)}
 .os-signin-foot{margin:14px 0 0!important;font-size:var(--os-small)!important}
 .os-signin.is-wrong{animation:os-shake 300ms ease-out}
 .os-signin.is-correct .avatar{animation:os-celebrate 380ms ease-out;box-shadow:0 0 0 7px color-mix(in srgb,var(--os-accent) 10%,transparent)}

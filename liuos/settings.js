@@ -7,7 +7,7 @@ export const LIUOS_CONFIG={
  typography:{small:12,body:14,title:16,section:22,large:28,bodyLineHeight:1.5},
  font:'Georgia,"Times New Roman",serif',labelFont:'Inter,"Segoe UI",sans-serif',blur:0,radius:0,transitionMs:300,
  dock:{launchMs:700}, // dock icon bounce before an app's window opens (macOS style)
- puzzle:{answers:['python'],hint:'Named after a comedy group; also a kind of snake.',celebrationMs:380},
+ puzzle:{answers:['python'],hint:'Named after a comedy group; also a kind of snake.',celebrationMs:380,successMs:1200},
  apps:[{id:'projects',title:'Projects',icon:'folder'},{id:'experience',title:'Experience',icon:'briefcase'},{id:'terminal',title:'Terminal',icon:'terminal'},{id:'resume',title:'Resume',icon:'document'},{id:'about',title:'About me',icon:'person'},{id:'contact',title:'Contact',icon:'mail'},{id:'guide',title:'AI guide',icon:'spark'}],
  profile:{...profile,avatarSelector:"#signin-panel .avatar img",aboutHeading:"About Nathan"},
  projects,

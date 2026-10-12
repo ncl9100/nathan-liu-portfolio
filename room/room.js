@@ -38,7 +38,13 @@ const estimated = {board:0.8,upright:0.85,desktopThickness:1.1};
 const stage = document.getElementById('stage');
 const scene = new THREE.Scene(); scene.background=null;
 const renderer = new THREE.WebGLRenderer({antialias:true,alpha:true});renderer.setPixelRatio(Math.min(devicePixelRatio,DRAFTING_CONFIG.camera.pixelRatioCap));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.domElement.setAttribute('aria-label',"3D model of Nathan's room. Use the navigation above to view About, Experience, Projects, Resume, and Contact.");renderer.domElement.tabIndex=0;stage.appendChild(renderer.domElement);
-const camera=new THREE.PerspectiveCamera(38,1,0.1,DRAFTING_CONFIG.camera.far);
+// Near is 1 inch. The closest view sits 18 inches away, and a nearer plane wastes depth
+// precision, which is what made thin labels flicker from across the room.
+const camera=new THREE.PerspectiveCamera(38,1,1,DRAFTING_CONFIG.camera.far);
+// A printed face or window sits just in front of a solid. From the overview that gap is
+// smaller than one step of the depth buffer, so the two surfaces take turns. This tells
+// the GPU the thin layer is in front without moving it enough to see.
+function stick(material){material.polygonOffset=true;material.polygonOffsetFactor=-1;material.polygonOffsetUnits=-4;return material;}
 renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15;
 // A deterministic oak-like grain: broad growth rings plus fine fibers. It is
 // synthesized locally, not extracted from the supplied photos or downloaded.
@@ -88,7 +94,7 @@ const deskFurniture=new Set(desk.children);
 // Laptop base is measured; screen height and keyboard spacing are photo estimates.
 const laptopBase=box(14,0.45,9.5,-5,30.25,3.8,dark);
 const screen=box(14,8,0.35,-5,34.35,-0.5,dark);screen.rotation.x=-0.15;
-const screenFace=box(12.8,6.7,0.08,-5,34.35,-0.26,new THREE.MeshBasicMaterial({color:'#ffffff',toneMapped:false}));screenFace.rotation.x=-0.15;screenFace.castShadow=false;screenFace.receiveShadow=false;
+const screenFace=box(12.8,6.7,0.08,-5,34.35,-0.26,stick(new THREE.MeshBasicMaterial({color:'#ffffff',toneMapped:false})));screenFace.rotation.x=-0.15;screenFace.castShadow=false;screenFace.receiveShadow=false;
 
 const keys=new THREE.Group();desk.add(keys);
 const keyMat=new THREE.MeshStandardMaterial({color:'#15191e',roughness:.65});
@@ -110,7 +116,7 @@ for(const x of [-15,1])box(1.2,18,1.2,x,27,33,material,chair);
 box(17,11,1.5,-7,30.5,33,chairMat,chair);
 // Floor and room structure are built below after relocating the desk.
 scene.add(new THREE.HemisphereLight(0xe8efff,0x8b7153,1.35));
-const light=new THREE.DirectionalLight(0xffecd4,2.1);light.position.set(35,200,100);light.castShadow=true;light.shadow.mapSize.set(2048,2048);light.target.position.set(155,0,65);scene.add(light.target);light.shadow.camera.left=-240;light.shadow.camera.right=240;light.shadow.camera.top=200;light.shadow.camera.bottom=-200;light.shadow.camera.near=1;light.shadow.camera.far=600;light.shadow.bias=-0.0004;light.shadow.radius=4;scene.add(light);
+const light=new THREE.DirectionalLight(0xffecd4,2.1);light.position.set(35,200,100);light.castShadow=true;light.shadow.mapSize.set(2048,2048);light.target.position.set(155,0,65);scene.add(light.target);light.shadow.camera.left=-240;light.shadow.camera.right=240;light.shadow.camera.top=200;light.shadow.camera.bottom=-200;light.shadow.camera.near=1;light.shadow.camera.far=600;light.shadow.bias=-0.0008;light.shadow.normalBias=.6;light.shadow.radius=4;scene.add(light);
 // Lamp silhouette is estimated from the photos; the ambient light stays on
 // when its spotlight is off so the scene remains usable.
 const silver=new THREE.MeshStandardMaterial({color:'#a9adb0',metalness:.65,roughness:.3});
@@ -243,7 +249,8 @@ function addStool(x,z){
  const stool=new THREE.Group();stool.position.set(x,0,z);fixtures.add(stool);
  const part=(w,h,d,px,py,pz,mat=material)=>box(w,h,d,px,py,pz,mat,stool);
  part(15,1.3,15,0,30.35,0);
- for(const px of [-6.3,6.3])for(const pz of [-6.3,6.3])part(1.4,29.7,1.4,px,14.85,pz);
+ // Leg tops end inside the seat. Flush with the underside, they flicker from across the room.
+ for(const px of [-6.3,6.3])for(const pz of [-6.3,6.3])part(1.4,30.2,1.4,px,15.1,pz);
  // Aprons under the seat; narrow stretchers leave the center visibly open.
  for(const pz of [-6.3,6.3])part(12.6,2.2,.8,0,28.1,pz,trim);
  for(const px of [-6.3,6.3])part(.8,2.2,12.6,px,28.1,0,trim);
@@ -281,8 +288,9 @@ for(const z of [sinkZ-10.4,sinkZ+10.4])box(15.5,9.5,.2,sinkX,31.75,z,sinkSteel,s
 function roundedPath(path,w,h,r){path.moveTo(-w/2+r,-h/2);path.lineTo(w/2-r,-h/2);path.quadraticCurveTo(w/2,-h/2,w/2,-h/2+r);path.lineTo(w/2,h/2-r);path.quadraticCurveTo(w/2,h/2,w/2-r,h/2);path.lineTo(-w/2+r,h/2);path.quadraticCurveTo(-w/2,h/2,-w/2,h/2-r);path.lineTo(-w/2,-h/2+r);path.quadraticCurveTo(-w/2,-h/2,-w/2+r,-h/2);return path;}
 const rimShape=roundedPath(new THREE.Shape(),15.5,21,1.1);rimShape.holes.push(roundedPath(new THREE.Path(),14.7,20.2,.85));
 const sinkRim=new THREE.Mesh(new THREE.ExtrudeGeometry(rimShape,{depth:.12,bevelEnabled:false,curveSegments:12}),sinkSteel);sinkRim.rotation.x=-Math.PI/2;sinkRim.position.set(sinkX,36.38,sinkZ);sink.add(sinkRim);
-const drain=new THREE.Mesh(new THREE.CylinderGeometry(.65,.65,.04,32),dark);drain.position.set(sinkX,sinkBottom+.23,sinkZ);sink.add(drain);
-for(let i=0;i<8;i++){const slot=box(.07,.02,.65,sinkX+Math.sin(i*Math.PI/4)*.3,sinkBottom+.26,sinkZ+Math.cos(i*Math.PI/4)*.3,silver,sink);slot.rotation.y=i*Math.PI/4;}
+const drain=new THREE.Mesh(new THREE.CylinderGeometry(.65,.65,.04,32),stick(dark.clone()));drain.position.set(sinkX,sinkBottom+.23,sinkZ);sink.add(drain);
+const drainSlots=stick(silver.clone());
+for(let i=0;i<8;i++){const slot=box(.07,.02,.65,sinkX+Math.sin(i*Math.PI/4)*.3,sinkBottom+.28,sinkZ+Math.cos(i*Math.PI/4)*.3,drainSlots,sink);slot.rotation.y=i*Math.PI/4;}
 // The curved faucet itself is the interaction target; no overlay or UI button.
 const faucet=new THREE.Group();kitchenObjects.add(faucet);
 const chrome=new THREE.MeshPhysicalMaterial({color:'#d4dae0',metalness:.65,roughness:.19,clearcoat:.3});
@@ -318,7 +326,7 @@ function seeded(seed){return()=>(seed=(seed*16807)%2147483647)/2147483647;}
 function dirtTexture(seed,count,colors){const c=document.createElement('canvas');c.width=c.height=256;const ctx=c.getContext('2d'),rand=seeded(seed);
  for(let i=0;i<count;i++){ctx.fillStyle=colors[i%colors.length];ctx.globalAlpha=.55+rand()*.4;ctx.beginPath();ctx.ellipse(40+rand()*176,40+rand()*176,6+rand()*26,4+rand()*14,rand()*Math.PI,0,2*Math.PI);ctx.fill();}
  const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;return t;}
-function dirt(geometry,seed,count,colors){const m=new THREE.MeshStandardMaterial({map:dirtTexture(seed,count,colors),transparent:true,depthWrite:false,roughness:.6,polygonOffset:true,polygonOffsetFactor:-2,side:THREE.DoubleSide});dirtMaterials.push(m);return new THREE.Mesh(geometry,m);}
+function dirt(geometry,seed,count,colors){const m=stick(new THREE.MeshStandardMaterial({map:dirtTexture(seed,count,colors),transparent:true,depthWrite:false,roughness:.6,side:THREE.DoubleSide}));dirtMaterials.push(m);return new THREE.Mesh(geometry,m);}
 const sauce=['#8a3b1c','#a4521f','#5b3a1e','#6b7a2e'],ceramic=new THREE.MeshStandardMaterial({color:'#f1eee6',roughness:.3,side:THREE.DoubleSide});
 const plateProfile=[[.01,0],[3.2,0],[3.4,.2],[4.9,.75],[5,.85],[4.8,.85],[3.3,.3],[.01,.3]].map(([r,y])=>new THREE.Vector2(r,y));
 // Plates lean against the basin's far wall, dirty side toward the kitchen view; the basin's near
@@ -326,7 +334,7 @@ const plateProfile=[[.01,0],[3.2,0],[3.4,.2],[4.9,.75],[5,.85],[4.8,.85],[3.3,.3
 for(const [seed,x,z,lean] of [[11,209.7,sinkZ+3,-1.2],[17,210.6,sinkZ+3.8,-1.1]]){const plate=new THREE.Group();plate.position.set(x,basinFloor+4.65,z);plate.rotation.z=lean;dishes.add(plate);
  plate.add(new THREE.Mesh(new THREE.LatheGeometry(plateProfile,48),ceramic));
  const smear=dirt(new THREE.CircleGeometry(3.25,48),seed,14,sauce);smear.rotation.x=-Math.PI/2;smear.position.y=.31;plate.add(smear);}
-const fork=new THREE.Group();fork.position.set(sinkX+1,basinFloor+.05,sinkZ+2);fork.rotation.y=.6;dishes.add(fork);box(4.2,.07,.32,0,0,0,silver,fork);for(let t=0;t<4;t++)box(1.3,.06,.06,-2.7,0,-.13+t*.087,silver,fork);
+const fork=new THREE.Group();fork.position.set(sinkX+1,basinFloor+.08,sinkZ+2);fork.rotation.y=.6;dishes.add(fork);const forkMetal=stick(silver.clone());box(4.2,.07,.32,0,0,0,forkMetal,fork);for(let t=0;t<4;t++)box(1.3,.06,.06,-2.7,0,-.13+t*.087,forkMetal,fork);
 const bowl=new THREE.Group();bowl.position.set(sinkX+2.5,basinFloor,sinkZ-5.5);bowl.rotation.x=.25;dishes.add(bowl);
 bowl.add(new THREE.Mesh(new THREE.LatheGeometry([[.01,0],[1.6,0],[2.6,.9],[3.2,2.2],[3.3,2.4],[3.1,2.4],[2.45,1],[1.5,.2],[.01,.2]].map(([r,y])=>new THREE.Vector2(r,y)),48),ceramic));
 const bowlFloor=dirt(new THREE.CircleGeometry(1.5,32),23,8,sauce);bowlFloor.rotation.x=-Math.PI/2;bowlFloor.position.y=.22;bowl.add(bowlFloor);
@@ -348,7 +356,7 @@ kb(23,35,32,292.5,17.5,103,cabinet);kb(24,1.5,32,292,35.75,103,white);
 kb(26,35,26,291,17.5,132,white);
 kb(2,8,26,302,39,132,white);
 kb(.5,20,22,277.7,18,132,white);
-kb(.08,8,12,277.42,19.2,132,dark);
+kb(.08,8,12,277.3,19.2,132,stick(dark.clone()));
 kb(.45,.4,16,277.3,25.2,132,dark);
 for(let i=0;i<5;i++){const knob=new THREE.Mesh(new THREE.CylinderGeometry(.42,.42,.35,16),white);knob.rotation.z=Math.PI/2;knob.position.set(277.4,31.6,122.4+i*4.8);knob.castShadow=true;kitchenObjects.add(knob);}
 textSurface('avanti',4.2,1.1,277.4,10.6,132,kitchenObjects,'#4a4a4a').rotation.y=-Math.PI/2;
@@ -407,7 +415,7 @@ const pullTab=new THREE.Mesh(new THREE.TorusGeometry(.22,.055,8,24),aluminum);pu
 const resumeTexture=await new THREE.TextureLoader().loadAsync(document.getElementById('resume-image').src);resumeTexture.colorSpace=THREE.SRGBColorSpace;resumeTexture.anisotropy=renderer.capabilities.getMaxAnisotropy();
 const resumePaper=new THREE.Group();resumePaper.position.set(9,30.08,5.2);resumePaper.rotation.y=-.12;desk.add(resumePaper);
 box(8.5,.035,11,0,0,0,new THREE.MeshStandardMaterial({color:'#fafaf4',roughness:.95}),resumePaper);
-const paperFace=new THREE.Mesh(new THREE.PlaneGeometry(8.5,11),new THREE.MeshBasicMaterial({map:resumeTexture,toneMapped:false}));paperFace.rotation.x=-Math.PI/2;paperFace.position.y=.024;resumePaper.add(paperFace);
+const paperFace=new THREE.Mesh(new THREE.PlaneGeometry(8.5,11),stick(new THREE.MeshBasicMaterial({map:resumeTexture,toneMapped:false})));paperFace.rotation.x=-Math.PI/2;paperFace.position.y=.024;resumePaper.add(paperFace);
 
 box(3.7,5.7,2.8,-16,53.35,-7,solid('#d8c48c'));textSurface('TISSUES',3.2,1.2,-16,53.4,-5.56,desk,'#9e7552');
 const tissue=new THREE.PlaneGeometry(2.5,3,5,5);for(let i=0;i<tissue.attributes.position.count;i++)tissue.attributes.position.setZ(i,.25*Math.sin(i*2));tissue.computeVertexNormals();const tissueMesh=new THREE.Mesh(tissue,new THREE.MeshStandardMaterial({color:'#faf8ed',side:THREE.DoubleSide,roughness:1}));tissueMesh.position.set(-16,56.9,-7);tissueMesh.rotation.x=-.5;desk.add(tissueMesh);
@@ -477,7 +485,7 @@ nyuMug(-9,-7);
 // cover is the only one in full view. Spines are on the left, page edges on the right.
 function book(w,h,t,x,z,color,cover){const g=new THREE.Group();g.position.set(x,63,z);desk.add(g);const mat=solid(color,.75);
  box(w,h,.07,0,h/2,t/2-.035,mat,g);box(w,h,.07,0,h/2,-t/2+.035,mat,g);box(.1,h,t,-w/2+.05,h/2,0,mat,g);box(w-.15,h-.16,t-.14,.025,h/2,0,solid('#efe3c4',.95),g);
- if(cover){const face=new THREE.Mesh(new THREE.PlaneGeometry(w-.08,h-.08),new THREE.MeshStandardMaterial({map:cover,roughness:.75}));face.position.set(0,h/2,t/2+.003);g.add(face);}}
+ if(cover){const face=new THREE.Mesh(new THREE.PlaneGeometry(w-.08,h-.08),stick(new THREE.MeshStandardMaterial({map:cover,roughness:.75})));face.position.set(0,h/2,t/2+.02);g.add(face);}}
 const keepCalm=labelTexture(430,620,'#c8202e',ctx=>{ctx.fillStyle='#f4ece4';
  ctx.fillRect(-48,128,96,16);ctx.beginPath();ctx.moveTo(-48,128);for(let i=0;i<=4;i++){ctx.lineTo(-48+i*24,i%2?100:80);if(i<4)ctx.lineTo(-36+i*24,118);}ctx.lineTo(48,128);ctx.fill();for(let i=0;i<=4;i++)disc(ctx,-48+i*24,i%2?96:76,6,'#f4ece4');
  ctx.font=font(600,72,'"Gill Sans","Segoe UI",Arial,sans-serif');ctx.fillText('KEEP',0,225);ctx.fillText('CALM',0,312);ctx.font=font(600,40,'"Gill Sans","Segoe UI",Arial,sans-serif');ctx.fillText('AND',0,380);ctx.font=font(600,72,'"Gill Sans","Segoe UI",Arial,sans-serif');ctx.fillText('CARRY',0,450);ctx.fillText('ON',0,537);});
@@ -490,13 +498,13 @@ const monkey=new THREE.Group();desk.add(monkey);ellipsoid(monkey,15,80,-7,2.4,3.
 const microwave=new THREE.Group();microwave.position.set(216,42,76);kitchenObjects.add(microwave);
 box(12,11,17,0,0,0,dark,microwave);
 // Door and panel face into the kitchen (+x), the side you see from the room and the kitchen view.
-const mwGlass=new THREE.Mesh(new THREE.PlaneGeometry(10.4,9.4),new THREE.MeshPhysicalMaterial({color:'#141518',metalness:.55,roughness:.18}));mwGlass.rotation.y=Math.PI/2;mwGlass.position.set(6.02,.15,-2.4);microwave.add(mwGlass);
+const mwGlass=new THREE.Mesh(new THREE.PlaneGeometry(10.4,9.4),stick(new THREE.MeshPhysicalMaterial({color:'#141518',metalness:.55,roughness:.18})));mwGlass.rotation.y=Math.PI/2;mwGlass.position.set(6.08,.15,-2.4);microwave.add(mwGlass);
 box(.35,7.2,.45,6.28,.1,2.55,silver,microwave);
 const mwPanel=labelTexture(256,512,'#111216',ctx=>{
  ctx.fillStyle='#3ad0ff';ctx.font=font(600,42,'Consolas,"Courier New",monospace');ctx.fillText('0:00',0,70);
  ctx.fillStyle='#6a6e74';for(let r=0;r<6;r++)for(let c=0;c<2;c++)disc(ctx,-28+c*56,150+r*52,7,'#2a2d32');
 });
-const mwFace=new THREE.Mesh(new THREE.PlaneGeometry(5.2,9.6),new THREE.MeshStandardMaterial({map:mwPanel,roughness:.4}));mwFace.rotation.y=Math.PI/2;mwFace.position.set(6.02,.1,5.6);microwave.add(mwFace);
+const mwFace=new THREE.Mesh(new THREE.PlaneGeometry(5.2,9.6),stick(new THREE.MeshStandardMaterial({map:mwPanel,roughness:.4})));mwFace.rotation.y=Math.PI/2;mwFace.position.set(6.08,.1,5.6);microwave.add(mwFace);
 textSurface('TOSHIBA',3.4,.7,6.04,-4.3,-4.6,microwave,'#c8ccd0').rotation.y=Math.PI/2;
 cylinder(kitchenObjects,2.2,6,214,39.5,91,new THREE.MeshPhysicalMaterial({color:'#cedee0',transparent:true,opacity:.55,roughness:.2,metalness:.15}));cylinder(kitchenObjects,2.3,.45,214,42.7,91,black);
 cylinder(kitchenObjects,.9,3.5,205,38.3,sinkZ+13,solid('#9aba96'));kb(1.3,.2,.45,205,40.3,sinkZ+13,white);kb(2,.6,3,218,36.8,sinkZ+13,solid('#d5c359'));
@@ -504,8 +512,9 @@ for(let i=0;i<5;i++){cylinder(kitchenObjects,.75,2.5,205,37.8,94+i*2.1,solid(['#
 cylinder(kitchenObjects,1.7,7,205,40,86,white);cylinder(kitchenObjects,.2,8,205,40.5,86,silver);
 // Friends-and-family photos scattered over the open counter between the glass, the oil bottles, and the
 // sink. Each print stays at least a few inches from the others, so only a few corners overlap. A seeded
-// random keeps the layout the same on every visit. Each print sits a hair above the one before so
-// overlaps never flicker. The 3D prints use small thumbnails; the pop-up loads the full photo.
+// random keeps the layout the same on every visit. Each print sits clearly above the one before:
+// a hairline gap flickers from across the room, where the depth buffer can't tell them apart.
+// The 3D prints use small thumbnails; the pop-up loads the full photo.
 const photoPile=new THREE.Group();photoPile.name='Photo pile';fixtures.add(photoPile);
 const photoFolder=new URL('../assets/photos/friends-family/web/',import.meta.url);
 function sizePrint({border,face},aspect){const long=4.2,w=aspect>=1?long:long*aspect,d=aspect>=1?long/aspect:long;face.scale.set(w,d,1);border.scale.set(w+.35,1,d+.35);}
@@ -518,9 +527,9 @@ const photoPrints=[];{
  for(let i=spots.length-1;i>0;i--){const j=Math.floor(random()*(i+1));[spots[i],spots[j]]=[spots[j],spots[i]];}
  photos.forEach((photo,index)=>{
   const [x,z]=spots[index];
-  const print=new THREE.Group();print.position.set(x+(random()-.5)*.7,36.5+index*.012,z+(random()-.5)*.7);print.rotation.y=(random()-.5)*.65;print.name='Photo '+(index+1);photoPile.add(print);
+  const print=new THREE.Group();print.position.set(x+(random()-.5)*.7,36.5+index*.06,z+(random()-.5)*.7);print.rotation.y=(random()-.5)*.65;print.name='Photo '+(index+1);photoPile.add(print);
   const border=new THREE.Mesh(new THREE.BoxGeometry(1,.015,1),photoBorder);border.position.y=.0075;border.receiveShadow=true;print.add(border);
-  const face=new THREE.Mesh(new THREE.PlaneGeometry(1,1),new THREE.MeshStandardMaterial({color:'#d9d3c6',roughness:.55}));face.rotation.x=-Math.PI/2;face.position.y=.016;print.add(face);
+  const face=new THREE.Mesh(new THREE.PlaneGeometry(1,1),stick(new THREE.MeshStandardMaterial({color:'#d9d3c6',roughness:.55})));face.rotation.x=-Math.PI/2;face.position.y=.03;print.add(face);
   const entry={print,border,face,src:new URL(photo.file,photoFolder).href,thumb:new URL('thumbs/'+photo.file,photoFolder).href,caption:photo.caption};
   sizePrint(entry,4/3);photoPrints.push(entry);
  });

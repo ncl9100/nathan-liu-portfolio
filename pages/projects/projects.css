@@ -1,0 +1,52 @@
+/* Projects page: a grid of drafting-paper cards. Two columns on wide screens, one on phones. */
+
+.list-page { width: min(980px, 100%); margin: 0 auto; padding: 110px 16px 48px; display: grid; gap: 22px; }
+.list-page > .sheet-header { padding: 0 0 6px; border-bottom: 1px solid var(--drawing-rule); }
+
+.project-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 380px), 1fr)); gap: 18px; }
+
+.project-card {
+  display: flex; flex-direction: column;
+  border: 1px solid var(--drawing-rule);
+  background: color-mix(in srgb, var(--paper-center) 90%, transparent);
+  transition: transform .2s ease, box-shadow .2s ease, opacity .5s ease;
+}
+.card-main { display: flex; flex-direction: column; flex: 1; color: inherit; text-decoration: none; }
+
+.card-image { aspect-ratio: 16 / 10; overflow: hidden; border-bottom: 1px solid var(--drawing-rule); background: #e9e3d6; }
+.card-image img { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; transition: transform .35s ease; }
+
+.card-body { display: grid; gap: 8px; padding: 18px 20px 20px; align-content: start; }
+.card-date { font: 11px/1.2 Inter, "Segoe UI", sans-serif; letter-spacing: .14em; text-transform: uppercase; color: var(--drawing-ink); }
+.card-title { margin: 0; font: 400 24px var(--drawing-serif); color: #332c21; }
+.card-badge {
+  justify-self: start;
+  font: 12px/1.3 Inter, "Segoe UI", sans-serif;
+  color: #332c21;
+  border: 1px solid #332c21;
+  padding: 4px 8px;
+}
+.card-summary { margin: 0; font: 15px/1.55 var(--drawing-serif); color: var(--drawing-ink); }
+.card-visit { font: 14px var(--drawing-serif); color: #332c21; text-decoration: underline; text-decoration-color: var(--drawing-rule); text-underline-offset: 4px; }
+
+.card-github {
+  display: flex; align-items: center; min-height: 48px; padding: 0 20px;
+  border-top: 1px solid color-mix(in srgb, var(--drawing-rule) 60%, transparent);
+  font: 14px var(--drawing-serif); color: #332c21; text-decoration: none;
+}
+.card-github:hover { background: #b4a68b24; }
+
+/* Hover is a desktop bonus: lift the card and zoom the screenshot slightly. Phones still see "Visit site ↗". */
+@media (hover: hover) {
+  .project-card:has(.card-main:hover) { transform: translateY(-4px); box-shadow: 0 14px 30px #4a3f2e22; }
+  .card-main:hover .card-image img { transform: scale(1.03); }
+  .card-main:hover .card-visit { text-decoration-color: currentColor; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .project-card, .card-image img { transition: none; }
+  .card-main:hover .card-image img { transform: none; }
+}
+@media (max-width: 500px) {
+  .list-page { padding-top: 90px; }
+  .card-body { padding: 16px; }
+}

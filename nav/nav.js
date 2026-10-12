@@ -2,16 +2,17 @@
 // The same nav appears on every page. Each page names itself with <body data-page="...">.
 //
 // Ordinary links (work on every page):
-//   Résumé → the PDF in a new tab.  Contact → /pages/contact/.  "Nathan Liu" → the room.
+//   Experience, Projects, Contact → their pages in pages/.  Résumé → the PDF in a new tab.
+//   "Nathan Liu" → the room.
 //   Pages other than the room put their own "Back to the room" button below their content.
 //
 // On the room page only, the nav also asks the room through announcements:
 //   Announces:    room:go {view}               "Nathan Liu" → overview, floor-plan icon → floor plan
-//                 room:open-app {name,opener}  About, Experience, Projects (LiuOS, until their pages exist)
+//                 room:open-app {name,opener}  About (LiuOS, until its page exists)
 //   Listens for:  room:view {view}                         highlight the floor-plan button
 //                 laptop:apps-changed {active}             highlight the app in front
 //                 laptop:closed / resume:closed            close the mobile menu
-// On other pages, About / Experience / Projects go back to the room.
+// On other pages, About goes back to the room.
 
 const markup = await fetch(new URL('nav.html', import.meta.url)).then(response => response.text());
 document.body.insertAdjacentHTML('afterbegin', markup);
@@ -35,7 +36,7 @@ function updateHighlights() {
 }
 
 // Mark the link for the page we're on.
-if (page === 'contact') document.getElementById('nav-contact').setAttribute('aria-current', 'page');
+document.getElementById('nav-' + page)?.setAttribute('aria-current', 'page');
 
 // Mobile menu
 menuToggle.addEventListener('click', () => {
@@ -69,7 +70,7 @@ if (onRoomPage) {
   document.addEventListener('laptop:apps-changed', ({ detail: { active } }) => { activeApp = active; updateHighlights(); });
   document.addEventListener('laptop:closed', closeMenu);
 } else {
-  // No room here: the floor plan means nothing, and LiuOS apps live in the room.
+  // No room here: the floor plan means nothing, and LiuOS (About, for now) lives in the room.
   floorPlan.hidden = true;
   for (const button of document.querySelectorAll('[data-os-route]'))
     button.addEventListener('click', () => { location.href = '/'; });

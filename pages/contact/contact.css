@@ -13,14 +13,11 @@ body { min-height: 100dvh; display: grid; place-items: center; padding: 110px 16
 }
 
 .sheet-header { padding: 22px 24px 18px; border-bottom: 1px solid var(--drawing-rule); }
-.sheet-header small,
 .contact-row dt {
   font: 11px/1.2 Inter, "Segoe UI", sans-serif;
   letter-spacing: .14em;
   text-transform: uppercase;
 }
-.sheet-header h1 { margin: 6px 0 4px; font-size: 32px; font-weight: 400; letter-spacing: -.5px; color: #332c21; }
-.sheet-header p { margin: 0; font-size: 15px; }
 
 .contact-list { margin: 0; }
 .contact-row {
@@ -55,17 +52,6 @@ body { min-height: 100dvh; display: grid; place-items: center; padding: 110px 16
   min-height: 36px;
 }
 #copy-email:hover { background: #b4a68b24; }
-
-/* Back to the room: a full-width button right below the sheet, where people are already looking. */
-.sheet-back {
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-  min-height: 52px;
-  font: 17px var(--drawing-serif);
-  color: var(--paper-center);
-  background: #332c21;
-  text-decoration: none;
-}
-.sheet-back:hover { background: var(--drawing-ink); }
 
 @media (max-width: 500px) {
   body { padding-top: 90px; }

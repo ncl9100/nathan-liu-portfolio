@@ -1,0 +1,22 @@
+/* Shared by every page in pages/: the page title, the "Back to the room" button, and the scroll fade-in. */
+
+.sheet-header h1 { margin: 6px 0 4px; font: 400 32px var(--drawing-serif); letter-spacing: -.5px; color: #332c21; }
+
+/* Back to the room: a full-width button right below the page's content, where people are already looking. */
+.sheet-back {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 52px;
+  font: 17px var(--drawing-serif);
+  color: #332c21;
+  background: var(--paper-edge);
+  border: 1px solid #332c21;
+  text-decoration: none;
+}
+.sheet-back:hover { background: color-mix(in srgb, var(--paper-edge) 70%, var(--drawing-rule)); }
+
+/* Scroll fade-in (pages/reveal.js adds these classes; without JS everything stays visible). */
+.reveal { opacity: 0; transform: translateY(16px); transition: opacity .5s ease, transform .5s ease; }
+.reveal.is-visible { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+}

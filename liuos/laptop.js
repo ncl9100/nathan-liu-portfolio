@@ -34,15 +34,14 @@ function localClock(now=new Date()){return {time:now.toLocaleTimeString([],{hour
 function drawScreen(force=false){const now=new Date(),minute=Math.floor(now.getTime()/60000),state=laptopPowered+'/'+laptopUnlocked;if(!force&&minute===screenMinute&&state===screenState)return false;screenMinute=minute;screenState=state;
  const ctx=screenContext,w=screenCanvas.width,h=screenCanvas.height,c=LIUOS_CONFIG.colors;ctx.clearRect(0,0,w,h);ctx.fillStyle=laptopPowered?c.base:c.bezel;ctx.fillRect(0,0,w,h);
  if(laptopPowered){
- const blob=(x,y,rx,ry,color)=>{ctx.save();ctx.translate(x*w,y*h);ctx.scale(rx*w,ry*h);const g=ctx.createRadialGradient(0,0,0,0,0,1);g.addColorStop(0,color);g.addColorStop(1,color+'00');ctx.fillStyle=g;ctx.fillRect(-4,-4,8,8);ctx.restore();};
- blob(.8,.8,.8,.8,c.paperEdge);blob(.12,.15,.9,.9,c.border);
- ctx.textAlign='center';ctx.fillStyle=c.text;const clock=localClock(now);ctx.font=`300 ${Math.round(w*.135)}px ${LIUOS_CONFIG.font}`;ctx.fillText(clock.time,w*.5,h*.43);
- ctx.fillStyle=c.muted;ctx.font=`400 ${Math.round(w*.022)}px ${LIUOS_CONFIG.font}`;ctx.fillText(clock.date,w*.5,h*.53);
- ctx.font=`600 ${Math.round(w*.019)}px ${LIUOS_CONFIG.font}`;ctx.fillText('LiuOS',w*.5,h*.64);
- ctx.font=`400 ${Math.round(w*.015)}px ${LIUOS_CONFIG.font}`;ctx.fillText(laptopUnlocked?'Workspace ready · Click to open':'Click to open',w*.5,h*.9);
+ ctx.save();ctx.translate(w*.48,h*.43);ctx.scale(w*.52*Math.SQRT2,h*.57*Math.SQRT2);const paper=ctx.createRadialGradient(0,0,0,0,0,1);paper.addColorStop(0,c.base);paper.addColorStop(.2,c.base);paper.addColorStop(1,c.paperEdge);ctx.fillStyle=paper;ctx.fillRect(-2,-2,4,4);ctx.restore();
+ const cell=w/40;ctx.save();ctx.strokeStyle=c.border;ctx.globalAlpha=.22;ctx.lineWidth=Math.max(1,w/950);ctx.beginPath();for(let x=cell/2;x<w;x+=cell){ctx.moveTo(x,0);ctx.lineTo(x,h);}for(let y=cell/2;y<h;y+=cell){ctx.moveTo(0,y);ctx.lineTo(w,y);}ctx.stroke();ctx.restore();
+ const label=(text,size,y)=>{ctx.font=`500 ${Math.round(w*size)}px ${LIUOS_CONFIG.labelFont}`;ctx.letterSpacing=Math.round(w*size*.12)+'px';ctx.fillText(text.toUpperCase(),w*.5,y);ctx.letterSpacing='0px';};
+ ctx.textAlign='center';ctx.fillStyle=c.text;const clock=localClock(now);ctx.font=`400 ${Math.round(w*.135)}px ${LIUOS_CONFIG.font}`;ctx.fillText(clock.time,w*.5,h*.43);
+ ctx.fillStyle=c.muted;label(clock.date,.02,h*.53);label('LiuOS',.016,h*.64);label(laptopUnlocked?'Workspace ready · Click to open':'Click to open',.014,h*.9);
  }
  const glare=ctx.createLinearGradient(0,h,w,0),opacity=LIUOS_CONFIG.screen.glareOpacity;glare.addColorStop(0,'rgba(255,255,255,0)');glare.addColorStop(.35,'rgba(255,255,255,0)');glare.addColorStop(.48,`rgba(255,255,255,${opacity})`);glare.addColorStop(.65,'rgba(255,255,255,0)');glare.addColorStop(1,'rgba(255,255,255,0)');ctx.fillStyle=glare;ctx.fillRect(0,0,w,h);
- const vignette=ctx.createRadialGradient(w/2,h/2,h*.2,w/2,h/2,w*.6);vignette.addColorStop(0,'rgba(0,0,0,0)');vignette.addColorStop(1,`rgba(0,0,0,${LIUOS_CONFIG.screen.vignetteOpacity})`);ctx.fillStyle=vignette;ctx.fillRect(0,0,w,h);
+ const vignette=ctx.createRadialGradient(w/2,h/2,h*.2,w/2,h/2,w*.6);vignette.addColorStop(0,c.bezel+'00');vignette.addColorStop(1,c.bezel+Math.round(LIUOS_CONFIG.screen.vignetteOpacity*255).toString(16).padStart(2,'0'));ctx.fillStyle=vignette;ctx.fillRect(0,0,w,h);
  return true;
 }
 function announceScreen(redrawn){document.dispatchEvent(new CustomEvent('laptop:screen',{detail:{canvas:screenCanvas,redrawn,powered:laptopPowered}}));}

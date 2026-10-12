@@ -53,6 +53,6 @@ export const LIUOS_CONFIG={
 },
  resumeViewer:{windowWidth:530,pageMaxWidth:620,zoomStep:.25,minZoom:.75,maxZoom:2},
  windows:{contactWidth:560,contactHeight:380,widthRatio:.65,heightRatio:.7,minWidth:260,maxWidth:720,minHeight:200,maxHeight:420,cascade:28,animationMs:180,mobileBreakpoint:600},
- screen:{resolution:2048,aspect:12.8/6.7,glareOpacity:.055,vignetteOpacity:.13,wallpaperFps:15,animatedWallpaper:false,brightness:.94,hoverBrightness:1,calloutGap:24},
+ screen:{resolution:2048,aspect:12.8/6.7,glareOpacity:.055,vignetteOpacity:.08,wallpaperFps:15,animatedWallpaper:false,brightness:.94,hoverBrightness:1,calloutGap:24},
  wallpaper:{speed:2,resolution:1,maxFps:30,cursorStrength:.035,cursorDamping:4,pixelRatioCap:2,module:'./wallpaper.js'},clock:{refreshMs:30000}
 };

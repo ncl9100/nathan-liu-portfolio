@@ -1,0 +1,51 @@
+/* Photo viewer: a photo from the kitchen counter, held up close while the room blurs behind it. */
+
+#photo-window {
+  width: 100vw; height: 100dvh; max-width: none; max-height: none;
+  margin: 0; padding: 0; border: 0; border-radius: 0; box-shadow: none;
+  background: transparent; overflow: hidden;
+}
+/* Top padding keeps the print below the nav bar. */
+#photo-window[open] { display: grid; place-items: center; box-sizing: border-box; padding: 60px 12px 16px; }
+#photo-window::backdrop {
+  background: rgba(245, 241, 232, .28);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  animation: photo-backdrop-in .45s ease-out;
+}
+#photo-window.closing::backdrop { animation: photo-backdrop-out .35s ease-in forwards; }
+@keyframes photo-backdrop-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes photo-backdrop-out { from { opacity: 1; } to { opacity: 0; } }
+
+/* The print: a white border like the ones on the counter, caption written on the bottom edge.
+   --aspect (width / height) and --reserve (room for the nav and caption) are set by viewer.js. */
+.photo-print {
+  position: relative; margin: 0; padding: 12px;
+  background: #fbf9f3; box-shadow: 0 18px 50px #2b221640;
+  transform-origin: top left;
+}
+.photo-print img {
+  display: block;
+  width: min(calc(90vw - 24px), calc((100dvh - var(--reserve, 150px)) * var(--aspect, 1.333)));
+  aspect-ratio: var(--aspect, 1.333); height: auto;
+  margin-inline: auto; object-fit: cover; background: #e4dfd3;
+}
+/* width 0 + min-width: wrap to the photo's width instead of stretching the print, but never
+   narrower than a short line, even under a tall photo on a short screen. */
+.photo-print figcaption {
+  box-sizing: border-box; width: 0; min-width: max(100%, 13rem); padding: 12px 4px 2px;
+  font: 17px/1.4 var(--drawing-serif); color: #332c21; text-align: center;
+}
+
+.photo-close {
+  position: absolute; top: -14px; right: -14px;
+  width: 40px; height: 40px; padding: 0;
+  display: grid; place-items: center;
+  border: 1px solid #aaa09145; border-radius: 50%;
+  background: #f5f1e8; color: #332c21; font: 24px/1 Georgia, serif;
+  cursor: pointer; box-shadow: 0 4px 14px #2b221626;
+}
+.photo-close:hover { background: #ebe4d6; }
+
+@media (prefers-reduced-motion: reduce) {
+  #photo-window::backdrop, #photo-window.closing::backdrop { animation: none; }
+}

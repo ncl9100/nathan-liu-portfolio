@@ -32,7 +32,7 @@ const measured = {width:42,depth:24,desktopHeight:30,shelfWidth:42,shelfDepth:10
 const estimated = {board:0.8,upright:0.85,desktopThickness:1.1};
 const stage = document.getElementById('stage');
 const scene = new THREE.Scene(); scene.background=null;
-const renderer = new THREE.WebGLRenderer({antialias:true,alpha:true});renderer.setPixelRatio(Math.min(devicePixelRatio,DRAFTING_CONFIG.camera.pixelRatioCap));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.domElement.setAttribute('aria-label',"3D model of Nathan's room. Use the navigation above to view About, Experience, Projects, Résumé, and Contact.");renderer.domElement.tabIndex=0;stage.appendChild(renderer.domElement);
+const renderer = new THREE.WebGLRenderer({antialias:true,alpha:true});renderer.setPixelRatio(Math.min(devicePixelRatio,DRAFTING_CONFIG.camera.pixelRatioCap));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.domElement.setAttribute('aria-label',"3D model of Nathan's room. Use the navigation above to view About, Experience, Projects, Resume, and Contact.");renderer.domElement.tabIndex=0;stage.appendChild(renderer.domElement);
 const camera=new THREE.PerspectiveCamera(38,1,0.1,DRAFTING_CONFIG.camera.far);
 renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15;
 // A deterministic oak-like grain: broad growth rings plus fine fibers. It is
@@ -197,8 +197,9 @@ const yourBed=bed(93,19.5,74,39,linen,true);
 const otherBed=bed(117,115.5,74,39,paleGreen,false);
 for(const [root,name] of [[yourBed,'Your bed'],[otherBed,'Other bed']]){root.name=name;root.traverse(obj=>{if(obj.isMesh)obj.name=name+' / '+obj.geometry.type;});}
 // Roommate's desk uses the same dorm-furniture proportions as an estimate.
-const otherDesk=desk.clone();otherDesk.position.set(44,0,123);otherDesk.rotation.y=Math.PI;scene.add(otherDesk);
-const otherChair=chair.clone();otherChair.position.set(44,0,123);otherChair.rotation.y=Math.PI;scene.add(otherChair);
+// x=50 leaves a 1-inch gap to the dresser (x 8-28) and 9 inches to the roommate's bed.
+const otherDesk=desk.clone();otherDesk.position.set(50,0,123);otherDesk.rotation.y=Math.PI;scene.add(otherDesk);
+const otherChair=chair.clone();otherChair.position.set(50,0,123);otherChair.rotation.y=Math.PI;scene.add(otherChair);
 for(const z of [17,108]){rb(20,45,24,18,22.5,z);for(let i=0;i<5;i++)rb(.7,7.7,22,28.4,5+i*8.5,z,trim);}
 // Four identical measured stools, arranged in a photo-based cluster beside the kitchen.
 const stoolDimensions={width:15,depth:15,height:31};
@@ -339,8 +340,16 @@ box(3.7,5.7,2.8,-16,53.35,-7,solid('#d8c48c'));textSurface('TISSUES',3.2,1.2,-16
 const tissue=new THREE.PlaneGeometry(2.5,3,5,5);for(let i=0;i<tissue.attributes.position.count;i++)tissue.attributes.position.setZ(i,.25*Math.sin(i*2));tissue.computeVertexNormals();const tissueMesh=new THREE.Mesh(tissue,new THREE.MeshStandardMaterial({color:'#faf8ed',side:THREE.DoubleSide,roughness:1}));tissueMesh.position.set(-16,56.9,-7);tissueMesh.rotation.x=-.5;desk.add(tissueMesh);
 mug(desk,-9,50.5,-7);textSurface('NYU',1.7,1.6,-9,52,-5.76,desk,'#644b83');mug(desk,2,50.5,-7);
 box(.25,4.3,.3,1.8,55,-7,solid('#1c7b97'));box(.35,.8,.35,1.8,57.5,-7,white);box(.9,3,.45,2.5,54.8,-7.2,solid('#9a2832'));textSurface('paste',.8,.9,2.5,55,-6.94,desk,'#fff');
-cylinder(desk,2.5,7.2,11,54.1,-7,white);cylinder(desk,2.55,.55,11,57.9,-7,solid('#629341'));textSurface('Organic\nProtein',3.5,4,11,54.3,-4.45,desk,'#3d643a','#f0efe7');
-cylinder(desk,1.65,5.2,17,53.1,-7,white);cylinder(desk,1.7,.4,17,55.9,-7,black);textSurface('CREATINE',2.6,2,17,53.3,-5.3,desk,'#303638','#efeee8');
+// A printed band wrapped around a tub; the text is centered on the side facing the desk chair.
+function wrapLabel(lines,r,h,x,y,z,color,bg){
+ const c=document.createElement('canvas');c.width=1024;c.height=Math.round(1024*h/(2*Math.PI*r));const ctx=c.getContext('2d');ctx.fillStyle=bg;ctx.fillRect(0,0,c.width,c.height);ctx.fillStyle=color;ctx.textAlign='center';ctx.textBaseline='middle';
+ // Text stays within the front quarter of the wrap, where the curve barely foreshortens it.
+ const size=Math.min(c.height*.75/lines.length,1024*.27/(.72*Math.max(...lines.map(l=>l.length))));ctx.font=`700 ${size}px "Segoe UI",Arial,sans-serif`;lines.forEach((line,i)=>ctx.fillText(line,512,c.height/2+(i-(lines.length-1)/2)*size*1.1));
+ const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=renderer.capabilities.getMaxAnisotropy();
+ const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,48,1,true,-Math.PI,2*Math.PI),new THREE.MeshStandardMaterial({map:t,roughness:.7}));m.position.set(x,y,z);desk.add(m);return m;
+}
+cylinder(desk,2.5,7.2,11,54.1,-7,white);cylinder(desk,2.55,.55,11,57.9,-7,solid('#629341'));wrapLabel(['PROTEIN','POWDER'],2.53,4.4,11,54.1,-7,'#3d643a','#f0efe7');
+cylinder(desk,1.65,5.2,17,53.1,-7,white);cylinder(desk,1.7,.4,17,55.9,-7,black);wrapLabel(['CREATINE'],1.68,2.6,17,53.1,-7,'#303638','#efeee8');
 for(let i=0;i<5;i++){const colors=['#a52b29','#d4c8aa','#24395e','#855266','#b8b4a8'];box(.7,6+(i%2),4,-16+i*.85,66+(i%2)*.5,-7,solid(colors[i]));}textSurface('KEEP CALM',.68,3,-16,66,-4.97,desk,'#f2ddad');
 const monkey=new THREE.Group();desk.add(monkey);ellipsoid(monkey,15,80,-7,2.4,3.3,1.9,brown);ellipsoid(monkey,15,80,-5.5,1.65,2.3,.55,cream);ellipsoid(monkey,15,84.4,-7,2.15,2.2,1.8,brown);ellipsoid(monkey,15,84.1,-5.45,1.6,1.5,.65,cream);for(const x of [12.7,17.3]){ellipsoid(monkey,x,84.4,-7,.7,.8,.5,cream);ellipsoid(monkey,x,78.7,-6,.8,2,.8,brown);ellipsoid(monkey,x,75.8,-4.9,1.1,.65,1.6,cream);}for(const x of [14.4,15.6])ellipsoid(monkey,x,84.7,-4.84,.18,.2,.12,black);textSurface('⌣',1.2,.6,15,83.4,-4.74,monkey,'#4c3827');for(const x of [13.6,16.4])ellipsoid(monkey,x,77,-6,.8,1.5,.8,brown);
 // Sink-side counter: appliances near the passage, soap and sponge by the basin.
@@ -418,11 +427,13 @@ let target=new THREE.Vector3(150,12,70),yaw=0.55,pitch=0.85,radius=600;
 function render(){if(document.hidden||laptopOpen)return;document.body.dataset.roomView=currentView;camera.position.set(target.x+radius*Math.sin(yaw+sway.offset+parallax.x)*Math.cos(pitch+parallax.y),target.y+radius*Math.sin(pitch+parallax.y),target.z+radius*Math.cos(yaw+sway.offset+parallax.x)*Math.cos(pitch+parallax.y));camera.lookAt(target);updateBackControl();updateWalls();renderer.render(scene,camera);updateHotspots();updateDimensionLabels();}
 function fittedRadius(value){return value*Math.max(1,DRAFTING_CONFIG.camera.mobileFitAspect/camera.aspect);}
 function resize(){renderer.setSize(stage.clientWidth,stage.clientHeight);camera.aspect=stage.clientWidth/stage.clientHeight;if(['angle','front','desk'].includes(currentView))radius=fittedRadius(presets[currentView].radius);camera.updateProjectionMatrix();render();}window.addEventListener('resize',resize);
-const presets={stools:{yaw:-2.3,pitch:.55,radius:92,target:[183,18,94],fov:48},resume:{yaw:0,pitch:1.48,radius:25,target:[163.75,30.1,17.2],fov:40},details:{yaw:-.15,pitch:.2,radius:130,target:[154.75,48,10]},angle:{yaw:.55,pitch:.85,radius:600,target:[150,12,70]},front:{yaw:0,pitch:Math.PI/2-.001,radius:560,target:[156,0,73]},side:{yaw:Math.PI/2,pitch:.2,radius:48,target:[215,38,119],fov:65},fridge:{yaw:-.45,pitch:.18,radius:145,target:[284,47,80]},desk:{yaw:0,pitch:.27,radius:29,target:[149.75,34,12]},bed:{yaw:-Math.PI/2,pitch:.15,radius:60,target:[130,34,19.5]}};
+const presets={stools:{yaw:-2.3,pitch:.55,radius:92,target:[183,18,94],fov:48},resume:{yaw:0,pitch:1.48,radius:25,target:[163.75,30.1,17.2],fov:40},details:{yaw:-.15,pitch:.2,radius:130,target:[154.75,48,10]},angle:{yaw:.55,pitch:.85,radius:600,target:[150,12,70]},front:{yaw:0,pitch:Math.PI/2-.001,radius:560,target:[156,0,73]},side:{yaw:Math.PI/2,pitch:.2,radius:48,target:[215,38,119],fov:65},fridge:{yaw:-.45,pitch:.18,radius:145,target:[284,47,80]},desk:{yaw:0,pitch:.27,radius:29,target:[149.75,34,12]},bed:{yaw:-Math.PI/2,pitch:.15,radius:60,target:[130,34,19.5]},otherBed:lookFrom([125,52,104],[152,40,10],50)};
+// A preset from where a seated person's eyes are to what they're looking at.
+function lookFrom(eye,look,fov){const d=new THREE.Vector3(...eye).sub(new THREE.Vector3(...look)),r=d.length();return {yaw:Math.atan2(d.x,d.z),pitch:Math.asin(d.y/r),radius:r,target:look,fov};}
 let animation=0,moving=false,currentView='angle';
 const hint=document.querySelector('.hint');let captionTimer=0,captionHideTimer=0;
 const defaultCaption='Click around. Most things in here do something.';
-const viewCaptions={angle:defaultCaption,front:'The floor plan. Click an object to explore.',desk:'You’re at your desk. Click the laptop to open LiuOS.',bed:'You’re on your bed. Drag to look around.',side:'You’re in the kitchen. Drag to look around.',fridge:'The fridge. Drag to look around.',stools:'Four stools beside the kitchen.',details:'Your shelves and desk. Click the lamp or laptop.',resume:'Your résumé, up close.'};
+const viewCaptions={angle:defaultCaption,front:'The floor plan. Click an object to explore.',desk:'You’re at your desk. Click the laptop to open LiuOS.',bed:'You’re on your bed. Drag to look around.',otherBed:'Your roommate’s bed. Drag to look around.',side:'You’re in the kitchen. Drag to look around.',fridge:'The fridge. Drag to look around.',stools:'Four stools beside the kitchen.',details:'Your shelves and desk. Click the lamp or laptop.',resume:'Your resume, up close.',zoom:'A closer look. Click outside the room to step back.'};
 function hideCaption(){clearTimeout(captionTimer);clearTimeout(captionHideTimer);hint.classList.remove('caption-visible');captionHideTimer=setTimeout(()=>hint.hidden=true,reducedMotion()?0:250);}
 function showCaption(message=defaultCaption,duration=DRAFTING_CONFIG.interaction.captionMs){hideCaption();clearTimeout(captionHideTimer);hint.hidden=false;hint.textContent=message;hint.classList.add('caption-visible');captionTimer=setTimeout(hideCaption,duration);}
 
@@ -433,7 +444,7 @@ for(const button of hotspotButtons){const name=button.dataset.destination,[title
 function updateHotspots(){
 for(const [index,button] of hotspotButtons.entries()){
 const name=button.dataset.destination,leader=leaders.get(name);if(name==='laptop')button.querySelector('.callout-action').textContent=laptopScreenPowered?'Open laptop':'Turn on laptop';
-const available=(!moving||name==='laptop')&&modelProgress===1&&(name==='laptop'?currentView==='desk':name==='resume'?['angle','front','custom','desk','details'].includes(currentView):['angle','front','custom'].includes(currentView));
+const available=(!moving||name==='laptop')&&modelProgress===1&&(name==='laptop'?currentView==='desk':name==='resume'?['angle','front','custom','zoom','desk','details'].includes(currentView):['angle','front','custom','zoom'].includes(currentView));
 button.hidden=!available;button.disabled=!introDone;leader.line.style.display=leader.dot.style.display=available?'':'none';if(!available)continue;
 const point=new THREE.Vector3(...hotspotPositions[name]).project(camera);
 if(point.z>1||point.z< -1||Math.abs(point.x)>.95||Math.abs(point.y)>.95){button.hidden=true;leader.line.style.display=leader.dot.style.display='none';continue;}
@@ -450,7 +461,7 @@ if(name==='laptop'){
 const opacity=introDone?1:phase(introElapsed,[DRAFTING_CONFIG.intro.callouts[0]+index*DRAFTING_CONFIG.intro.calloutStagger,DRAFTING_CONFIG.intro.callouts[1]+index*DRAFTING_CONFIG.intro.calloutEndStagger]);button.style.opacity=opacity;leader.line.style.opacity=leader.dot.style.opacity=opacity;button.style.left=lx+'px';button.style.top=ly+'px';leader.line.setAttribute('points',name==='laptop'?`${x},${y} ${Math.abs(ly-y)>10?lx:lx+(lx>x?-1:1)*button.offsetWidth/2},${Math.abs(ly-y)>10?ly+button.offsetHeight/2:ly}`:`${x},${y} ${lx},${ly+18} ${lx+36},${ly+18}`);leader.dot.setAttribute('cx',x);leader.dot.setAttribute('cy',y);
 }
 }
-const closeupViews=new Set(['desk','bed','side','fridge','stools','details']);
+const closeupViews=new Set(['desk','bed','otherBed','side','fridge','stools','details','zoom']);
 let closeupView=null,firstCloseupSeen=false,zoomExitDelta=0,lastZoomOut=0;
 const backToRoom=document.getElementById('back-to-room');
 function isCloseup(){return closeupView!==null;}
@@ -498,8 +509,9 @@ hotspotButtons.forEach(button=>{for(const [event,hovering] of [['pointerenter',t
 const raycaster=new THREE.Raycaster(),mouse=new THREE.Vector2();
 const hoverOutline=new THREE.Box3Helper(new THREE.Box3(),DRAFTING_CONFIG.interaction.hoverColor);hoverOutline.material.transparent=true;hoverOutline.material.opacity=DRAFTING_CONFIG.interaction.hoverOpacity;hoverOutline.material.depthWrite=false;hoverOutline.visible=false;hoverOutline.userData.pickThrough=true;hoverOutline.raycast=()=>{};scene.add(hoverOutline);
 function clearHighlight(){hoverOutline.visible=false;stage.style.cursor='grab';screenHover(false);}
-function pick(event){const bounds=stage.getBoundingClientRect();mouse.set((event.clientX-bounds.left)/bounds.width*2-1,1-(event.clientY-bounds.top)/bounds.height*2);raycaster.setFromCamera(mouse,camera);
-const hit=raycaster.intersectObjects([modelRoot],true).find(h=>{let node=h.object;while(node){if(node.visible===false||node.userData?.pickThrough)return false;node=node.parent;}return true;});if(!hit)return null;
+function firstHit(event){const bounds=stage.getBoundingClientRect();mouse.set((event.clientX-bounds.left)/bounds.width*2-1,1-(event.clientY-bounds.top)/bounds.height*2);raycaster.setFromCamera(mouse,camera);
+return raycaster.intersectObjects([modelRoot],true).find(h=>{let node=h.object;while(node){if(node.visible===false||node.userData?.pickThrough)return false;node=node.parent;}return true;})||null;}
+function pick(event,hit=firstHit(event)){if(!hit)return null;
 if(DRAFTING_CONFIG.interaction.debugPicking&&event.type==='pointerup')console.debug('Room pick',hit.object.name,hit.object.geometry?.type);let obj=hit.object;while(obj){
 if(lampMeshes.includes(obj))return {view:'lamp',root:obj};
 if(obj===faucet)return {view:'faucet',root:faucet};
@@ -507,7 +519,8 @@ if(obj===resumePaper)return {view:'resume',root:resumePaper};
 if([laptopBase,screen,screenFace,keys].includes(obj))return {view:currentView==='desk'?'laptop':'desk',root:obj};
 if(obj===refrigerator||obj===fridgeTrim)return {view:'fridge',root:refrigerator};
 if(stools.includes(obj))return {view:'stools',root:obj};
-if(obj===yourBed||obj===otherBed)return {view:'bed',root:obj};
+if(obj===yourBed)return {view:'bed',root:obj};
+if(obj===otherBed)return {view:'otherBed',root:obj};
 if(obj.parent===desk){if(deskFurniture.has(obj))return isCloseup()?null:{view:'desk',root:obj};return {view:'details',root:obj};}
 if(obj.parent===kitchenObjects||obj===kitchenObjects)return {view:'side',root:obj===kitchenObjects?hit.object:obj};
 obj=obj.parent;
@@ -522,7 +535,12 @@ if(pointer.id!==event.pointerId)return;
 if(Math.hypot(event.clientX-pointer.startX,event.clientY-pointer.startY)<DRAFTING_CONFIG.interaction.clickPixels&&!pointer.dragged)return;
 if(!pointer.dragged){bakeSway();cancelCameraMove();}pointer.dragged=true;currentView='custom';clearHighlight();yaw-=(event.clientX-pointer.x)*.007;pitch=Math.max(-.1,Math.min(1.569,pitch+(event.clientY-pointer.y)*.007));pointer.x=event.clientX;pointer.y=event.clientY;announceView('custom');render();
 });
-stage.addEventListener('pointerup',event=>{const click=pointer&&pointer.id===event.pointerId&&!pointer.dragged&&Math.hypot(event.clientX-pointer.startX,event.clientY-pointer.startY)<DRAFTING_CONFIG.interaction.clickPixels&&performance.now()-pointer.started<DRAFTING_CONFIG.interaction.clickMs;pointer=null;noteInput();if(click&&!laptopOpen){const selected=pick(event);if(selected){renderer.domElement.focus({preventScroll:true});activate(selected.view);}else if(isCloseup())returnToRoom();}});
+stage.addEventListener('pointerup',event=>{const click=pointer&&pointer.id===event.pointerId&&!pointer.dragged&&Math.hypot(event.clientX-pointer.startX,event.clientY-pointer.startY)<DRAFTING_CONFIG.interaction.clickPixels&&performance.now()-pointer.started<DRAFTING_CONFIG.interaction.clickMs;pointer=null;noteInput();if(click&&!laptopOpen){const hit=firstHit(event),selected=pick(event,hit);if(selected){renderer.domElement.focus({preventScroll:true});activate(selected.view);}else if(hit)zoomInto(hit.point);else if(currentView!=='angle')returnToRoom();}});
+// Clicking empty space inside the room moves in closer on that spot. Close-ups switch to the
+// overview's angle; otherwise the current angle is kept.
+function zoomInto(point){if(laptopOpen||resumeOpen)return;const keep=!closeupView||closeupView==='zoom',a=presets.angle;
+presets.zoom={yaw:keep?yaw+sway.offset:a.yaw,pitch:keep?pitch:a.pitch,radius:fittedRadius(a.radius)/DRAFTING_CONFIG.interaction.clickZoom,target:[point.x,Math.min(point.y,40),point.z]};
+if(moving){queuedCameraAction='zoom';return;}navigate('zoom');}
 for(const event of ['pointercancel','lostpointercapture'])stage.addEventListener(event,()=>{pointer=null;noteInput();});
 stage.addEventListener('pointerleave',()=>{parallax.targetX=parallax.targetY=0;requestParallax();clearHighlight();render();});
 function zoomRoom(event){event.preventDefault();noteInput();if(moving||laptopOpen)return;const delta=event.deltaY*(event.deltaMode===1?16:event.deltaMode===2?stage.clientHeight:1),now=performance.now();

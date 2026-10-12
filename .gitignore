@@ -3,3 +3,7 @@ node_modules/
 .env
 .env.*
 .DS_Store
+
+# Private sources: LaTeX files and personal reference photos stay out of the repo (and the live site).
+*.tex
+assets/photos/nathan.jpg

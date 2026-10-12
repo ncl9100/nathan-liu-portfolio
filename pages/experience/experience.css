@@ -1,9 +1,7 @@
 /* Experience page: a vertical timeline drawn like a dimension line, with a dot for each job. */
 
-.list-page { width: min(860px, 100%); margin: 0 auto; padding: 110px 16px 48px; display: grid; gap: 22px; }
-.list-page > .sheet-header { padding: 0 0 6px; border-bottom: 1px solid var(--drawing-rule); }
 
-.timeline { list-style: none; margin: 0; padding: 0; position: relative; }
+.timeline { max-width: 860px; list-style: none; margin: 0; padding: 0; position: relative; }
 /* The line runs down the left of the entries. */
 .timeline::before { content: ""; position: absolute; left: 7px; top: 8px; bottom: 8px; width: 1px; background: var(--drawing-rule); }
 
@@ -31,7 +29,6 @@
 .timeline-tags li { font: 12px/1 Inter, "Segoe UI", sans-serif; color: var(--drawing-ink); border: 1px solid var(--drawing-rule); padding: 5px 8px; }
 
 @media (max-width: 500px) {
-  .list-page { padding-top: 90px; }
   .timeline-item { padding-left: 28px; }
   .timeline-body { padding: 14px 16px; }
   .timeline-role { font-size: 21px; }

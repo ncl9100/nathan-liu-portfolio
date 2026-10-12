@@ -10,7 +10,7 @@ showcases my experience. Audience: recruiters and hiring managers for ML / data 
 - **The room and its objects** — exists: desk, laptop, résumé paper, lamp, faucet, measurements,
   callouts, title block.
 - **LiuOS** (the laptop's desktop) — exists: lock screen, apps, windows, dock. Planned: redesign
-  it to match my real laptop.
+  it to match the website's design system (drafting paper, ink, serif type).
 - **Career content** — exists: the same nav on every page links to About, Experience, Projects,
   and Contact pages (in `pages/`), and Résumé opens the PDF in a new tab. About shows my headshot
   and types out my bio. Idea for later: an animated character that speaks facts about me.
@@ -23,7 +23,7 @@ showcases my experience. Audience: recruiters and hiring managers for ML / data 
   `room/room.*`, `liuos/laptop.*`, `resume-viewer/viewer.*`, `nav/nav.*`. A component's tunable
   values live in its own `settings.js` (room and LiuOS have one).
 - Components never call each other. They talk with announcements (`CustomEvent`s on `document`),
-  e.g. `laptop:open`, `resume:closed`, `room:go`. The comment at the top of each component's `.js`
+  e.g. `laptop:open`, `laptop:closed`, `room:go`. The comment at the top of each component's `.js`
   lists what it listens for and announces. Keep that comment up to date, and follow the pattern
   for new components.
   - One allowed exception: a component may read another component's `settings.js` (the room
@@ -36,6 +36,8 @@ showcases my experience. Audience: recruiters and hiring managers for ML / data 
 - Shared styles: `css/base.css` (including the drafting-paper theme). Shared files: `assets/`
   (project screenshots in `assets/projects/`).
 - CSS order matters: `nav/nav.css` loads last on purpose (see the comment in `index.html`).
+- `resume-viewer/viewer.html` is a hand-made web copy of my LaTeX résumé (Jake's template, set in
+  Computer Modern). When the résumé changes, update the PDF, `resume.png` (the desk texture), and this copy.
 - Three.js is imported by URL in both `room/room.js` and `liuos/laptop.js`. The URLs must match
   exactly so the browser loads it once. If you change the version, change it in both files.
 
@@ -53,7 +55,8 @@ showcases my experience. Audience: recruiters and hiring managers for ML / data 
   1. Intro plays; clicking objects flies the camera there; floor-plan view works.
   2. Laptop: opens → lock screen → sign in → open an app → close.
   3. Every nav link works, on desktop and in the mobile menu.
-  4. Résumé opens and closes (button and Esc), and the camera returns.
+  4. Résumé: the nav link opens the PDF in a new tab; the paper on the desk zooms in and opens the
+     in-room résumé, and "Back to desk" goes to the shelves view.
   5. Console has no errors.
   6. Check every page at phone width (about 390px) and desktop width.
 - Vercel deploys the `main` branch as-is, so `main` is the live site. Work on a branch and

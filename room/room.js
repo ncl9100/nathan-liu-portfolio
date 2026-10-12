@@ -1,11 +1,11 @@
 // Room: the 3D drafting-sheet view of the room (scene, camera, intro, hotspots, captions).
 //
 // Listens for:  room:go {view}                 move the camera (nav)
-//               resume:opened / resume:closed  track the viewer; move the camera back on close
+//               resume:opened / resume:closed  track the résumé viewer; go to the shelves view on close
 //               laptop:opened / laptop:closed  pause while LiuOS covers the room
 //               laptop:screen {canvas,...}     show LiuOS's picture on the 3D laptop screen
 // Announces:    room:view {view}               where the camera is (nav highlights)
-//               resume:open / resume:close     ask the viewer to open or close
+//               resume:open / resume:close     ask the résumé viewer to open or close
 //               laptop:open / laptop:close / laptop:screen-request
 
 import { DRAFTING_CONFIG } from './settings.js';
@@ -14,10 +14,10 @@ import { LIUOS_CONFIG } from '../liuos/settings.js'; // only for the 3D screen's
 const markup = await fetch(new URL('room.html', import.meta.url)).then(response => response.text());
 document.body.insertAdjacentHTML('beforeend', markup);
 
-// Résumé viewer state, kept in sync by its resume:opened / resume:closed announcements.
-let resumeOpen=false;
 // LiuOS state, kept in sync by its laptop:opened / laptop:closed / laptop:screen announcements.
 let laptopOpen=false,laptopScreenPowered=true;
+// Résumé viewer state, kept in sync by its resume:opened / resume:closed announcements.
+let resumeOpen=false;
 
 const motionPreference=matchMedia('(prefers-reduced-motion: reduce)');
 const reducedMotion=()=>motionPreference.matches||!DRAFTING_CONFIG.intro.enabled;
@@ -350,8 +350,6 @@ cylinder(kitchenObjects,.9,3.5,205,38.3,sinkZ+13,solid('#9aba96'));kb(1.3,.2,.45
 for(let i=0;i<5;i++){cylinder(kitchenObjects,.75,2.5,205,37.8,94+i*2.1,solid(['#6c845d','#793529','#a89670','#87976d','#493c30'][i]));cylinder(kitchenObjects,.8,.3,205,39.2,94+i*2.1,black);}
 cylinder(kitchenObjects,1.7,7,205,40,86,white);cylinder(kitchenObjects,.2,8,205,40.5,86,silver);
 // Readable floor labels are orientation aids, not portfolio content.
-function label(text,x,z){const c=document.createElement('canvas');c.width=512;c.height=96;const ctx=c.getContext('2d');ctx.font='500 34px Segoe UI';ctx.fillStyle='#4e5c50';ctx.textAlign='center';ctx.fillText(text,256,61);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;const m=new THREE.Mesh(new THREE.PlaneGeometry(65,12),new THREE.MeshBasicMaterial({map:t,transparent:true,depthWrite:false}));m.rotation.x=-Math.PI/2;m.position.set(x,.07,z);fixtures.add(m);}
-label('WINDOW',19,67);label('SLEEP / STUDY',125,72);label('ENTRY',262,passageCenterZ);label('KITCHEN',253,kitchenCenterZ);
 // Cutaway and upper cabinets remain enabled for every camera preset.
 const cutaway=true;
 upperCabinets.visible=true;
@@ -414,11 +412,11 @@ const presets={stools:{yaw:-2.3,pitch:.55,radius:92,target:[183,18,94],fov:48},r
 let animation=0,moving=false,currentView='angle';
 const hint=document.querySelector('.hint');let captionTimer=0,captionHideTimer=0;
 const defaultCaption='Click around. Most things in here do something.';
-const viewCaptions={angle:defaultCaption,front:'The floor plan. Click an object to explore.',desk:'You’re at your desk. Click the laptop to open LiuOS.',bed:'You’re on your bed. Drag to look around.',side:'You’re in the kitchen. Drag to look around.',fridge:'The fridge. Drag to look around.',stools:'Four stools beside the kitchen.',details:'Your desk objects. Click the lamp or laptop.',resume:'Your résumé, up close.'};
+const viewCaptions={angle:defaultCaption,front:'The floor plan. Click an object to explore.',desk:'You’re at your desk. Click the laptop to open LiuOS.',bed:'You’re on your bed. Drag to look around.',side:'You’re in the kitchen. Drag to look around.',fridge:'The fridge. Drag to look around.',stools:'Four stools beside the kitchen.',details:'Your shelves and desk. Click the lamp or laptop.',resume:'Your résumé, up close.'};
 function hideCaption(){clearTimeout(captionTimer);clearTimeout(captionHideTimer);hint.classList.remove('caption-visible');captionHideTimer=setTimeout(()=>hint.hidden=true,reducedMotion()?0:250);}
 function showCaption(message=defaultCaption){hideCaption();clearTimeout(captionHideTimer);hint.hidden=false;hint.textContent=message;hint.classList.add('caption-visible');captionTimer=setTimeout(hideCaption,DRAFTING_CONFIG.interaction.captionMs);}
 
-const hotspotPositions={desk:[154.75,39,25],bed:[100,29,19.5],side:[252,40,100],laptop:[149.75,38.1,12.35],resume:[163.75,31,17.2]};
+const hotspotPositions={desk:[154.75,39,25],details:[154.75,64,14],laptop:[149.75,38.1,12.35],resume:[163.75,31,17.2]};
 const hotspotButtons=[...document.querySelectorAll('[data-destination]')];
 const leaders=new Map(),leaderSvg=document.getElementById('callout-lines');
 for(const button of hotspotButtons){const name=button.dataset.destination,[letter,title]=DRAFTING_CONFIG.callouts[name],action=button.textContent;button.replaceChildren();const heading=document.createElement('span'),detail=document.createElement('span');heading.className='callout-title';heading.textContent=letter+' / '+title;detail.className='callout-action';detail.textContent=action;button.append(heading,detail);const line=document.createElementNS('http://www.w3.org/2000/svg','polyline'),dot=document.createElementNS('http://www.w3.org/2000/svg','circle');dot.setAttribute('r','2');leaderSvg.append(line,dot);leaders.set(name,{line,dot});}
@@ -469,9 +467,12 @@ document.addEventListener('room:go',({detail:{view}})=>{if(laptopOpen)document.d
 function screenHover(active){screenFace.material.color.setScalar(active?LIUOS_CONFIG.screen.hoverBrightness:LIUOS_CONFIG.screen.brightness);}
 document.addEventListener('keydown',event=>{if(event.key==='Escape'&&moving&&!laptopOpen&&!resumeOpen){event.preventDefault();cancelCameraMove();pointer=null;render();}});
 
-let resumeReturnView='details',resumeReturnFocus=null;
-function openResume(opener=document.activeElement){if(moving||resumeOpen)return;resumeReturnView=presets[currentView]?currentView:'details';resumeReturnFocus=opener;navigate('resume',()=>document.dispatchEvent(new CustomEvent('resume:open')));}
+// Clicking the résumé paper zooms the camera in on it, then opens the résumé viewer.
+// Closing it always goes back to the shelves view ("details"), where the desk is in view.
+let resumeReturnFocus=null;
+function openResume(opener=document.activeElement){if(moving||resumeOpen)return;resumeReturnFocus=opener;navigate('resume',()=>document.dispatchEvent(new CustomEvent('resume:open')));}
 document.addEventListener('resume:opened',()=>{resumeOpen=true;updateBackControl();});
+document.addEventListener('resume:closed',()=>{resumeOpen=false;navigate('details',()=>{if(resumeReturnFocus instanceof HTMLElement&&resumeReturnFocus.isConnected)resumeReturnFocus.focus({preventScroll:true});});});
 // The room asks LiuOS to open only when the camera is at the desk.
 function requestLaptop(opener=document.activeElement){if(currentView!=='desk'||moving)return;document.dispatchEvent(new CustomEvent('laptop:open',{detail:{opener}}));}
 document.addEventListener('laptop:opened',()=>{laptopOpen=true;updateBackControl();cancelAnimationFrame(waterFrame);resetParallax();});
@@ -479,7 +480,6 @@ document.addEventListener('laptop:closed',()=>{laptopOpen=false;render();if(wate
 // LiuOS paints its own screen picture; the room only displays it on the 3D laptop.
 let screenTexture=null;
 document.addEventListener('laptop:screen',({detail})=>{laptopScreenPowered=detail.powered;if(!screenTexture){screenTexture=new THREE.CanvasTexture(detail.canvas);screenTexture.colorSpace=THREE.SRGBColorSpace;screenTexture.anisotropy=renderer.capabilities.getMaxAnisotropy();screenTexture.minFilter=THREE.LinearMipmapLinearFilter;screenTexture.magFilter=THREE.LinearFilter;screenFace.material.map=screenTexture;screenFace.material.needsUpdate=true;}else if(detail.redrawn)screenTexture.needsUpdate=true;render();});
-document.addEventListener('resume:closed',()=>{resumeOpen=false;navigate(resumeReturnView,()=>{if(resumeReturnFocus instanceof HTMLElement&&resumeReturnFocus.isConnected)resumeReturnFocus.focus({preventScroll:true});});});
 function activate(view){if(view==='lamp'){toggleLamp();return;}if(moving){queuedCameraAction=view;return;}if(view==='faucet')toggleFaucet();else if(view==='laptop')requestLaptop();else if(view==='resume')openResume();else navigate(view);}
 hotspotButtons.forEach(button=>button.addEventListener('click',()=>{if(button.dataset.destination==='desk'){navigate('desk');return;}activate(button.dataset.destination);}));
 // Mesh picking keeps navigation discoverable without extra room controls.

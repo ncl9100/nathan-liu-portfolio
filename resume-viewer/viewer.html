@@ -1,1 +1,100 @@
-<dialog id="resume-window" aria-labelledby="resume-title"><div class="windowbar"><h2 id="resume-title">Nathan Liu · Résumé</h2><div><a class="pdf-download" download="Liu_Nathan_Resume.pdf" href="assets/resume/resume.pdf">Download PDF</a><button id="close-resume" aria-label="Back to desk">Back to desk ×</button></div></div><div class="resume-reading"><article class="resume-text" aria-label="Nathan Liu résumé"><h1>Nathan Liu</h1><p>New York, NY | 408-930-1186 | ncl9100@nyu.edu | 24natel.com | linkedin.com/in/nathan-ncl-liu | github.com/ncl9100</p><h2>Education</h2><p>New York University New York, NY</p><p>Bachelor of Arts in Computer Science and Data Science | Dean’s List Sep. 2024 – May 2028</p><p>Relevant Coursework: Probability and Statistics, Principles of Data Science I &amp; II, Data Management and Analysis,</p><p>Fundamentals of Machine Learning, Linear Algebra, Causal Inference (in progress)</p><h2>Experience</h2><h3>Data Science Intern Nov. 2025 – Present</h3><p>NYU Entrepreneurial Institute New York, NY</p><ul><li>Built an LLM-assisted pipeline (Perplexity, Google Search APIs) classifying 2.6k+ startup records by NYU school for segment reporting</li><li>Shipped 5 features to a BigQuery-backed React analytics dashboard tracking 2.6k+ annual coaching sessions and 5k+ visits, including drill-down time-series charts and year-over-year comparison</li><li>Audited 31 production data pipelines against documentation, tracing 24 discrepancies to root causes and flagging 7 untracked scripts writing to production data</li><li>Leading CRM deduplication of ˜14k entries, building a 50-row gold set to QA duplicate-detection signals</li></ul><h3>Full-Stack AI Developer June 2025 – Aug. 2025</h3><p>Amazon China</p><ul><li>Trained a scikit-learn regression model on 30-day rolling prices for short-term forecasting in an AI trading assistant (Flask, React)</li><li>Built a signal engine combining TextBlob sentiment on 40 headlines per refresh with 24h price change to classify assets as buy, sell, or hold</li><li>Validated sentiment classification against manually labeled headlines in Jupyter and wrote 26 tests (pytest, Jest)</li></ul><h3>Outreach Coordinator Feb. 2026 – Present</h3><p>NYU Data Science Club New York, NY</p><ul><li>Co-organized NYU’s 2026 Datathon for 50+ participants, leading sponsor outreach to companies including Datadog and TikTok</li></ul><h2>Projects</h2><h3>HotTakes | 2nd Place, NYU Stern Sustainability Hackathon Oct. 2026</h3><ul><li>Trained a gradient-boosted heat demand forecast (scikit-learn) on synthetic hourly data calibrated to Con Ed filings, reaching 8.5% MAPE vs 17.5% for a naive baseline, and presented the model in the pitch</li><li>Validated on real metered steam from 7 buildings, cutting WAPE to 18% vs 24% and 39% for two baselines</li><li>Compared 5 outage reserve policies in an 8,760-hour simulation, finding a reserve does not pay since storage is usually full</li><li>Deployed a Streamlit dashboard (5 tabs, 20 inputs) with a Claude assistant that calls 4 read-only model tools</li></ul><h3>Ad Click-Through Rate Prediction (Fundamentals of ML) | Python, pandas, scikit-learn Summer 2026</h3><ul><li>Predicted clicks on 1M Avazu ad impressions, reaching 0.723 ROC-AUC and 0.411 log loss vs a 0.456 base-rate baseline</li><li>Engineered 105 leakage-free features, adding time features after EDA showed click rates varied by hour and device</li><li>Showed why accuracy misleads on imbalanced data: a never-click model scores 83% accuracy but 0.50 ROC-AUC</li></ul><h3>MarginGuard | Python, DuckDB, Claude API Apr. 2026</h3><ul><li>Built a Python/SQL pipeline in DuckDB joining 1.2M+ labor logs and 90K+ billing records into project-level signals</li><li>Defined margin metrics and erosion thresholds an AI agent uses to rank the 3 highest-exposure of 405 projects</li></ul><h2>Technical Skills</h2><p>Languages: Python, SQL, R, Java, C/C++, JavaScript</p><p>Data &amp; ML: pandas, NumPy, scikit-learn, XGBoost, Matplotlib, Seaborn, Jupyter, Streamlit</p><p>Data &amp; Cloud: BigQuery, DuckDB, PostgreSQL, Google Cloud Run, Git/GitHub</p><p>Methods: Regression and forecasting, classification, clustering, statistical inference, causal inference, root-cause analysis</p></article></div></dialog>
+<dialog id="resume-window" aria-labelledby="resume-title">
+<div class="viewer-column">
+  <div class="viewer-bar">
+    <h2 id="resume-title">Résumé</h2>
+    <div class="viewer-actions">
+      <a class="viewer-button" href="/assets/resume/resume.pdf" download="Liu_Nathan_Resume.pdf">Download PDF</a>
+      <button id="close-resume" class="viewer-button viewer-primary" type="button"><span aria-hidden="true">←</span> Back to desk</button>
+    </div>
+  </div>
+
+  <!-- A web copy of the LaTeX résumé (Jake's template). Keep it in sync with the .tex when the résumé changes. -->
+  <div class="sheet-frame">
+  <article class="resume-sheet" aria-label="Nathan Liu résumé">
+    <header class="r-heading">
+      <h1>Nathan Liu</h1>
+      <p>New York, NY <span class="r-sep">|</span> 408-930-1186 <span class="r-sep">|</span>
+        <a href="mailto:ncl9100@nyu.edu">ncl9100@nyu.edu</a> <span class="r-sep">|</span>
+        <a href="https://24natel.com" target="_blank" rel="noopener">24natel.com</a> <span class="r-sep">|</span>
+        <a href="https://www.linkedin.com/in/nathan-ncl-liu" target="_blank" rel="noopener">linkedin.com/in/nathan-ncl-liu</a> <span class="r-sep">|</span>
+        <a href="https://github.com/ncl9100" target="_blank" rel="noopener">github.com/ncl9100</a></p>
+    </header>
+
+    <section>
+      <h2>Education</h2>
+      <div class="r-entry r-edu">
+        <div class="r-row"><strong>New York University</strong><span>New York, NY</span></div>
+        <div class="r-row r-sub"><em>Bachelor of Arts in Computer Science and Data Science <span class="r-sep">|</span> Dean’s List</em><em>Sep. 2024 – May 2028</em></div>
+        <p class="r-small">Relevant Coursework: Probability and Statistics, Principles of Data Science I &amp; II, Data Management and Analysis, Fundamentals of Machine Learning, Linear Algebra, Causal Inference (in progress)</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>Experience</h2>
+      <div class="r-entry">
+        <div class="r-row"><strong>Data Science Intern</strong><span>Nov. 2025 – Present</span></div>
+        <div class="r-row r-sub"><em>NYU Entrepreneurial Institute</em><em>New York, NY</em></div>
+        <ul>
+          <li>Built an LLM-assisted pipeline (Perplexity, Google Search APIs) classifying 2.6k+ startup records by NYU school for segment reporting</li>
+          <li>Shipped 5 features to a BigQuery-backed React analytics dashboard tracking 2.6k+ annual coaching sessions and 5k+ visits, including drill-down time-series charts and year-over-year comparison</li>
+          <li>Audited 31 production data pipelines against documentation, tracing 24 discrepancies to root causes and flagging 7 untracked scripts writing to production data</li>
+          <li>Leading CRM deduplication of ~14k entries, building a 50-row gold set to QA duplicate-detection signals</li>
+        </ul>
+      </div>
+      <div class="r-entry">
+        <div class="r-row"><strong>Full-Stack AI Developer</strong><span>June 2025 – Aug. 2025</span></div>
+        <div class="r-row r-sub"><em>Amazon China</em><em></em></div>
+        <ul>
+          <li>Trained a scikit-learn regression model on 30-day rolling prices for short-term forecasting in an AI trading assistant (Flask, React)</li>
+          <li>Built a signal engine combining TextBlob sentiment on 40 headlines per refresh with 24h price change to classify assets as buy, sell, or hold</li>
+          <li>Validated sentiment classification against manually labeled headlines in Jupyter and wrote 26 tests (pytest, Jest)</li>
+        </ul>
+      </div>
+      <div class="r-entry">
+        <div class="r-row"><strong>Outreach Coordinator</strong><span>Feb. 2026 – Present</span></div>
+        <div class="r-row r-sub"><em>NYU Data Science Club</em><em>New York, NY</em></div>
+        <ul>
+          <li>Co-organized NYU’s 2026 Datathon for 50+ participants, leading sponsor outreach to companies including Datadog and TikTok</li>
+        </ul>
+      </div>
+    </section>
+
+    <section>
+      <h2>Projects</h2>
+      <div class="r-entry r-project">
+        <div class="r-row"><span><strong><a class="r-quiet" href="https://github.com/ncl9100/hot-takes" target="_blank" rel="noopener">HotTakes</a></strong> <span class="r-sep">|</span> <em>2nd Place, NYU Stern Sustainability Hackathon</em></span><span>Oct. 2026</span></div>
+        <ul>
+          <li>Trained a gradient-boosted heat demand forecast (scikit-learn) on synthetic hourly data calibrated to Con Ed filings, reaching 8.5% MAPE vs 17.5% for a naive baseline, and presented the model in the pitch</li>
+          <li>Validated on real metered steam from 7 buildings, cutting WAPE to 18% vs 24% and 39% for two baselines</li>
+          <li>Compared 5 outage reserve policies in an 8,760-hour simulation, finding a reserve does not pay since storage is usually full</li>
+          <li>Deployed a Streamlit dashboard (5 tabs, 20 inputs) with a Claude assistant that calls 4 read-only model tools</li>
+        </ul>
+      </div>
+      <div class="r-entry r-project">
+        <div class="r-row"><span><strong>Ad Click-Through Rate Prediction (Fundamentals of ML)</strong> <span class="r-sep">|</span> <em>Python, pandas, scikit-learn</em></span><span>Summer 2026</span></div>
+        <ul>
+          <li>Predicted clicks on 1M Avazu ad impressions, reaching 0.723 ROC-AUC and 0.411 log loss vs a 0.456 base-rate baseline</li>
+          <li>Engineered 105 leakage-free features, adding time features after EDA showed click rates varied by hour and device</li>
+          <li>Showed why accuracy misleads on imbalanced data: a never-click model scores 83% accuracy but 0.50 ROC-AUC</li>
+        </ul>
+      </div>
+      <div class="r-entry r-project">
+        <div class="r-row"><span><strong><a class="r-quiet" href="https://devpost.com/software/datathon-2026" target="_blank" rel="noopener">MarginGuard</a></strong> <span class="r-sep">|</span> <em>Python, DuckDB, Claude API</em></span><span>Apr. 2026</span></div>
+        <ul>
+          <li>Built a Python/SQL pipeline in DuckDB joining 1.2M+ labor logs and 90K+ billing records into project-level signals</li>
+          <li>Defined margin metrics and erosion thresholds an AI agent uses to rank the 3 highest-exposure of 405 projects</li>
+        </ul>
+      </div>
+    </section>
+
+    <section>
+      <h2>Technical Skills</h2>
+      <p class="r-skills"><strong>Languages</strong>: Python, SQL, R, Java, C/C++, JavaScript<br>
+        <strong>Data &amp; ML</strong>: pandas, NumPy, scikit-learn, XGBoost, Matplotlib, Seaborn, Jupyter, Streamlit<br>
+        <strong>Data &amp; Cloud</strong>: BigQuery, DuckDB, PostgreSQL, Google Cloud Run, Git/GitHub<br>
+        <strong>Methods</strong>: Regression and forecasting, classification, clustering, statistical inference, causal inference, root-cause analysis</p>
+    </section>
+  </article>
+  </div>
+</div>
+</dialog>

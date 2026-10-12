@@ -1,18 +1,13 @@
-/* Contact page: one drafting sheet with three labeled rows, styled like the room's title block. */
-
-body { min-height: 100dvh; display: grid; place-items: center; padding: 110px 16px 48px; }
-
-.contact-page { width: min(560px, 100%); display: grid; gap: 14px; }
+/* Contact page: a drafting sheet with three labeled rows, styled like the room's title block. */
 
 .contact-sheet {
-  width: 100%;
+  width: min(560px, 100%);
   border: 1px solid var(--drawing-rule);
   background: color-mix(in srgb, var(--paper-center) 88%, transparent);
   font-family: var(--drawing-serif);
   color: var(--drawing-ink);
 }
 
-.sheet-header { padding: 22px 24px 18px; border-bottom: 1px solid var(--drawing-rule); }
 .contact-row dt {
   font: 11px/1.2 Inter, "Segoe UI", sans-serif;
   letter-spacing: .14em;
@@ -54,7 +49,5 @@ body { min-height: 100dvh; display: grid; place-items: center; padding: 110px 16
 #copy-email:hover { background: #b4a68b24; }
 
 @media (max-width: 500px) {
-  body { padding-top: 90px; }
   .contact-row { grid-template-columns: 1fr; gap: 0; padding: 12px 18px; }
-  .sheet-header { padding: 18px; }
 }

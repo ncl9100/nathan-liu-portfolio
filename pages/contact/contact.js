@@ -1,6 +1,7 @@
 // Contact page: fills in my links from the shared content file (the only place they live).
 
 import { profile } from '../../content/portfolio.js';
+import { reveal } from '../reveal.js';
 
 const show = (id, href, text) => {
   const link = document.getElementById(id);
@@ -24,3 +25,6 @@ copyButton.addEventListener('click', async () => {
   }
   setTimeout(() => { copyButton.textContent = 'Copy'; }, 2000);
 });
+
+// Fade the whole page in on load, like the other pages.
+reveal(document.querySelectorAll('.page > *'));

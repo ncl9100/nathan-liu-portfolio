@@ -15,7 +15,7 @@ export const LIUOS_CONFIG={
  content:{
   "copyEmailLabel":"Copy", "copiedEmailLabel":"Copied", "copyFailedLabel":"Try again",
   "contactHeading": "Let’s connect",
-  "contactIntro": "Find me online or send a note.",
+  "contactIntro": "Happy to chat about tech, internships, or whatever you're building.",
   "contactLabels": [
     [
       "email",

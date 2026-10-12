@@ -9,7 +9,8 @@ export const DRAFTING_CONFIG = {
   intro:{enabled:true,duration:2700,grid:[0,850],dimensions:[350,1300],room:[650,1850],callouts:[1900,2200],calloutStagger:100,calloutEndStagger:100,rise:14},
   parallax:{enabled:true,yaw:.018,pitch:.012,damping:9,epsilon:.00005},
   camera:{pixelRatioCap:2,far:3000,mobileFitAspect:.95,maxRadius:1800},
-  callouts:{desk:['A','Desk',-65,-68],bed:['B','Bed',-90,35],side:['C','Kitchen',82,-42],resume:['D','Résumé',55,47],laptop:['E','Laptop',0,-42]},
-  mobileCallouts:{desk:[-25,-64],bed:[-45,35],side:[60,-85],resume:[20,65],laptop:[0,-42]},
+  // Callout letters run in order across what's visible: A Desk, B Shelves, C Résumé, D Laptop.
+  callouts:{desk:['A','Desk',-65,-68],details:['B','Shelves',125,-45],resume:['C','Résumé',55,47],laptop:['D','Laptop',0,-42]},
+  mobileCallouts:{desk:[-25,-64],details:[55,-70],resume:[20,65],laptop:[0,-42]},
   date:{timeZone:'America/New_York'}
 };

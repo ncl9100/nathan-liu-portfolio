@@ -1,7 +1,5 @@
 /* Projects page: a grid of drafting-paper cards. Two columns on wide screens, one on phones. */
 
-.list-page { width: min(980px, 100%); margin: 0 auto; padding: 110px 16px 48px; display: grid; gap: 22px; }
-.list-page > .sheet-header { padding: 0 0 6px; border-bottom: 1px solid var(--drawing-rule); }
 
 .project-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 380px), 1fr)); gap: 18px; }
 
@@ -47,6 +45,5 @@
   .card-main:hover .card-image img { transform: none; }
 }
 @media (max-width: 500px) {
-  .list-page { padding-top: 90px; }
   .card-body { padding: 16px; }
 }

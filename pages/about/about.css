@@ -1,8 +1,5 @@
 /* About page: headshot on the left, typed-out bio on the right. Photo on top on phones. */
 
-.about-page { width: min(980px, 100%); margin: 0 auto; padding: 90px 16px 48px; display: grid; gap: 22px; }
-.about-page > .sheet-header { padding: 0 0 6px; border-bottom: 1px solid var(--drawing-rule); }
-
 .about-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr); gap: 32px; align-items: start; }
 
 .about-photo { margin: 0; padding: 10px; border: 1px solid var(--drawing-rule); background: color-mix(in srgb, var(--paper-center) 85%, transparent); }

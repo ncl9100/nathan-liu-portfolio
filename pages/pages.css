@@ -1,4 +1,13 @@
-/* Shared by every page in pages/: the page title, the "Back to the room" button, and the scroll fade-in. */
+/* Shared by every page in pages/: the page layout, the page title, the "Back to the room" button, and the scroll fade-in. */
+
+/* Always reserve the scrollbar's space, so long and short pages line up exactly. */
+html { scrollbar-gutter: stable; }
+/* Short pages (like Contact) still get the paper background all the way down. */
+body { min-height: 100dvh; }
+
+/* One column for every page, so the title sits in the same spot as you click through the nav. */
+.page { width: min(980px, 100%); margin: 0 auto; padding: 90px 16px 48px; display: grid; gap: 22px; align-content: start; }
+.page > .sheet-header { padding: 0 0 6px; border-bottom: 1px solid var(--drawing-rule); }
 
 .sheet-header h1 { margin: 6px 0 4px; font: 400 32px var(--drawing-serif); letter-spacing: -.5px; color: #332c21; }
 

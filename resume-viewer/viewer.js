@@ -5,6 +5,9 @@
 // Announces:     resume:opened  → it is now open
 //                resume:closed  → it is now closed (button, Escape key, or resume:close)
 
+// Start downloading the résumé's font (Computer Modern) now, so it's ready before anyone opens it.
+for (const style of ['400 11px', 'italic 400 11px', '700 11px', 'italic 700 11px']) document.fonts.load(`${style} "CMU Serif"`);
+
 const markup = await fetch(new URL('viewer.html', import.meta.url)).then(response => response.text());
 document.body.insertAdjacentHTML('beforeend', markup);
 

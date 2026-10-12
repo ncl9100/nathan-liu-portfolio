@@ -9,12 +9,27 @@
 }
 
 .contact-row dt {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   font: 11px/1.2 Inter, "Segoe UI", sans-serif;
   letter-spacing: .14em;
   text-transform: uppercase;
 }
 
 .contact-list { margin: 0; }
+
+/* Thin ink outline icons, drawn like the room's line work. */
+.contact-icon {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
 .contact-row {
   display: grid;
   grid-template-columns: 110px 1fr;

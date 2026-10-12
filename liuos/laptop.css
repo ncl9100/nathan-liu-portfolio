@@ -269,6 +269,10 @@ body:has(#laptop-window[open]){overflow:hidden}
 #laptop-window .os-dock button{width:44px;height:44px;min-width:44px;min-height:44px;padding:10px}
 .os-dock{width:max-content}
 .os-pinned{min-width:0;overflow-x:auto;scrollbar-width:thin;scrollbar-color:var(--os-muted) transparent}
+/* Dock launch bounce. The pinned strip scrolls sideways, which also clips upward, so it gets headroom above the icons (the negative margin keeps the dock the same size). */
+.os-pinned{padding-top:18px;margin-top:-18px}
+#laptop-window .os-dock button.os-launching .os-icon{animation:os-dock-bounce var(--launch-ms,700ms) ease-out}
+@keyframes os-dock-bounce{0%,40%,80%,100%{transform:translateY(0)}20%{transform:translateY(-14px)}60%{transform:translateY(-7px)}}
 .os-dock-clock{flex-shrink:0}
 #laptop-window .os-contact-copy{font-size:var(--os-small)}
 #laptop-window .os-terminal-form input{width:calc(100% - 158px)}

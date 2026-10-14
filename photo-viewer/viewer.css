@@ -6,7 +6,7 @@
   background: transparent; overflow: hidden;
 }
 /* Top padding keeps the print below the nav bar. */
-#photo-window[open] { display: grid; place-items: center; box-sizing: border-box; padding: 60px 12px 16px; }
+#photo-window[open] { display: grid; place-items: center; box-sizing: border-box; padding: 72px 12px 16px; }
 #photo-window::backdrop {
   background: rgba(245, 241, 232, .28);
   -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);

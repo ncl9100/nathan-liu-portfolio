@@ -8,6 +8,7 @@
 //
 // On the room page only, the nav also talks to the room through announcements:
 //   Announces:    room:go {view}                 "Nathan Liu" → overview, floor-plan icon → floor plan
+//                 hero:show                      "Nathan Liu" → bring the intro cover back
 //   Listens for:  room:view {view}               highlight the floor-plan button
 //                 laptop:closed / resume:closed  close the mobile menu
 
@@ -44,6 +45,7 @@ if (page === 'room') {
     link.addEventListener('click', event => {
       event.preventDefault();
       announce('room:go', { view: link.dataset.view });
+      if (link.classList.contains('room-wordmark')) announce('hero:show');
     });
   document.addEventListener('room:view', ({ detail: { view } }) => {
     floorPlan.setAttribute('aria-pressed', String(view === 'front'));

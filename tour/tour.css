@@ -1,0 +1,45 @@
+/* Tour: the step card in the bottom-right corner (opposite the title block), and the "Take the tour" button bottom center. */
+
+.tour-card{position:fixed;z-index:6;right:24px;bottom:24px;width:min(400px,calc(100vw - 24px));padding:14px 16px 12px;border:1px solid var(--drawing-rule);background:color-mix(in srgb,var(--paper-center) 94%,transparent);box-shadow:0 10px 30px #332c211f;font-family:var(--drawing-serif);color:var(--inkStrong,#332c21);animation:tour-in .25s ease-out}
+.tour-card[hidden]{display:none}
+.tour-step{margin:0 0 6px;font:11px Segoe UI,sans-serif;text-transform:uppercase;letter-spacing:.12em;color:var(--drawing-ink)}
+.tour-text{margin:0;font-size:17px;line-height:1.45}
+.tour-actions{display:flex;align-items:center;gap:8px;margin-top:12px}
+.tour-actions button{min-height:40px;padding:8px 16px;border-radius:0;font:15px var(--drawing-serif);color:var(--inkStrong,#332c21)}
+.tour-skip{margin-right:auto;padding-left:0!important;color:var(--drawing-ink)!important;text-decoration:underline;text-underline-offset:3px}
+.tour-skip:hover{background:none;color:var(--inkStrong,#332c21)!important}
+.tour-back{border:1px solid var(--drawing-ink)}
+.tour-back:disabled{opacity:.4;cursor:default}
+.tour-next{background:var(--inkStrong,#332c21)!important;color:var(--paper-center)!important;border:1px solid var(--inkStrong,#332c21)}
+.tour-back:not(:disabled):hover{background:var(--paperHover,#fffaf0)}
+.tour-next:hover{opacity:.88}
+
+/* Bottom center, on the sheet's bottom edge (the room lifts its captions above it in the overview).
+   Paper and ink like the rest; it pulses a few times when it appears. */
+.tour-replay{position:fixed;z-index:6;left:50%;bottom:24px;transform:translateX(-50%);white-space:nowrap;display:flex;align-items:center;gap:10px;padding:13px 22px;border:1px solid var(--inkStrong,#332c21);border-radius:0;background:color-mix(in srgb,var(--paper-center) 94%,transparent);box-shadow:0 8px 24px #332c211f;font:18px var(--drawing-serif);color:var(--inkStrong,#332c21);animation:tour-pulse 1.6s ease-out 3}
+.tour-replay::before{content:'▶';font-size:.65em}
+.tour-replay:hover{background:var(--paperHover,#fffaf0)}
+@keyframes tour-pulse{0%{box-shadow:0 8px 24px #332c211f,0 0 0 0 #655e5259}70%{box-shadow:0 8px 24px #332c211f,0 0 0 12px #655e5200}100%{box-shadow:0 8px 24px #332c211f,0 0 0 0 #655e5200}}
+
+/* First-visit invite: the room dims, then a big "Take the tour" rises at the bottom center and pulses. */
+.tour-invite{position:fixed;inset:0;z-index:7;display:flex;align-items:flex-end;justify-content:center;padding:0 16px 40px;background:#332c2138;animation:tour-dim .4s ease-out}
+.tour-invite[hidden]{display:none}
+.tour-invite-panel{display:flex;flex-direction:column;align-items:center;gap:10px;animation:tour-rise .6s cubic-bezier(.2,.7,.2,1) .25s both}
+.tour-invite-start{display:flex;align-items:center;gap:12px;padding:16px 34px;border:1px solid var(--inkStrong,#332c21);border-radius:0;background:var(--paper-center);box-shadow:0 12px 32px #332c2140;font:21px var(--drawing-serif);color:var(--inkStrong,#332c21);animation:tour-pulse 1.6s ease-out .9s 3}
+.tour-invite-start::before{content:'▶';font-size:.65em}
+.tour-invite-start:hover{background:var(--paperHover,#fffaf0)}
+.tour-invite-skip{padding:6px 10px;border-radius:0;font:15px var(--drawing-serif);color:var(--paper-center);text-decoration:underline;text-underline-offset:3px;text-shadow:0 1px 6px #332c2199}
+.tour-invite-skip:hover{background:none;color:#fff}
+@keyframes tour-dim{from{opacity:0}to{opacity:1}}
+@keyframes tour-rise{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
+@keyframes tour-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media(max-width:600px){
+  .tour-card{right:12px;bottom:12px;padding:12px 14px 10px}
+  .tour-text{font-size:16px}
+  .tour-replay{bottom:16px;padding:11px 18px;font-size:16px}
+  .tour-invite{padding-bottom:28px}
+  .tour-invite-start{padding:14px 28px;font-size:19px}
+}
+@media(prefers-reduced-motion:reduce){
+  .tour-card,.tour-replay,.tour-invite,.tour-invite-panel,.tour-invite-start{animation:none}
+}

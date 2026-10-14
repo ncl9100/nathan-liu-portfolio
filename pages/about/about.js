@@ -13,7 +13,7 @@ const skip = document.getElementById('about-skip');
 const full = document.getElementById('about-full');
 for (const text of paragraphs) full.append(Object.assign(document.createElement('p'), { textContent: text }));
 
-const MS_PER_PARAGRAPH = 5000; // fast: each paragraph takes about five seconds
+const MS_PER_PARAGRAPH = 2500; // fast: each paragraph takes about two and a half seconds
 let timer = 0;
 let finished = false;
 
@@ -48,7 +48,7 @@ function typeParagraph(index) {
     row.shown.textContent = row.text.slice(0, count);
     row.rest.textContent = row.text.slice(count);
     if (count < row.text.length) timer = setTimeout(step, delay * 2);
-    else { row.p.classList.remove('typing'); timer = setTimeout(() => typeParagraph(index + 1), 350); }
+    else { row.p.classList.remove('typing'); timer = setTimeout(() => typeParagraph(index + 1), 200); }
   };
   step();
 }

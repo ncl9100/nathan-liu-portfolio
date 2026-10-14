@@ -30,15 +30,15 @@
 
 .hero .visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 
-/* Phones and narrow tablets: photo above the name, everything in one column. */
+/* Phones and narrow tablets: no photo, just the name, with the buttons stacked full width. */
 @media(max-width:760px){
-  .hero{grid-template-columns:1fr;align-content:center;gap:24px;padding:80px 20px 84px}
-  .hero-photo{order:-1;width:clamp(130px,38vw,200px)}
-  .hero-kicker{margin-bottom:12px}
-  .hero-name{font-size:clamp(52px,16vw,80px)}
-  .hero-role{margin-top:18px}
-  .hero-actions{margin-top:26px}
-  .hero-actions a{flex:1;min-width:0}
+  .hero{grid-template-columns:1fr;align-content:center;padding:80px 24px 84px}
+  .hero-photo{display:none}
+  .hero-kicker{margin-bottom:16px}
+  .hero-name{font-size:clamp(56px,19vw,104px)}
+  .hero-role{margin-top:22px}
+  .hero-actions{flex-direction:column;margin-top:40px}
+  .hero-actions a{min-width:0;padding:15px 20px}
   .hero-explore{left:20px;right:20px;bottom:20px;gap:10px;white-space:normal;text-align:left}
   .hero-explore-rule{width:28px;flex:none}
 }

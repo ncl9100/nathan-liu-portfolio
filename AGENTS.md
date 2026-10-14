@@ -23,7 +23,8 @@ showcases my experience. Audience: recruiters and hiring managers for ML / data 
 ## How the code is organized
 - `index.html` is only a shell: meta tags, stylesheet links, one `<script type="module">` per component.
 - One folder per component, each with its own `.html`, `.css`, `.js` (the `.js` fetches its `.html`):
-  `room/room.*`, `liuos/laptop.*`, `resume-viewer/viewer.*`, `nav/nav.*`. A component's tunable
+  `room/room.*`, `liuos/laptop.*`, `resume-viewer/viewer.*`, `nav/nav.*`, `hero/hero.*` (the intro
+ cover over the room; `/#room` skips it), `tour/tour.*` (the guided tour; its stops are in `tour/settings.js`). A component's tunable
   values live in its own `settings.js` (room and LiuOS have one).
 - Components never call each other. They talk with announcements (`CustomEvent`s on `document`),
   e.g. `laptop:open`, `laptop:closed`, `room:go`. The comment at the top of each component's `.js`

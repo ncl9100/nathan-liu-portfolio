@@ -364,11 +364,15 @@ body:has(#laptop-window[open]){overflow:hidden}
 #laptop-window .desktop-icons{top:20px}
 .os-widget{top:20px}
 #laptop-window .os-dock button{width:40px;height:40px;min-width:40px;min-height:40px;padding:8px}
+/* Center the laptop in the space below the nav bar (64px tall) instead of the whole screen. */
+@media(min-width:601px) and (min-height:520px){
+  #laptop-window{top:64px}
+}
 @media(min-width:600px){
   .os-window.os-maximized{left:0!important;top:0!important;width:100%!important;height:calc(100% - var(--os-dock-height))!important}
 }
 @media(max-width:600px){
-  #laptop-window{width:min(380px,calc(100vw - 20px));height:calc(100dvh - 76px);max-height:calc(100dvh - 76px);margin:64px auto 12px;padding:12px 8px 14px;border-radius:32px}
+  #laptop-window{width:min(380px,calc(100vw - 20px));height:calc(100dvh - 82px);max-height:calc(100dvh - 82px);margin:70px auto 12px;padding:12px 8px 14px;border-radius:32px}
   .os-bezel{padding:0 4px 8px}
   #laptop-window .lock-screen,#laptop-window .os-desktop{height:auto;max-height:none;border-radius:20px}
   .os-window,.os-window.os-maximized{left:0!important;top:0!important;width:100%!important;height:calc(100% - var(--os-dock-height))!important;padding-bottom:0;border-radius:0}

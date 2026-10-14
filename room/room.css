@@ -108,6 +108,11 @@ body .room-feedback .hint{position:static;left:auto;bottom:auto;transform:none;w
 @media(max-width:900px){
   .room-feedback{max-width:calc(100vw - 36px);width:max-content;bottom:22px}
 }
+/* In the overview the bottom edge belongs to the tour's "Take the tour" button, so captions sit just above it. */
+body:is([data-room-view=angle],[data-room-view=front],[data-room-view=custom]) .room-feedback{bottom:88px}
+@media(max-width:600px){
+  body:is([data-room-view=angle],[data-room-view=front],[data-room-view=custom]) .room-feedback{bottom:74px}
+}
 @media(max-width:500px){
   .room-feedback{flex-wrap:wrap;width:calc(100vw - 36px)}
   body .room-feedback .hint{flex-basis:100%;padding:10px 14px}

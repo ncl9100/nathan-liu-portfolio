@@ -1,0 +1,56 @@
+/* Hero: the cover over the room on the home page. Name first, photo to the side; the room shows faintly behind. */
+
+.hero{position:fixed;inset:0;z-index:50;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:clamp(32px,6vw,96px);padding:104px max(24px,calc((100vw - 1120px) / 2)) 88px;background:color-mix(in srgb,var(--paper-center) 84%,transparent);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);color:var(--inkStrong,#332c21);overflow:hidden;transition:transform .8s cubic-bezier(.65,0,.35,1),visibility 0s}
+.hero.is-away{transform:translateY(-100%);visibility:hidden;transition:transform .8s cubic-bezier(.65,0,.35,1),visibility 0s .8s}
+.hero.no-slide{transition:none}
+
+.hero-text{min-width:0}
+.hero-kicker{margin:0 0 18px;font:12px/1.6 Segoe UI,sans-serif;text-transform:uppercase;letter-spacing:.14em;color:var(--drawing-ink)}
+.hero-name{margin:0;font:400 clamp(52px,9vw,128px)/.95 var(--drawing-serif);letter-spacing:-.02em}
+.hero-name span{display:block}
+.hero-role{margin:28px 0 0;min-height:1.5em;font:clamp(19px,2vw,24px)/1.5 var(--drawing-serif);color:var(--drawing-ink)}
+.hero-caret{display:inline-block;width:1px;height:1.05em;margin-left:2px;vertical-align:-.15em;background:currentColor;animation:hero-caret 1s steps(1) infinite}
+.roles-static .hero-caret{display:none}
+@keyframes hero-caret{50%{opacity:0}}
+
+.hero-actions{display:flex;gap:10px;margin-top:36px}
+.hero-actions a{min-width:132px;padding:11px 20px;text-align:center;border:1px solid var(--inkStrong,#332c21);color:var(--inkStrong,#332c21);text-decoration:none;font:15px var(--drawing-serif);transition:background .18s,color .18s}
+.hero-actions .hero-primary{background:var(--inkStrong,#332c21);color:var(--paper-center)}
+.hero-actions a:hover{background:var(--paperHover,#fffaf0);color:var(--inkStrong,#332c21)}
+
+/* A cutout (no background), so the shoulders fade into the paper instead of ending at a hard edge. */
+.hero-photo{margin:0;width:clamp(240px,27vw,380px)}
+.hero-photo img{display:block;width:100%;height:auto;
+  -webkit-mask-image:linear-gradient(to bottom,#000 70%,transparent 100%),linear-gradient(to right,transparent,#000 10%,#000 90%,transparent);-webkit-mask-composite:source-in;
+  mask-image:linear-gradient(to bottom,#000 70%,transparent 100%),linear-gradient(to right,transparent,#000 10%,#000 90%,transparent);mask-composite:intersect}
+
+.hero-explore{position:absolute;left:max(24px,calc((100vw - 1120px) / 2));bottom:28px;display:flex;align-items:center;gap:12px;padding:8px 0;border-radius:0;font:12px Segoe UI,sans-serif;text-transform:uppercase;letter-spacing:.14em;color:var(--drawing-ink)}
+.hero-explore:hover{background:none;color:var(--inkStrong,#332c21)}
+.hero-explore-rule{width:48px;height:1px;background:var(--drawing-rule)}
+
+.hero .visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* Phones and narrow tablets: photo above the name, everything in one column. */
+@media(max-width:760px){
+  .hero{grid-template-columns:1fr;align-content:center;gap:24px;padding:80px 20px 84px}
+  .hero-photo{order:-1;width:clamp(130px,38vw,200px)}
+  .hero-kicker{margin-bottom:12px}
+  .hero-name{font-size:clamp(52px,16vw,80px)}
+  .hero-role{margin-top:18px}
+  .hero-actions{margin-top:26px}
+  .hero-actions a{flex:1;min-width:0}
+  .hero-explore{left:20px;right:20px;bottom:20px;gap:10px;white-space:normal;text-align:left}
+  .hero-explore-rule{width:28px;flex:none}
+}
+/* Short screens (phones held sideways): no room for the photo. */
+@media(max-height:520px){
+  .hero{padding-top:64px;padding-bottom:64px}
+  .hero-photo{display:none}
+  .hero-name{font-size:clamp(40px,7vw,72px)}
+  .hero-explore{bottom:12px}
+}
+@media(prefers-reduced-motion:reduce){
+  .hero,.hero.is-away{transition:none}
+  .hero-caret{animation:none}
+  .hero-actions a{transition:none}
+}

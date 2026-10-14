@@ -9,6 +9,10 @@ export const profile = {
   "linkedin": "https://www.linkedin.com/in/nathan-ncl-liu",
   "github": "https://github.com/ncl9100",
   "education": "NYU · Computer Science and Data Science",
+  "year": "Junior",
+  "minor": "Business",
+  // The home page cycles through these under my name.
+  "roles": ["Data Science Intern", "Full-Stack Developer", "Hackathon Winner"],
   "about": [
     "Hi, I'm Nathan. I'm a junior at NYU pursuing a Bachelor of Arts in Computer Science and Data Science, and I'm working toward a career in ML engineering and data science.",
     "Right now I'm a data science intern at the Leslie eLab, NYU's startup hub, where I work on data and AI tooling. Recently my team took 2nd place at the NYU Stern Sustainability Hackathon with HotTakes, a project that reuses data center waste heat to supply hot water to nearby residents.",

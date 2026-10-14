@@ -5,6 +5,8 @@
 //               laptop:opened / laptop:closed  pause while LiuOS covers the room; go to the shelves view on close
 //               laptop:screen {canvas,...}     show LiuOS's picture on the 3D laptop screen
 //               photo:opened / photo:closed    track the photo pop-up; hide the counter print while it's open
+//               hero:hidden                    the intro cover slid away; show the welcome caption
+//               tour:started / tour:ended      hide captions and the back button while the tour card is up
 // Announces:    room:view {view}               where the camera is (nav highlights)
 //               resume:open / resume:close     ask the résumé viewer to open or close
 //               laptop:open / laptop:close / laptop:screen-request
@@ -610,9 +612,10 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden)resetParall
 let target=new THREE.Vector3(150,12,70),yaw=0.55,pitch=0.85,radius=600;
 function placeCamera(){camera.position.set(target.x+radius*Math.sin(yaw+sway.offset+parallax.x)*Math.cos(pitch+parallax.y),target.y+radius*Math.sin(pitch+parallax.y),target.z+radius*Math.cos(yaw+sway.offset+parallax.x)*Math.cos(pitch+parallax.y));camera.lookAt(target);camera.updateMatrixWorld();}
 function render(){if(document.hidden||laptopOpen)return;document.body.dataset.roomView=currentView;placeCamera();updateBackControl();updateWalls();renderer.render(scene,camera);updateHotspots();updateDimensionLabels();}
+const desktopOverview=matchMedia(DRAFTING_CONFIG.camera.desktopQuery);
 function fittedRadius(value){return value*Math.max(1,DRAFTING_CONFIG.camera.mobileFitAspect/camera.aspect);}
 function resize(){renderer.setSize(stage.clientWidth,stage.clientHeight);camera.aspect=stage.clientWidth/stage.clientHeight;if(['angle','front','desk'].includes(currentView))radius=fittedRadius(presets[currentView].radius);camera.updateProjectionMatrix();render();}window.addEventListener('resize',resize);
-const presets={resume:{yaw:0,pitch:1.48,radius:25,target:[163.75,30.1,17.2],fov:40},details:{yaw:-.15,pitch:.2,radius:130,target:[154.75,48,10]},angle:{yaw:.55,pitch:.85,radius:600,target:[150,12,70]},front:{yaw:0,pitch:Math.PI/2-.001,radius:560,target:[156,0,73]},side:{yaw:Math.PI/2,pitch:.4,radius:48,target:[215,38,119],fov:65},fridge:{yaw:-.45,pitch:.18,radius:145,target:[284,47,80]},desk:{yaw:0,pitch:.27,radius:29,target:[149.75,34,12]},bed:{yaw:-Math.PI/2,pitch:.15,radius:60,target:[130,34,19.5]},otherBed:lookFrom([126,44,122],[148,3,13],62)};
+const presets={resume:{yaw:0,pitch:1.48,radius:25,target:[163.75,30.1,17.2],fov:40},details:{yaw:-.15,pitch:.2,radius:130,target:[154.75,48,10]},angle:{yaw:.55,pitch:.85,get radius(){return desktopOverview.matches?DRAFTING_CONFIG.camera.desktopOverviewRadius:600;},target:[150,12,70]},front:{yaw:0,pitch:Math.PI/2-.001,radius:560,target:[156,0,73]},side:{yaw:Math.PI/2,pitch:.4,radius:48,target:[215,38,119],fov:65},fridge:{yaw:-.45,pitch:.18,radius:145,target:[284,47,80]},desk:{yaw:0,pitch:.27,radius:29,target:[149.75,34,12]},bed:{yaw:-Math.PI/2,pitch:.15,radius:60,target:[130,34,19.5]},otherBed:lookFrom([126,44,122],[148,3,13],62)};
 // A preset from where a seated person's eyes are to what they're looking at. The roommate's-bed
 // eye sits over the mattress and tilts down about 20 degrees, so the blanket's edge fills the
 // bottom of the view.
@@ -626,11 +629,13 @@ let animation=0,moving=false,currentView='angle';
 const hint=document.querySelector('.hint');let captionTimer=0,captionHideTimer=0;
 const defaultCaption='Click around. Most things in here do something.';
 let touchExplore=false;
+// While the tour card is up it does the talking, so captions and the back button stay hidden.
+let touring=false;
 const viewCaptions={angle:defaultCaption,front:'The floor plan. Click an object to explore.',desk:'You’re at your desk. Click the laptop to open LiuOS.',bed:'You’re on your bed. Drag to look around.',otherBed:'Your roommate’s bed. Drag to look around.',side:'You’re in the kitchen. Drag to look around.',fridge:'The fridge. Drag to look around.',seated:'Pull up a stool. Click a photo to look closer.',details:'Still at the desk. Click the laptop, or wander.',resume:'Your resume, up close.',zoom:'A closer look. Click outside the room to step back.'};
 function applyTouchCaptions(){if(touchExplore)return;touchExplore=true;viewCaptions.angle=DRAFTING_CONFIG.interaction.touchCaption;viewCaptions.front='The floor plan. Pinch to zoom, swipe to move, or twist to turn.';}
 if(matchMedia('(pointer: coarse)').matches)applyTouchCaptions();
 function hideCaption(){clearTimeout(captionTimer);clearTimeout(captionHideTimer);hint.classList.remove('caption-visible');captionHideTimer=setTimeout(()=>hint.hidden=true,reducedMotion()?0:250);}
-function showCaption(message=defaultCaption,duration=DRAFTING_CONFIG.interaction.captionMs){if(touchExplore)message=message===defaultCaption&&!isCloseup()?DRAFTING_CONFIG.interaction.touchCaption:message.replaceAll('Click','Tap').replaceAll('Drag to look around','Twist two fingers to turn');hideCaption();clearTimeout(captionHideTimer);hint.hidden=false;hint.textContent=message;hint.classList.add('caption-visible');captionTimer=setTimeout(hideCaption,duration);}
+function showCaption(message=defaultCaption,duration=DRAFTING_CONFIG.interaction.captionMs){if(touring)return;if(touchExplore)message=message===defaultCaption&&!isCloseup()?DRAFTING_CONFIG.interaction.touchCaption:message.replaceAll('Click','Tap').replaceAll('Drag to look around','Twist two fingers to turn');hideCaption();clearTimeout(captionHideTimer);hint.hidden=false;hint.textContent=message;hint.classList.add('caption-visible');captionTimer=setTimeout(hideCaption,duration);}
 
 const hotspotPositions={desk:[154.75,39,25],laptop:[149.75,38.1,12.35],resume:[163.75,31,17.2]};
 const hotspotButtons=[...document.querySelectorAll('[data-destination]')];
@@ -661,14 +666,14 @@ let closeupView=null,firstCloseupSeen=false,zoomExitDelta=0,lastZoomOut=0;
 const backToRoom=document.getElementById('back-to-room');
 function isCloseup(){return closeupView!==null;}
 function updateBackControl(){
-backToRoom.hidden=!isCloseup()||laptopOpen||resumeOpen||photoOpen;
+backToRoom.hidden=!isCloseup()||laptopOpen||resumeOpen||photoOpen||touring;
 const label=closeupView==='desk'?'Back to desk':'Back to room';
 if(backToRoom.dataset.label!==label){backToRoom.dataset.label=label;backToRoom.textContent=label;}
 }
 function returnToRoom(){if(laptopOpen||resumeOpen||photoOpen)return;activate(closeupView==='desk'?'details':'angle');}
 backToRoom.addEventListener('click',returnToRoom);
 // The roommate's-bed caption always shows; the one-time step-back hint waits for the next close-up.
-function arrivalCaption(view){if(closeupViews.has(view)&&view!=='otherBed'&&!firstCloseupSeen){firstCloseupSeen=true;return DRAFTING_CONFIG.interaction.firstCloseupHint;}return viewCaptions[view]||defaultCaption;}
+function arrivalCaption(view){if(closeupViews.has(view)&&view!=='otherBed'&&!firstCloseupSeen&&!touring){firstCloseupSeen=true;return DRAFTING_CONFIG.interaction.firstCloseupHint;}return viewCaptions[view]||defaultCaption;}
 let cameraMove=null,queuedCameraAction=null;
 function cancelCameraMove(){cancelAnimationFrame(animation);animation=0;cameraMove=null;queuedCameraAction=null;if(moving)currentView='custom';moving=false;showCaption();announceView('custom');}
 
@@ -685,6 +690,9 @@ function tick(now){if(cameraMove!==move)return;const t=reduced?1:Math.min((now-t
 // Requests from the nav (room:go). The room owns the camera, so it decides how to get there.
 const announceView=view=>document.dispatchEvent(new CustomEvent('room:view',{detail:{view}}));
 document.addEventListener('room:go',({detail:{view}})=>{if(laptopOpen)document.dispatchEvent(new CustomEvent('laptop:close'));if(resumeOpen)document.dispatchEvent(new CustomEvent('resume:close'));if(photoOpen)document.dispatchEvent(new CustomEvent('photo:close'));navigate(view);});
+document.addEventListener('hero:hidden',()=>{noteInput();showCaption(DRAFTING_CONFIG.interaction.welcomeCaption,DRAFTING_CONFIG.interaction.welcomeMs);});
+document.addEventListener('tour:started',()=>{touring=true;hideCaption();render();});
+document.addEventListener('tour:ended',()=>{touring=false;render();showCaption();});
 function screenHover(active){screenFace.material.color.setScalar(active?LIUOS_CONFIG.screen.hoverBrightness:LIUOS_CONFIG.screen.brightness);}
 document.addEventListener('keydown',event=>{if(event.key==='Escape'&&moving&&!laptopOpen&&!resumeOpen&&!photoOpen){event.preventDefault();cancelCameraMove();pointer=null;touch=null;touchGesture=false;render();}});
 

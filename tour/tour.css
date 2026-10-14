@@ -16,7 +16,7 @@
 
 /* Bottom center, on the sheet's bottom edge (the room lifts its captions above it in the overview).
    Paper and ink like the rest; it pulses a few times when it appears. */
-.tour-replay{position:fixed;z-index:6;left:50%;bottom:24px;transform:translateX(-50%);white-space:nowrap;display:flex;align-items:center;gap:10px;padding:13px 22px;border:1px solid var(--inkStrong,#332c21);border-radius:0;background:color-mix(in srgb,var(--paper-center) 94%,transparent);box-shadow:0 8px 24px #332c211f;font:18px var(--drawing-serif);color:var(--inkStrong,#332c21);animation:tour-pulse 1.6s ease-out 3}
+.tour-replay{position:fixed;z-index:6;left:50%;bottom:24px;transform:translateX(-50%);white-space:nowrap;display:flex;align-items:center;gap:10px;padding:13px 22px;border:1px solid var(--inkStrong,#332c21);border-radius:0;background:color-mix(in srgb,var(--paper-center) 94%,transparent);box-shadow:0 8px 24px #332c211f;font:18px var(--drawing-serif);color:var(--inkStrong,#332c21)}
 .tour-replay::before{content:'▶';font-size:.65em}
 .tour-replay:hover{background:var(--paperHover,#fffaf0)}
 @keyframes tour-pulse{0%{box-shadow:0 8px 24px #332c211f,0 0 0 0 #655e5259}70%{box-shadow:0 8px 24px #332c211f,0 0 0 12px #655e5200}100%{box-shadow:0 8px 24px #332c211f,0 0 0 0 #655e5200}}
@@ -41,5 +41,5 @@
   .tour-invite-start{padding:14px 28px;font-size:19px}
 }
 @media(prefers-reduced-motion:reduce){
-  .tour-card,.tour-replay,.tour-invite,.tour-invite-panel,.tour-invite-start{animation:none}
+  .tour-card,.tour-invite,.tour-invite-panel,.tour-invite-start{animation:none}
 }

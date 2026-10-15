@@ -5,7 +5,7 @@
 //               laptop:opened / laptop:closed  pause while LiuOS covers the room; go to the shelves view on close
 //               laptop:screen {canvas,...}     show LiuOS's picture on the 3D laptop screen
 //               photo:opened / photo:closed    track the photo pop-up; hide the counter print while it's open
-//               hero:hidden                    the intro cover slid away; show the welcome caption
+//               hero:hidden                    the intro cover slid away; glide into the overview, then welcome
 //               tour:started / tour:ended      hide captions and the back button while the tour card is up
 // Announces:    room:view {view}               where the camera is (nav highlights)
 //               resume:open / resume:close     ask the résumé viewer to open or close
@@ -692,7 +692,10 @@ function tick(now){if(cameraMove!==move)return;const t=reduced?1:Math.min((now-t
 // Requests from the nav (room:go). The room owns the camera, so it decides how to get there.
 const announceView=view=>document.dispatchEvent(new CustomEvent('room:view',{detail:{view}}));
 document.addEventListener('room:go',({detail:{view}})=>{if(laptopOpen)document.dispatchEvent(new CustomEvent('laptop:close'));if(resumeOpen)document.dispatchEvent(new CustomEvent('resume:close'));if(photoOpen)document.dispatchEvent(new CustomEvent('photo:close'));navigate(view);});
-document.addEventListener('hero:hidden',()=>{noteInput();showCaption(DRAFTING_CONFIG.interaction.welcomeCaption,DRAFTING_CONFIG.interaction.welcomeMs);});
+// As the cover lifts, the camera starts a little farther out and higher, then settles into the overview.
+document.addEventListener('hero:hidden',()=>{const welcome=()=>{noteInput();showCaption(DRAFTING_CONFIG.interaction.welcomeCaption,DRAFTING_CONFIG.interaction.welcomeMs);};
+if(currentView!=='angle'||moving||reducedMotion()){welcome();return;}
+const g=DRAFTING_CONFIG.camera.heroGlide;radius*=g.radiusScale;pitch=Math.min(1.4,pitch+g.pitchLift);render();navigate('angle',welcome);});
 document.addEventListener('tour:started',()=>{touring=true;hideCaption();render();});
 document.addEventListener('tour:ended',()=>{touring=false;render();showCaption();});
 function screenHover(active){screenFace.material.color.setScalar(active?LIUOS_CONFIG.screen.hoverBrightness:LIUOS_CONFIG.screen.brightness);}

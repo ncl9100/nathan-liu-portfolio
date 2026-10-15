@@ -5,9 +5,9 @@ export const TOUR_CONFIG = {
   storageKey: 'tour-seen',
   steps: [
     { view: 'angle', text: 'Welcome to my room. Here’s a 30-second tour.' },
-    { view: 'details', text: 'The paper on my desk is my résumé. Click it to read it up close.' },
+    { view: 'details', text: 'The paper on my desk is my resume. Click it to read it up close.' },
     { view: 'desk', text: 'My laptop runs LiuOS. Open it to see my projects and experience.' },
-    { view: 'seated', label: 'Easter eggs', text: 'Off the clock: photos with friends and family. Click one to look closer.' },
+    { view: 'seated', label: 'Easter eggs', text: 'Outside of work: photos with friends and family. Click one to look closer.' },
     { view: 'angle', text: 'That’s it. Drag to turn, scroll to zoom, and click anything.', touchText: 'That’s it. Swipe to move, pinch to zoom, and tap anything.' }
   ]
 };

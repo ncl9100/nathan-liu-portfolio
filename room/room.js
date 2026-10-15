@@ -9,6 +9,7 @@
 //               tour:started / tour:ended      hide captions and the back button while the tour card is up
 // Announces:    room:view {view}               where the camera is (nav highlights)
 //               resume:open / resume:close     ask the résumé viewer to open or close
+//               room:ready                     the heavy setup is done (or failed), so the page is responsive again
 //               laptop:open / laptop:close / laptop:screen-request
 //               photo:open {src,thumb,caption,rect} / photo:close   ask the photo pop-up to open or close
 
@@ -33,6 +34,7 @@ document.getElementById('drawing-date').textContent=new Date().toLocaleDateStrin
 
 // Measured structure with procedural oak and an estimated lamp, not a finished room.
 const status = document.getElementById('status');
+let photosLoaded=Promise.resolve();
 try {
 const THREE = await import('https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js');
 const measured = {width:42,depth:24,desktopHeight:30,shelfWidth:42,shelfDepth:10,shelfHeights:[50.5,63,75],frontStripHeight:2.75,drawerWidth:15.5};
@@ -542,8 +544,8 @@ const photoPrints=[];{
   sizePrint(entry,4/3);photoPrints.push(entry);
  });
 }
-function loadPhotoTextures(){const loader=new THREE.TextureLoader();for(const entry of photoPrints)loader.load(entry.thumb,texture=>{texture.colorSpace=THREE.SRGBColorSpace;texture.anisotropy=renderer.capabilities.getMaxAnisotropy();
- const material=entry.face.material;material.map=texture;material.color.set('#ffffff');material.needsUpdate=true;sizePrint(entry,texture.image.width/texture.image.height);render();});}
+function loadPhotoTextures(){const loader=new THREE.TextureLoader();return Promise.all(photoPrints.map(entry=>new Promise(done=>loader.load(entry.thumb,texture=>{texture.colorSpace=THREE.SRGBColorSpace;texture.anisotropy=renderer.capabilities.getMaxAnisotropy();
+ const material=entry.face.material;material.map=texture;material.color.set('#ffffff');material.needsUpdate=true;sizePrint(entry,texture.image.width/texture.image.height);render();done();},undefined,done))));}
 // Readable floor labels are orientation aids, not portfolio content.
 // Cutaway and upper cabinets remain enabled for every camera preset.
 const cutaway=true;
@@ -809,6 +811,8 @@ screenHover(false);document.dispatchEvent(new CustomEvent('laptop:screen-request
 // Compile every shader now, while loading, so the first faucet click doesn't stall. compile() skips
 // hidden objects, and the intro hides the whole room until it starts rising.
 modelRoot.visible=waterGroup.visible=true;renderer.compile(scene,camera);waterGroup.visible=waterOn;applyIntro(0);
-status.hidden=true;startDraftingIntro();loadPhotoTextures();
+status.hidden=true;startDraftingIntro();photosLoaded=loadPhotoTextures();
 window.deskStudy={measured,estimated,room,scene,camera,renderer,refrigerator,aboveFridge,aboveCounter,aboveStove,fridgePartition};
 }catch(error){status.hidden=false;status.textContent='The 3D view could not load. Check your internet connection and WebGL support, then reload. ';console.error(error);}
+// The first couple of frames (shadows) and each photo's arrival are slow too, so wait them out before saying ready.
+photosLoaded.then(()=>requestAnimationFrame(()=>requestAnimationFrame(()=>setTimeout(()=>document.dispatchEvent(new CustomEvent('room:ready')),100))));

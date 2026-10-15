@@ -28,18 +28,28 @@
 .hero-explore:hover{background:none;color:var(--inkStrong,#332c21)}
 .hero-explore-rule{width:48px;height:1px;background:var(--drawing-rule)}
 
+/* First load: each piece fades in and drifts up, one after another. */
+.hero-kicker,.hero-name,.hero-role,.hero-actions,.hero-photo,.hero-explore{animation:hero-rise .7s cubic-bezier(.2,.7,.2,1) both}
+.hero-name{animation-delay:.12s}
+.hero-role{animation-delay:.26s}
+.hero-actions{animation-delay:.38s}
+.hero-photo{animation-delay:.2s}
+.hero-explore{animation-delay:.55s}
+@keyframes hero-rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
 .hero .visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 
-/* Phones and narrow tablets: no photo, just the name, with the buttons stacked full width. */
+/* Phones and narrow tablets: no photo, just the name centered, with the buttons stacked full width. */
 @media(max-width:760px){
   .hero{grid-template-columns:1fr;align-content:center;padding:80px 24px 84px}
   .hero-photo{display:none}
+  .hero-text{text-align:center}
   .hero-kicker{margin-bottom:16px}
   .hero-name{font-size:clamp(56px,19vw,104px)}
   .hero-role{margin-top:22px}
   .hero-actions{flex-direction:column;margin-top:40px}
   .hero-actions a{min-width:0;padding:15px 20px}
-  .hero-explore{left:20px;right:20px;bottom:20px;gap:10px;white-space:normal;text-align:left}
+  .hero-explore{left:20px;right:20px;bottom:20px;justify-content:center;gap:10px;white-space:normal;text-align:center}
   .hero-explore-rule{width:28px;flex:none}
 }
 /* Short screens (phones held sideways): no room for the photo. */
@@ -51,6 +61,6 @@
 }
 @media(prefers-reduced-motion:reduce){
   .hero,.hero.is-away{transition:none}
-  .hero-caret{animation:none}
+  .hero-caret,.hero-kicker,.hero-name,.hero-role,.hero-actions,.hero-photo,.hero-explore{animation:none}
   .hero-actions a{transition:none}
 }

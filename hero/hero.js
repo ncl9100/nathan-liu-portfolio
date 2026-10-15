@@ -3,7 +3,8 @@
 // Visitors who arrive at /#room (the pages' "Back to the room" button) skip it.
 // Visitors who turned on "reduce motion" see all the roles at once and no slide.
 //
-// Listens for:  hero:show          slide back in (nav: "Nathan Liu")
+// Listens for:  room:ready         the room finished loading, so start typing the roles
+//               hero:show          slide back in (nav: "Nathan Liu")
 //               room:go {view}     the floor-plan button moved the camera, so get out of the way
 //                                  (the overview, "angle", comes with hero:show instead)
 // Announces:    hero:hidden        the cover slid away and the room is in view
@@ -56,11 +57,23 @@ function show() {
   cycleRoles();
 }
 
+// The room's 3D setup freezes the page for a second or two, which would stall the typing, so the
+// first role starts fully written and the typing waits for room:ready (or 8 seconds, just in case).
+let roomReady = false;
+function startTyping() {
+  if (roomReady) return;
+  roomReady = true;
+  if (!isAway()) cycleRoles(0, profile.roles[0].length);
+}
+document.addEventListener('room:ready', startTyping, { once: true });
+setTimeout(startTyping, 8000);
+
 if (location.hash === '#room') {
   hero.classList.add('no-slide');
   hide({ announce: false });
   requestAnimationFrame(() => requestAnimationFrame(() => hero.classList.remove('no-slide')));
-} else cycleRoles();
+} else if (reducedMotion.matches) cycleRoles();
+else roleText.textContent = profile.roles[0];
 
 hero.querySelector('.hero-explore').addEventListener('click', () => hide());
 

@@ -1,9 +1,9 @@
 // Tour: a short guided walk through the room, one card per stop (Back / Next / Skip tour).
-// The first time a visitor leaves the hero (remembered in their browser), the room dims and a big
-// "Take the tour" invite rises at the bottom, with "or explore on my own" under it. After that,
-// "Take the tour" replays it from the overview. Escape ends it.
+// Every time the cover slides away, the room dims and a big "Take the tour" invite rises at the
+// bottom, with "or explore on my own" under it. Closing it on this page leaves the smaller
+// "Take the tour" button. A new tab starts the invite over. Escape ends it.
 //
-// Listens for:  hero:hidden        first visit: show the invite
+// Listens for:  hero:hidden        the cover left: show the invite
 //               hero:show          the cover came back, so stop
 //               room:view {view}   only offer "Take the tour" from the overview
 // Announces:    room:go {view}     fly the camera to each stop
@@ -27,14 +27,11 @@ const touch = matchMedia('(pointer: coarse)').matches;
 const steps = TOUR_CONFIG.steps;
 let index = -1;      // the stop on screen, or -1 when the card is closed
 let active = false;  // the invite or the card is up
+let dismissed = false; // this page only; a new tab starts over
 let roomView = 'angle';
 let leaveTimer = 0;
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 const inOverview = () => ['angle', 'front', 'custom'].includes(roomView);
-
-// Private browsing in some browsers throws on storage, so treat that as "not seen".
-const seen = () => { try { return localStorage.getItem(TOUR_CONFIG.storageKey) === '1'; } catch { return false; } };
-const markSeen = () => { try { localStorage.setItem(TOUR_CONFIG.storageKey, '1'); } catch {} };
 
 function activate() {
   replay.hidden = true;
@@ -42,6 +39,7 @@ function activate() {
 }
 
 function showInvite() {
+  if (dismissed) return;
   activate();
   invite.hidden = false;
   invite.querySelector('.tour-invite-start').focus({ preventScroll: true });
@@ -72,9 +70,9 @@ function start() {
 function end({ finished = false } = {}) {
   if (!active) return;
   active = false;
+  dismissed = true;
   index = -1;
   invite.hidden = true;
-  markSeen();
   announce('tour:ended', { finished });
   const close = () => {
     card.hidden = true;
@@ -100,10 +98,12 @@ invite.addEventListener('click', event => { if (event.target === invite) end(); 
 document.addEventListener('keydown', event => {
   if (event.key === 'Escape' && active && !event.target.closest?.('dialog')) end();
 });
-document.addEventListener('hero:hidden', () => { if (!seen() && !active) showInvite(); });
+document.addEventListener('hero:hidden', () => { if (!dismissed && !active) showInvite(); });
+// The cover can slide away before this file finishes loading. /#room skips the cover on purpose.
+if (location.hash !== '#room' && document.getElementById('hero')?.classList.contains('is-away')) showInvite();
 document.addEventListener('hero:show', end);
 document.addEventListener('room:view', ({ detail: { view } }) => {
   roomView = view;
   if (!active) replay.hidden = !inOverview();
 });
-replay.hidden = false;
+replay.hidden = active;

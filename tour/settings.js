@@ -2,7 +2,6 @@
 // "view" is a room camera stop (the same names room:go takes). On touch screens "Click" reads
 // "Tap", and "touchText", if given, replaces the whole line.
 export const TOUR_CONFIG = {
-  storageKey: 'tour-seen',
   steps: [
     { view: 'angle', text: 'Welcome to my room. Here’s a 30-second tour.' },
     { view: 'details', text: 'The paper on my desk is my resume. Click it to read it up close.' },

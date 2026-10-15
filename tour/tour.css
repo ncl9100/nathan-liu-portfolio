@@ -30,6 +30,8 @@
 .tour-invite-start:hover{background:var(--paperHover,#fffaf0)}
 .tour-invite-skip{padding:6px 10px;border-radius:0;font:15px var(--drawing-serif);color:var(--paper-center);text-decoration:underline;text-underline-offset:3px;text-shadow:0 1px 6px #332c2199}
 .tour-invite-skip:hover{background:none;color:#fff}
+/* Phones and tablets draw ▶ as a color emoji, so leave it off there. */
+@media(pointer:coarse){.tour-replay::before,.tour-invite-start::before{content:none}}
 @keyframes tour-dim{from{opacity:0}to{opacity:1}}
 @keyframes tour-rise{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
 @keyframes tour-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}

@@ -7,8 +7,8 @@
 //               hero:show          the cover came back, so stop
 //               room:view {view}   only offer "Take the tour" from the overview
 // Announces:    room:go {view}     fly the camera to each stop
-//               tour:started / tour:ended   the room hides its captions and back button meanwhile
-//                                           (the invite counts as part of the tour)
+//               tour:started / tour:ended {finished}   the room hides its captions and back button meanwhile
+//                                           (the invite counts as part of the tour); finished = "Start exploring"
 
 import { TOUR_CONFIG } from './settings.js';
 
@@ -28,6 +28,8 @@ const steps = TOUR_CONFIG.steps;
 let index = -1;      // the stop on screen, or -1 when the card is closed
 let active = false;  // the invite or the card is up
 let roomView = 'angle';
+let leaveTimer = 0;
+const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 const inOverview = () => ['angle', 'front', 'custom'].includes(roomView);
 
 // Private browsing in some browsers throws on storage, so treat that as "not seen".
@@ -57,28 +59,41 @@ function show(i) {
 
 function start() {
   activate();
+  clearTimeout(leaveTimer);
+  card.classList.remove('is-leaving');
+  replay.classList.remove('is-arriving');
   invite.hidden = true;
   card.hidden = false;
   show(0);
   next.focus({ preventScroll: true });
 }
 
-function end() {
+// finished: they clicked "Start exploring" on the last stop, so the room gives the camera a gentle settle.
+function end({ finished = false } = {}) {
   if (!active) return;
   active = false;
   index = -1;
-  invite.hidden = card.hidden = true;
-  replay.hidden = !inOverview();
+  invite.hidden = true;
   markSeen();
-  announce('tour:ended');
+  announce('tour:ended', { finished });
+  const close = () => {
+    card.hidden = true;
+    card.classList.remove('is-leaving');
+    replay.classList.add('is-arriving');
+    replay.hidden = !inOverview();
+  };
+  if (card.hidden || reducedMotion.matches) { close(); return; }
+  card.classList.add('is-leaving');
+  leaveTimer = setTimeout(close, 350);
 }
 
-next.addEventListener('click', () => index === steps.length - 1 ? end() : show(index + 1));
+next.addEventListener('click', () => index === steps.length - 1 ? end({ finished: true }) : show(index + 1));
 back.addEventListener('click', () => { if (index > 0) show(index - 1); });
-card.querySelector('.tour-skip').addEventListener('click', end);
+card.querySelector('.tour-skip').addEventListener('click', () => end());
 replay.addEventListener('click', start);
+replay.addEventListener('animationend', () => replay.classList.remove('is-arriving'));
 invite.querySelector('.tour-invite-start').addEventListener('click', start);
-invite.querySelector('.tour-invite-skip').addEventListener('click', end);
+invite.querySelector('.tour-invite-skip').addEventListener('click', () => end());
 // Clicking the dimmed room counts as "explore on my own".
 invite.addEventListener('click', event => { if (event.target === invite) end(); });
 

@@ -55,6 +55,6 @@
    Add .r-exact to the sheet to keep the exact page at any width (LiuOS does when it has room). */
 @container (max-width: 560px) {
   .resume-sheet:not(.r-exact) { --pt: calc(1.25px * var(--r-zoom, 1)); min-height: 0; padding: 18px 16px; overflow-wrap: break-word; }
-  .resume-sheet:not(.r-exact) .r-row { flex-wrap: wrap; width: auto; }
-  .resume-sheet:not(.r-exact) .r-row > :last-child { margin-left: auto; }
+  /* A date that fits stays flush right; one that wraps sits under the heading on the left, like a second line. */
+  .resume-sheet:not(.r-exact) .r-row { flex-wrap: wrap; width: auto; column-gap: calc(8 * var(--pt)); row-gap: 0; }
 }

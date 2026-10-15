@@ -42,7 +42,9 @@ const measured = {width:42,depth:24,desktopHeight:30,shelfWidth:42,shelfDepth:10
 const estimated = {board:0.8,upright:0.85,desktopThickness:1.1};
 const stage = document.getElementById('stage');
 const scene = new THREE.Scene(); scene.background=null;
-const renderer = new THREE.WebGLRenderer({antialias:true,alpha:true});renderer.setPixelRatio(Math.min(devicePixelRatio,DRAFTING_CONFIG.camera.pixelRatioCap));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.domElement.setAttribute('aria-label',"3D model of Nathan's room. Use the navigation above to view About, Experience, Projects, Resume, and Contact.");renderer.domElement.tabIndex=0;stage.appendChild(renderer.domElement);
+// Phones redraw a lot of pixels. A softer image there keeps the cover and the typing from stuttering.
+const coarsePointer=matchMedia('(pointer: coarse)').matches;
+const renderer = new THREE.WebGLRenderer({antialias:!coarsePointer,alpha:true});renderer.setPixelRatio(Math.min(devicePixelRatio,coarsePointer?1.5:DRAFTING_CONFIG.camera.pixelRatioCap));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.domElement.setAttribute('aria-label',"3D model of Nathan's room. Use the navigation above to view About, Experience, Projects, Resume, and Contact.");renderer.domElement.tabIndex=0;stage.appendChild(renderer.domElement);
 // Near is 1 inch. The closest view sits 18 inches away, and a nearer plane wastes depth
 // precision, which is what made thin labels flicker from across the room.
 const camera=new THREE.PerspectiveCamera(38,1,1,DRAFTING_CONFIG.camera.far);
@@ -125,7 +127,7 @@ for(const x of [-15,1])box(1.2,17.5,1.2,x,26.75,33,material,chair);
 box(17,11,1.5,-7,30.5,33,chairMat,chair);
 // Floor and room structure are built below after relocating the desk.
 scene.add(new THREE.HemisphereLight(0xe8efff,0x8b7153,1.35));
-const light=new THREE.DirectionalLight(0xffecd4,2.1);light.position.set(35,200,100);light.castShadow=true;light.shadow.mapSize.set(2048,2048);light.target.position.set(155,0,65);scene.add(light.target);light.shadow.camera.left=-240;light.shadow.camera.right=240;light.shadow.camera.top=200;light.shadow.camera.bottom=-200;light.shadow.camera.near=1;light.shadow.camera.far=600;light.shadow.bias=-0.0008;light.shadow.normalBias=.6;light.shadow.radius=4;scene.add(light);
+const light=new THREE.DirectionalLight(0xffecd4,2.1);light.position.set(35,200,100);light.castShadow=true;light.shadow.mapSize.set(coarsePointer?1024:2048,coarsePointer?1024:2048);light.target.position.set(155,0,65);scene.add(light.target);light.shadow.camera.left=-240;light.shadow.camera.right=240;light.shadow.camera.top=200;light.shadow.camera.bottom=-200;light.shadow.camera.near=1;light.shadow.camera.far=600;light.shadow.bias=-0.0008;light.shadow.normalBias=.6;light.shadow.radius=4;scene.add(light);
 // Lamp silhouette is estimated from the photos; the ambient light stays on
 // when its spotlight is off so the scene remains usable.
 const silver=new THREE.MeshStandardMaterial({color:'#a9adb0',metalness:.65,roughness:.3});
@@ -546,7 +548,7 @@ const photoPrints=[];{
  });
 }
 function loadPhotoTextures(){const loader=new THREE.TextureLoader();return Promise.all(photoPrints.map(entry=>new Promise(done=>loader.load(entry.thumb,texture=>{texture.colorSpace=THREE.SRGBColorSpace;texture.anisotropy=renderer.capabilities.getMaxAnisotropy();
- const material=entry.face.material;material.map=texture;material.color.set('#ffffff');material.needsUpdate=true;sizePrint(entry,texture.image.width/texture.image.height);render();done();},undefined,done))));}
+ const material=entry.face.material;material.map=texture;material.color.set('#ffffff');material.needsUpdate=true;sizePrint(entry,texture.image.width/texture.image.height);done();},undefined,done)))).then(()=>{if(!coverOn)render();});}
 // Readable floor labels are orientation aids, not portfolio content.
 // Cutaway and upper cabinets remain enabled for every camera preset.
 const cutaway=true;
@@ -614,7 +616,9 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden)resetParall
 
 let target=new THREE.Vector3(150,12,70),yaw=0.55,pitch=0.85,radius=600;
 function placeCamera(){camera.position.set(target.x+radius*Math.sin(yaw+sway.offset+parallax.x)*Math.cos(pitch+parallax.y),target.y+radius*Math.sin(pitch+parallax.y),target.z+radius*Math.cos(yaw+sway.offset+parallax.x)*Math.cos(pitch+parallax.y));camera.lookAt(target);camera.updateMatrixWorld();}
-function render(){if(document.hidden||laptopOpen)return;document.body.dataset.roomView=currentView;placeCamera();updateBackControl();updateWalls();renderer.render(scene,camera);updateHotspots();updateDimensionLabels();}
+// While the landing cover is up, skip drawing the room. A live 3D frame under that cover is what stuttered the entrance and the typing.
+let coverOn=false;
+function render(){if(document.hidden||laptopOpen||coverOn)return;document.body.dataset.roomView=currentView;placeCamera();updateBackControl();updateWalls();renderer.render(scene,camera);updateHotspots();updateDimensionLabels();}
 const desktopOverview=matchMedia(DRAFTING_CONFIG.camera.desktopQuery);
 function fittedRadius(value){return value*Math.max(1,DRAFTING_CONFIG.camera.mobileFitAspect/camera.aspect);}
 function resize(){renderer.setSize(stage.clientWidth,stage.clientHeight);camera.aspect=stage.clientWidth/stage.clientHeight;if(['angle','front','desk'].includes(currentView))radius=fittedRadius(presets[currentView].radius);camera.updateProjectionMatrix();render();}window.addEventListener('resize',resize);
@@ -694,7 +698,7 @@ function tick(now){if(cameraMove!==move)return;const t=reduced?1:Math.min((now-t
 const announceView=view=>document.dispatchEvent(new CustomEvent('room:view',{detail:{view}}));
 document.addEventListener('room:go',({detail:{view}})=>{if(laptopOpen)document.dispatchEvent(new CustomEvent('laptop:close'));if(resumeOpen)document.dispatchEvent(new CustomEvent('resume:close'));if(photoOpen)document.dispatchEvent(new CustomEvent('photo:close'));navigate(view);});
 // As the cover lifts, the camera starts a little farther out and higher, then settles into the overview.
-document.addEventListener('hero:hidden',()=>{const welcome=()=>{noteInput();showCaption(DRAFTING_CONFIG.interaction.welcomeCaption,DRAFTING_CONFIG.interaction.welcomeMs);};
+document.addEventListener('hero:hidden',()=>{coverOn=false;compileScene();const welcome=()=>{noteInput();showCaption(DRAFTING_CONFIG.interaction.welcomeCaption,DRAFTING_CONFIG.interaction.welcomeMs);};
 if(currentView!=='angle'||moving||reducedMotion()){welcome();return;}
 const g=DRAFTING_CONFIG.camera.heroGlide;radius*=g.radiusScale;pitch=Math.min(1.4,pitch+g.pitchLift);render();navigate('angle',welcome);});
 document.addEventListener('tour:started',()=>{touring=true;hideCaption();render();});
@@ -817,12 +821,17 @@ for(const type of ['gesturestart','gesturechange','gestureend'])stage.addEventLi
 renderer.domElement.style.touchAction='none';
 for(const [type,handler] of [['touchstart',onTouchStart],['touchmove',onTouchMove],['touchend',onTouchEnd],['touchcancel',onTouchCancel]])stage.addEventListener(type,handler,{passive:false});
 renderer.domElement.addEventListener('webglcontextlost',event=>{event.preventDefault();status.textContent='Graphics connection lost. Reload this page to restore the model.';status.hidden=false;});
-screenHover(false);document.dispatchEvent(new CustomEvent('laptop:screen-request'));applyIntro(0);resize();
-// Compile every shader now, while loading, so the first faucet click doesn't stall. compile() skips
-// hidden objects, and the intro hides the whole room until it starts rising.
-modelRoot.visible=waterGroup.visible=true;renderer.compile(scene,camera);waterGroup.visible=waterOn;applyIntro(0);
-status.hidden=true;startDraftingIntro();photosLoaded=loadPhotoTextures();
+screenHover(false);document.dispatchEvent(new CustomEvent('laptop:screen-request'));applyIntro(0);
+const heroEl=document.getElementById('hero');
+coverOn=!!heroEl&&!heroEl.classList.contains('is-away');
+resize();
+// Shader compile is a long pause. Do it after the cover's entrance, not during it, and only once.
+let compiled=false;
+function compileScene(){if(compiled)return;compiled=true;modelRoot.visible=waterGroup.visible=true;renderer.compile(scene,camera);waterGroup.visible=waterOn;applyIntro(0);}
+status.hidden=true;
+if(coverOn)setTimeout(compileScene,1400);else{compileScene();startDraftingIntro();}
+photosLoaded=loadPhotoTextures();
 window.deskStudy={measured,estimated,room,scene,camera,renderer,refrigerator,aboveFridge,aboveCounter,aboveStove,fridgePartition};
 }catch(error){status.hidden=false;status.textContent='The 3D view could not load. Check your internet connection and WebGL support, then reload. ';console.error(error);}
-// The first couple of frames (shadows) and each photo's arrival are slow too, so wait them out before saying ready.
-photosLoaded.then(()=>requestAnimationFrame(()=>requestAnimationFrame(()=>setTimeout(()=>document.dispatchEvent(new CustomEvent('room:ready')),100))));
+// The typing on the cover waits for this. It used to wait for every photo, so the text sat still on a phone.
+requestAnimationFrame(()=>document.dispatchEvent(new CustomEvent('room:ready')));

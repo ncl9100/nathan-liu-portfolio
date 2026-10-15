@@ -35,6 +35,11 @@
 @keyframes tour-dim{from{opacity:0}to{opacity:1}}
 @keyframes tour-rise{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
 @keyframes tour-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+/* Closing: the card fades and drops away, then "Take the tour" fades in once the camera has settled. */
+.tour-card.is-leaving{animation:tour-out .35s ease-in both;pointer-events:none}
+.tour-replay.is-arriving{animation:tour-fade .6s ease-out .9s both}
+@keyframes tour-out{to{opacity:0;transform:translateY(16px)}}
+@keyframes tour-fade{from{opacity:0}}
 @media(max-width:600px){
   .tour-card{right:12px;bottom:12px;padding:12px 14px 10px}
   .tour-text{font-size:16px}
@@ -43,5 +48,5 @@
   .tour-invite-start{padding:14px 28px;font-size:19px}
 }
 @media(prefers-reduced-motion:reduce){
-  .tour-card,.tour-invite,.tour-invite-panel,.tour-invite-start{animation:none}
+  .tour-card,.tour-card.is-leaving,.tour-replay.is-arriving,.tour-invite,.tour-invite-panel,.tour-invite-start{animation:none}
 }

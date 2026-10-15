@@ -7,6 +7,7 @@
 //               photo:opened / photo:closed    track the photo pop-up; hide the counter print while it's open
 //               hero:hidden                    the intro cover slid away; glide into the overview, then welcome
 //               tour:started / tour:ended      hide captions and the back button while the tour card is up
+//                                              (ended with finished: a gentle camera settle)
 // Announces:    room:view {view}               where the camera is (nav highlights)
 //               resume:open / resume:close     ask the résumé viewer to open or close
 //               room:ready                     the heavy setup is done (or failed), so the page is responsive again
@@ -697,7 +698,13 @@ document.addEventListener('hero:hidden',()=>{const welcome=()=>{noteInput();show
 if(currentView!=='angle'||moving||reducedMotion()){welcome();return;}
 const g=DRAFTING_CONFIG.camera.heroGlide;radius*=g.radiusScale;pitch=Math.min(1.4,pitch+g.pitchLift);render();navigate('angle',welcome);});
 document.addEventListener('tour:started',()=>{touring=true;hideCaption();render();});
-document.addEventListener('tour:ended',()=>{touring=false;render();showCaption();});
+document.addEventListener('tour:ended',({detail})=>{touring=false;if(detail?.finished)settleCamera();else{render();showCaption();}});
+// After "Start exploring": a gentle lean in and back, ending exactly where it started. Any drag or click takes over.
+function settleCamera(){if(currentView!=='angle'||moving||reducedMotion()){render();showCaption();return;}
+resetParallax();stopSway();bakeSway();const g=DRAFTING_CONFIG.camera.tourEndSettle,base={yaw,pitch,radius},move=cameraMove={},started=performance.now();moving=true;
+function tick(now){if(cameraMove!==move)return;const t=Math.min(1,(now-started)/g.ms),s=Math.sin(Math.PI*t*t*(3-2*t));radius=base.radius*(1-g.radiusDip*s);pitch=base.pitch-g.pitchDip*s;yaw=base.yaw+g.yawTurn*s;
+if(t<1){render();animation=requestAnimationFrame(tick);return;}yaw=base.yaw;pitch=base.pitch;radius=base.radius;cameraMove=null;animation=0;moving=false;render();showCaption();noteInput();}
+animation=requestAnimationFrame(tick);}
 function screenHover(active){screenFace.material.color.setScalar(active?LIUOS_CONFIG.screen.hoverBrightness:LIUOS_CONFIG.screen.brightness);}
 document.addEventListener('keydown',event=>{if(event.key==='Escape'&&moving&&!laptopOpen&&!resumeOpen&&!photoOpen){event.preventDefault();cancelCameraMove();pointer=null;touch=null;touchGesture=false;render();}});
 

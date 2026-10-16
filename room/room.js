@@ -42,15 +42,13 @@ const measured = {width:42,depth:24,desktopHeight:30,shelfWidth:42,shelfDepth:10
 const estimated = {board:0.8,upright:0.85,desktopThickness:1.1};
 const stage = document.getElementById('stage');
 const scene = new THREE.Scene(); scene.background=null;
-// Phones and tablets redraw a lot of pixels. iPads often claim a fine pointer, so also
-// treat a touch screen at tablet width as handheld. Safari on iPhone is stricter still:
-// two WebGL contexts plus a full compile on load is what made it kill the tab and reload.
-// Chrome on the same phone is fine, and still says "Safari" in its user agent, so only
-// real Safari gets the no-shadow / skip-compile path.
+// Safari on iPhone: two WebGL contexts plus a full compile on load is what made it
+// kill the tab and reload. Chrome / Firefox / Edge on the same phone can run the
+// full room (shadows, antialias, sharper pixels). They still say "Safari" in the
+// user agent, so only real Safari gets the lighter path.
 const ios=/iP(hone|od|ad)/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
 const safari=ios&&!/CriOS|FxiOS|EdgiOS|OPiOS|OPT\/|DuckDuckGo|Chrome|Chromium/i.test(navigator.userAgent);
-const handheld=ios||matchMedia('(pointer: coarse)').matches||matchMedia('(hover: none)').matches||(navigator.maxTouchPoints>1&&matchMedia('(max-width: 1366px)').matches);
-const renderer = new THREE.WebGLRenderer({antialias:!handheld,alpha:true,powerPreference:safari?'low-power':'default'});renderer.setPixelRatio(Math.min(devicePixelRatio,safari?1:handheld?1.25:DRAFTING_CONFIG.camera.pixelRatioCap));renderer.shadowMap.enabled=!safari;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.domElement.setAttribute('aria-label',"3D model of Nathan's room. Use the navigation above to view About, Experience, Projects, Resume, and Contact.");renderer.domElement.tabIndex=0;stage.appendChild(renderer.domElement);
+const renderer = new THREE.WebGLRenderer({antialias:!safari,alpha:true,powerPreference:safari?'low-power':'default'});renderer.setPixelRatio(Math.min(devicePixelRatio,safari?1:DRAFTING_CONFIG.camera.pixelRatioCap));renderer.shadowMap.enabled=!safari;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.domElement.setAttribute('aria-label',"3D model of Nathan's room. Use the navigation above to view About, Experience, Projects, Resume, and Contact.");renderer.domElement.tabIndex=0;stage.appendChild(renderer.domElement);
 // Near is 1 inch. The closest view sits 18 inches away, and a nearer plane wastes depth
 // precision, which is what made thin labels flicker from across the room.
 const camera=new THREE.PerspectiveCamera(38,1,1,DRAFTING_CONFIG.camera.far);
@@ -133,7 +131,7 @@ for(const x of [-15,1])box(1.2,17.5,1.2,x,26.75,33,material,chair);
 box(17,11,1.5,-7,30.5,33,chairMat,chair);
 // Floor and room structure are built below after relocating the desk.
 scene.add(new THREE.HemisphereLight(0xe8efff,0x8b7153,1.35));
-const light=new THREE.DirectionalLight(0xffecd4,2.1);light.position.set(35,200,100);light.castShadow=!safari;if(!safari)light.shadow.mapSize.set(handheld?512:2048,handheld?512:2048);light.target.position.set(155,0,65);scene.add(light.target);light.shadow.camera.left=-240;light.shadow.camera.right=240;light.shadow.camera.top=200;light.shadow.camera.bottom=-200;light.shadow.camera.near=1;light.shadow.camera.far=600;light.shadow.bias=-0.0008;light.shadow.normalBias=.6;light.shadow.radius=4;scene.add(light);
+const light=new THREE.DirectionalLight(0xffecd4,2.1);light.position.set(35,200,100);light.castShadow=!safari;if(!safari)light.shadow.mapSize.set(2048,2048);light.target.position.set(155,0,65);scene.add(light.target);light.shadow.camera.left=-240;light.shadow.camera.right=240;light.shadow.camera.top=200;light.shadow.camera.bottom=-200;light.shadow.camera.near=1;light.shadow.camera.far=600;light.shadow.bias=-0.0008;light.shadow.normalBias=.6;light.shadow.radius=4;scene.add(light);
 // Lamp silhouette is estimated from the photos; the ambient light stays on
 // when its spotlight is off so the scene remains usable.
 const silver=new THREE.MeshStandardMaterial({color:'#a9adb0',metalness:.65,roughness:.3});
@@ -141,7 +139,7 @@ const lampMeshes=[box(4.5,.6,5,15,30.3,-4,silver),box(.8,10,.8,15,35.5,-6,silver
 const lampBar=box(1.25,.55,9,15,40.7,-2.2,silver);lampBar.rotation.x=-.15;
 const emitterMat=new THREE.MeshStandardMaterial({color:'#fff4d8',emissive:'#fff2d4',emissiveIntensity:2});
 const emitter=box(.9,.08,7.7,15,40.38,-2.2,emitterMat);emitter.rotation.x=-.15;
-const lampLight=new THREE.SpotLight(0xfff3dc,1800,55,.72,.75,2);lampLight.position.set(15,40,-1);lampLight.target.position.set(7,30,2);lampLight.castShadow=!safari;if(!safari){lampLight.shadow.mapSize.set(handheld?512:1024,handheld?512:1024);lampLight.shadow.bias=-.0001;}scene.add(lampLight,lampLight.target);
+const lampLight=new THREE.SpotLight(0xfff3dc,1800,55,.72,.75,2);lampLight.position.set(15,40,-1);lampLight.target.position.set(7,30,2);lampLight.castShadow=!safari;if(!safari){lampLight.shadow.mapSize.set(1024,1024);lampLight.shadow.bias=-.0001;}scene.add(lampLight,lampLight.target);
 lampMeshes.push(lampBar,emitter);
 let lampOn=true,lampFadeFrame=0;
 
@@ -715,10 +713,10 @@ const onEnd=event=>{if(event.target===hero&&event.propertyName==='transform')fin
 hero.addEventListener('transitionend',onEnd);
 setTimeout(finish,900);
 }
-// If the room is already drawn, reveal it on the next frames. On a phone or tablet that
-// someone swipes before that draw finishes, wait until the paper is gone, then pay the GPU cost.
+// If the room is already drawn, reveal it on the next frames. Safari skips that first
+// draw on purpose, so wait until the paper is gone, then pay the GPU cost.
 document.addEventListener('hero:hidden',()=>{
-if(handheld&&!compiled)afterCoverSlide(revealRoom);
+if(safari&&!compiled)afterCoverSlide(revealRoom);
 else afterPaint(revealRoom);
 });
 document.addEventListener('tour:started',()=>{touring=true;hideCaption();render();});
@@ -853,5 +851,5 @@ function warmUnderCover(){if(!coverOn)return;compileScene();finishIntro({quiet:t
 status.hidden=true;
 if(coverOn){if(safari)announceReady();else requestAnimationFrame(()=>requestAnimationFrame(warmUnderCover));}else{compileScene();startDraftingIntro();announceReady();}
 if(safari)setTimeout(()=>{photosLoaded=loadPhotoTextures();},4000);else photosLoaded=loadPhotoTextures();
-window.deskStudy={measured,estimated,room,scene,camera,renderer,refrigerator,aboveFridge,aboveCounter,aboveStove,fridgePartition};
+window.deskStudy={measured,estimated,room,scene,camera,renderer,safari,refrigerator,aboveFridge,aboveCounter,aboveStove,fridgePartition};
 }catch(error){status.hidden=false;status.textContent='The 3D view could not load. Check your internet connection and WebGL support, then reload. ';console.error(error);document.dispatchEvent(new CustomEvent('room:ready'));}

@@ -28,10 +28,11 @@ for(const [name,value] of Object.entries({font:LIUOS_CONFIG.font,labelFont:LIUOS
 
 const laptopDialog=document.getElementById('laptop-window');let laptopReturnFocus=null,laptopPowered=true,laptopUnlocked=false;
 const ios=/iP(hone|od|ad)/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+const safari=ios&&!/CriOS|FxiOS|EdgiOS|OPiOS|OPT\/|DuckDuckGo|Chrome|Chromium/i.test(navigator.userAgent);
 // The in-room screen keeps a static wallpaper frame and minute-based clock updates.
 // The live shader is reserved for the visible LiuOS screen to keep room rendering light.
 // Safari/iPhone: a 2048 screen texture plus a second WebGL wallpaper is what ran the tab out of memory.
-const screenCanvas=document.createElement('canvas');screenCanvas.width=ios?1024:LIUOS_CONFIG.screen.resolution;screenCanvas.height=Math.round(screenCanvas.width/LIUOS_CONFIG.screen.aspect);
+const screenCanvas=document.createElement('canvas');screenCanvas.width=safari?1024:LIUOS_CONFIG.screen.resolution;screenCanvas.height=Math.round(screenCanvas.width/LIUOS_CONFIG.screen.aspect);
 const screenContext=screenCanvas.getContext('2d');
 let screenMinute='',screenState='',screenClockTimer=0;
 function localClock(now=new Date()){return {time:now.toLocaleTimeString([],{hour:'numeric',minute:'2-digit',hour12:false}),date:now.toLocaleDateString([],{weekday:'long',month:'long',day:'numeric'})};}
@@ -122,7 +123,7 @@ async function ensureWallpaper(){
 }
 function updateWallpaperState(){
   if(!laptopDialog.open){
-    if(ios&&wallpaperController){wallpaperController.dispose();wallpaperController=null;wallpaperPromise=null;}
+    if(safari&&wallpaperController){wallpaperController.dispose();wallpaperController=null;wallpaperPromise=null;}
     else wallpaperController?.setState({visible:false,covered:true,alternate:alternateWallpaper});
     return;
   }

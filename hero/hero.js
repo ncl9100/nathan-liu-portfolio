@@ -13,8 +13,10 @@
 
 import { profile } from '../content/portfolio.js';
 
-// iPads often claim a mouse. Mark those as "save GPU" so the cover never blurs the room.
-if (matchMedia('(pointer: coarse)').matches || matchMedia('(hover: none)').matches || (navigator.maxTouchPoints > 1 && matchMedia('(max-width: 1366px)').matches)) {
+// Only Safari on iPhone/iPad needs the cheaper cover (no blur, faster slide).
+// Chrome and other browsers on the same phone keep the normal cover.
+const ios=/iP(hone|od|ad)/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+if (ios && !/CriOS|FxiOS|EdgiOS|OPiOS|OPT\/|DuckDuckGo|Chrome|Chromium/i.test(navigator.userAgent)) {
   document.documentElement.dataset.gpu = 'save';
 }
 

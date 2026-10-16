@@ -11,6 +11,11 @@
 
 import { profile } from '../content/portfolio.js';
 
+// iPads often claim a mouse. Mark those as "save GPU" so the cover never blurs the room.
+if (matchMedia('(pointer: coarse)').matches || matchMedia('(hover: none)').matches || (navigator.maxTouchPoints > 1 && matchMedia('(max-width: 1366px)').matches)) {
+  document.documentElement.dataset.gpu = 'save';
+}
+
 const markup = await fetch(new URL('hero.html', import.meta.url)).then(response => response.text());
 document.body.insertAdjacentHTML('beforeend', markup);
 
@@ -45,14 +50,19 @@ const isAway = () => hero.classList.contains('is-away');
 function hide({ announce = true } = {}) {
   if (isAway()) return;
   clearTimeout(timer);
-  hero.classList.add('is-away');
-  hero.inert = true;
-  if (announce) document.dispatchEvent(new CustomEvent('hero:hidden'));
+  hero.classList.add('is-clear');
+  hero.style.willChange = 'transform';
+  requestAnimationFrame(() => {
+    hero.classList.add('is-away');
+    hero.inert = true;
+    if (announce) document.dispatchEvent(new CustomEvent('hero:hidden'));
+  });
 }
 
 function show() {
   if (!isAway()) return;
-  hero.classList.remove('is-away');
+  hero.style.willChange = '';
+  hero.classList.remove('is-away', 'is-clear');
   hero.inert = false;
   cycleRoles();
 }

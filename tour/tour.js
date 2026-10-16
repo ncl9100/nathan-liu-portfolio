@@ -45,6 +45,32 @@ function showInvite() {
   invite.querySelector('.tour-invite-start').focus({ preventScroll: true });
 }
 
+function offerInvite() {
+  if (!dismissed && !active) showInvite();
+}
+
+// Wait until the cover has finished sliding. Putting the dim overlay up during that motion
+// made the scroll hitch, and the overlay would sit on top of the still-moving cover.
+function afterCoverGone(then) {
+  const heroEl = document.getElementById('hero');
+  if (!heroEl || reducedMotion.matches || heroEl.classList.contains('no-slide') || getComputedStyle(heroEl).visibility === 'hidden') {
+    then();
+    return;
+  }
+  let done = false;
+  const finish = () => {
+    if (done) return;
+    done = true;
+    heroEl.removeEventListener('transitionend', onEnd);
+    then();
+  };
+  const onEnd = event => {
+    if (event.target === heroEl && event.propertyName === 'transform') finish();
+  };
+  heroEl.addEventListener('transitionend', onEnd);
+  setTimeout(finish, 900);
+}
+
 function show(i) {
   index = i;
   const step = steps[i];
@@ -98,9 +124,9 @@ invite.addEventListener('click', event => { if (event.target === invite) end(); 
 document.addEventListener('keydown', event => {
   if (event.key === 'Escape' && active && !event.target.closest?.('dialog')) end();
 });
-document.addEventListener('hero:hidden', () => { if (!dismissed && !active) showInvite(); });
+document.addEventListener('hero:hidden', () => afterCoverGone(offerInvite));
 // The cover can slide away before this file finishes loading. /#room skips the cover on purpose.
-if (location.hash !== '#room' && document.getElementById('hero')?.classList.contains('is-away')) showInvite();
+if (location.hash !== '#room' && document.getElementById('hero')?.classList.contains('is-away')) afterCoverGone(offerInvite);
 document.addEventListener('hero:show', end);
 document.addEventListener('room:view', ({ detail: { view } }) => {
   roomView = view;

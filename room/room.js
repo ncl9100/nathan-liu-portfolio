@@ -5,7 +5,7 @@
 //               laptop:opened / laptop:closed  pause while LiuOS covers the room; go to the shelves view on close
 //               laptop:screen {canvas,...}     show LiuOS's picture on the 3D laptop screen
 //               photo:opened / photo:closed    track the photo pop-up; hide the counter print while it's open
-//               hero:hidden                    the intro cover slid away; glide into the overview, then welcome
+//               hero:hidden                    the intro cover slid away; show the already-drawn room
 //               tour:started / tour:ended      hide captions and the back button while the tour card is up
 //                                              (ended with finished: a gentle camera settle)
 // Announces:    room:view {view}               where the camera is (nav highlights)
@@ -42,9 +42,10 @@ const measured = {width:42,depth:24,desktopHeight:30,shelfWidth:42,shelfDepth:10
 const estimated = {board:0.8,upright:0.85,desktopThickness:1.1};
 const stage = document.getElementById('stage');
 const scene = new THREE.Scene(); scene.background=null;
-// Phones redraw a lot of pixels. A softer image there keeps the cover and the typing from stuttering.
-const coarsePointer=matchMedia('(pointer: coarse)').matches;
-const renderer = new THREE.WebGLRenderer({antialias:!coarsePointer,alpha:true});renderer.setPixelRatio(Math.min(devicePixelRatio,coarsePointer?1.5:DRAFTING_CONFIG.camera.pixelRatioCap));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.domElement.setAttribute('aria-label',"3D model of Nathan's room. Use the navigation above to view About, Experience, Projects, Resume, and Contact.");renderer.domElement.tabIndex=0;stage.appendChild(renderer.domElement);
+// Phones and tablets redraw a lot of pixels. iPads often claim a fine pointer, so also
+// treat a touch screen at tablet width as handheld. A softer image keeps the swipe from hitching.
+const handheld=matchMedia('(pointer: coarse)').matches||matchMedia('(hover: none)').matches||(navigator.maxTouchPoints>1&&matchMedia('(max-width: 1366px)').matches);
+const renderer = new THREE.WebGLRenderer({antialias:!handheld,alpha:true});renderer.setPixelRatio(Math.min(devicePixelRatio,handheld?1.25:DRAFTING_CONFIG.camera.pixelRatioCap));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.domElement.setAttribute('aria-label',"3D model of Nathan's room. Use the navigation above to view About, Experience, Projects, Resume, and Contact.");renderer.domElement.tabIndex=0;stage.appendChild(renderer.domElement);
 // Near is 1 inch. The closest view sits 18 inches away, and a nearer plane wastes depth
 // precision, which is what made thin labels flicker from across the room.
 const camera=new THREE.PerspectiveCamera(38,1,1,DRAFTING_CONFIG.camera.far);
@@ -127,7 +128,7 @@ for(const x of [-15,1])box(1.2,17.5,1.2,x,26.75,33,material,chair);
 box(17,11,1.5,-7,30.5,33,chairMat,chair);
 // Floor and room structure are built below after relocating the desk.
 scene.add(new THREE.HemisphereLight(0xe8efff,0x8b7153,1.35));
-const light=new THREE.DirectionalLight(0xffecd4,2.1);light.position.set(35,200,100);light.castShadow=true;light.shadow.mapSize.set(coarsePointer?1024:2048,coarsePointer?1024:2048);light.target.position.set(155,0,65);scene.add(light.target);light.shadow.camera.left=-240;light.shadow.camera.right=240;light.shadow.camera.top=200;light.shadow.camera.bottom=-200;light.shadow.camera.near=1;light.shadow.camera.far=600;light.shadow.bias=-0.0008;light.shadow.normalBias=.6;light.shadow.radius=4;scene.add(light);
+const light=new THREE.DirectionalLight(0xffecd4,2.1);light.position.set(35,200,100);light.castShadow=true;light.shadow.mapSize.set(handheld?512:2048,handheld?512:2048);light.target.position.set(155,0,65);scene.add(light.target);light.shadow.camera.left=-240;light.shadow.camera.right=240;light.shadow.camera.top=200;light.shadow.camera.bottom=-200;light.shadow.camera.near=1;light.shadow.camera.far=600;light.shadow.bias=-0.0008;light.shadow.normalBias=.6;light.shadow.radius=4;scene.add(light);
 // Lamp silhouette is estimated from the photos; the ambient light stays on
 // when its spotlight is off so the scene remains usable.
 const silver=new THREE.MeshStandardMaterial({color:'#a9adb0',metalness:.65,roughness:.3});
@@ -135,7 +136,7 @@ const lampMeshes=[box(4.5,.6,5,15,30.3,-4,silver),box(.8,10,.8,15,35.5,-6,silver
 const lampBar=box(1.25,.55,9,15,40.7,-2.2,silver);lampBar.rotation.x=-.15;
 const emitterMat=new THREE.MeshStandardMaterial({color:'#fff4d8',emissive:'#fff2d4',emissiveIntensity:2});
 const emitter=box(.9,.08,7.7,15,40.38,-2.2,emitterMat);emitter.rotation.x=-.15;
-const lampLight=new THREE.SpotLight(0xfff3dc,1800,55,.72,.75,2);lampLight.position.set(15,40,-1);lampLight.target.position.set(7,30,2);lampLight.castShadow=true;lampLight.shadow.mapSize.set(1024,1024);lampLight.shadow.bias=-.0001;scene.add(lampLight,lampLight.target);
+const lampLight=new THREE.SpotLight(0xfff3dc,1800,55,.72,.75,2);lampLight.position.set(15,40,-1);lampLight.target.position.set(7,30,2);lampLight.castShadow=true;lampLight.shadow.mapSize.set(handheld?512:1024,handheld?512:1024);lampLight.shadow.bias=-.0001;scene.add(lampLight,lampLight.target);
 lampMeshes.push(lampBar,emitter);
 let lampOn=true,lampFadeFrame=0;
 
@@ -548,7 +549,7 @@ const photoPrints=[];{
  });
 }
 function loadPhotoTextures(){const loader=new THREE.TextureLoader();return Promise.all(photoPrints.map(entry=>new Promise(done=>loader.load(entry.thumb,texture=>{texture.colorSpace=THREE.SRGBColorSpace;texture.anisotropy=renderer.capabilities.getMaxAnisotropy();
- const material=entry.face.material;material.map=texture;material.color.set('#ffffff');material.needsUpdate=true;sizePrint(entry,texture.image.width/texture.image.height);done();},undefined,done)))).then(()=>{if(!coverOn)render();});}
+ const material=entry.face.material;material.map=texture;material.color.set('#ffffff');material.needsUpdate=true;sizePrint(entry,texture.image.width/texture.image.height);done();},undefined,done)))).then(()=>render(true));}
 // Readable floor labels are orientation aids, not portfolio content.
 // Cutaway and upper cabinets remain enabled for every camera preset.
 const cutaway=true;
@@ -573,6 +574,7 @@ const contactShadow=new THREE.Mesh(new THREE.PlaneGeometry(shadowWidth,shadowDep
 const modelRoot=new THREE.Group();scene.add(modelRoot);for(const root of [desk,chair,roomObjects,otherDesk,otherChair,lampLight,lampLight.target])modelRoot.add(root);
 const materialStates=new Map();modelRoot.traverse(o=>{if(o.isMesh)for(const m of Array.isArray(o.material)?o.material:[o.material])if(!materialStates.has(m))materialStates.set(m,{opacity:m.opacity,transparent:m.transparent});});
 let introFrame=0,introDone=false,introElapsed=0,dimensionProgress=0,modelProgress=0;
+let coverOn=false,compiled=false;
 const ease=t=>t*t*(3-2*t);
 const phase=(time,range)=>ease(Math.max(0,Math.min(1,(time-range[0])/(range[1]-range[0]))));
 const dimensionGroup=new THREE.Group();scene.add(dimensionGroup);
@@ -596,7 +598,7 @@ function applyIntro(time){introElapsed=time;gridUniforms.reveal.value=phase(time
  for(const [material,original] of materialStates){const transparent=modelProgress<1||original.transparent;if(material.transparent!==transparent){material.transparent=transparent;material.needsUpdate=true;}material.opacity=original.opacity*modelProgress;}
  updateDimensionGeometry();}
 let welcomed=false;
-function finishIntro(){cancelAnimationFrame(introFrame);introDone=true;stage.dataset.intro='complete';applyIntro(DRAFTING_CONFIG.intro.duration);if(welcomed)showCaption();else{welcomed=true;showCaption(DRAFTING_CONFIG.interaction.welcomeCaption,DRAFTING_CONFIG.interaction.welcomeMs);}noteInput();}
+function finishIntro({quiet=false}={}){cancelAnimationFrame(introFrame);introDone=true;stage.dataset.intro='complete';applyIntro(DRAFTING_CONFIG.intro.duration);if(quiet||coverOn)return;if(welcomed)showCaption();else{welcomed=true;showCaption(DRAFTING_CONFIG.interaction.welcomeCaption,DRAFTING_CONFIG.interaction.welcomeMs);}noteInput();}
 function startDraftingIntro(){if(reducedMotion()){finishIntro();render();return;}stage.dataset.intro='running';const started=performance.now();function frame(now){applyIntro(Math.min(now-started,DRAFTING_CONFIG.intro.duration));if(now-started>=DRAFTING_CONFIG.intro.duration)finishIntro();render();if(!introDone)introFrame=requestAnimationFrame(frame);}introFrame=requestAnimationFrame(frame);}
 let parallaxFrame=0,parallaxTime=0;const parallax={x:0,y:0,targetX:0,targetY:0};
 function resetParallax(){cancelAnimationFrame(parallaxFrame);parallaxFrame=0;parallax.x=parallax.y=parallax.targetX=parallax.targetY=0;}
@@ -616,12 +618,12 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden)resetParall
 
 let target=new THREE.Vector3(150,12,70),yaw=0.55,pitch=0.85,radius=600;
 function placeCamera(){camera.position.set(target.x+radius*Math.sin(yaw+sway.offset+parallax.x)*Math.cos(pitch+parallax.y),target.y+radius*Math.sin(pitch+parallax.y),target.z+radius*Math.cos(yaw+sway.offset+parallax.x)*Math.cos(pitch+parallax.y));camera.lookAt(target);camera.updateMatrixWorld();}
-// While the landing cover is up, skip drawing the room. A live 3D frame under that cover is what stuttered the entrance and the typing.
-let coverOn=false;
-function render(){if(document.hidden||laptopOpen||coverOn)return;document.body.dataset.roomView=currentView;placeCamera();updateBackControl();updateWalls();renderer.render(scene,camera);updateHotspots();updateDimensionLabels();}
+// While the landing cover is up, skip drawing the room every frame. A forced pass still runs once
+// under the cover so the first scroll does not pay for shader compile and shadow maps.
+function render(force){if(document.hidden||laptopOpen||(coverOn&&!force))return;document.body.dataset.roomView=currentView;placeCamera();updateBackControl();updateWalls();renderer.render(scene,camera);updateHotspots();updateDimensionLabels();}
 const desktopOverview=matchMedia(DRAFTING_CONFIG.camera.desktopQuery);
 function fittedRadius(value){return value*Math.max(1,DRAFTING_CONFIG.camera.mobileFitAspect/camera.aspect);}
-function resize(){renderer.setSize(stage.clientWidth,stage.clientHeight);camera.aspect=stage.clientWidth/stage.clientHeight;if(['angle','front','desk'].includes(currentView))radius=fittedRadius(presets[currentView].radius);camera.updateProjectionMatrix();render();}window.addEventListener('resize',resize);
+function resize(){renderer.setSize(stage.clientWidth,stage.clientHeight);camera.aspect=stage.clientWidth/stage.clientHeight;if(['angle','front','desk'].includes(currentView))radius=fittedRadius(presets[currentView].radius);camera.updateProjectionMatrix();render(introDone);}window.addEventListener('resize',resize);
 const presets={resume:{yaw:0,pitch:1.48,radius:25,target:[163.75,30.1,17.2],fov:40},details:{yaw:-.15,pitch:.2,radius:130,target:[154.75,48,10]},angle:{yaw:.55,pitch:.85,get radius(){return desktopOverview.matches?DRAFTING_CONFIG.camera.desktopOverviewRadius:600;},target:[150,12,70]},front:{yaw:0,pitch:Math.PI/2-.001,radius:560,target:[156,0,73]},side:{yaw:Math.PI/2,pitch:.4,radius:48,target:[215,38,119],fov:65},fridge:{yaw:-.45,pitch:.18,radius:145,target:[284,47,80]},desk:{yaw:0,pitch:.27,radius:29,target:[149.75,34,12]},bed:{yaw:-Math.PI/2,pitch:.15,radius:60,target:[130,34,19.5]},otherBed:lookFrom([126,44,122],[148,3,13],62)};
 // A preset from where a seated person's eyes are to what they're looking at. The roommate's-bed
 // eye sits over the mattress and tilts down about 20 degrees, so the blanket's edge fills the
@@ -697,10 +699,23 @@ function tick(now){if(cameraMove!==move)return;const t=reduced?1:Math.min((now-t
 // Requests from the nav (room:go). The room owns the camera, so it decides how to get there.
 const announceView=view=>document.dispatchEvent(new CustomEvent('room:view',{detail:{view}}));
 document.addEventListener('room:go',({detail:{view}})=>{if(laptopOpen)document.dispatchEvent(new CustomEvent('laptop:close'));if(resumeOpen)document.dispatchEvent(new CustomEvent('resume:close'));if(photoOpen)document.dispatchEvent(new CustomEvent('photo:close'));navigate(view);});
-// As the cover lifts, the camera starts a little farther out and higher, then settles into the overview.
-document.addEventListener('hero:hidden',()=>{coverOn=false;compileScene();const welcome=()=>{noteInput();showCaption(DRAFTING_CONFIG.interaction.welcomeCaption,DRAFTING_CONFIG.interaction.welcomeMs);};
-if(currentView!=='angle'||moving||reducedMotion()){welcome();return;}
-const g=DRAFTING_CONFIG.camera.heroGlide;radius*=g.radiusScale;pitch=Math.min(1.4,pitch+g.pitchLift);render();navigate('angle',welcome);});
+function revealRoom(){coverOn=false;compileScene();if(!introDone)finishIntro({quiet:true});render();noteInput();}
+function afterPaint(fn){requestAnimationFrame(()=>requestAnimationFrame(fn));}
+function afterCoverSlide(fn){
+const hero=document.getElementById('hero');
+if(!hero||reducedMotion()||hero.classList.contains('no-slide')||getComputedStyle(hero).visibility==='hidden'){fn();return;}
+let done=false;
+const finish=()=>{if(done)return;done=true;hero.removeEventListener('transitionend',onEnd);fn();};
+const onEnd=event=>{if(event.target===hero&&event.propertyName==='transform')finish();};
+hero.addEventListener('transitionend',onEnd);
+setTimeout(finish,900);
+}
+// If the room is already drawn, reveal it on the next frames. On a phone or tablet that
+// someone swipes before that draw finishes, wait until the paper is gone, then pay the GPU cost.
+document.addEventListener('hero:hidden',()=>{
+if(handheld&&!compiled)afterCoverSlide(revealRoom);
+else afterPaint(revealRoom);
+});
 document.addEventListener('tour:started',()=>{touring=true;hideCaption();render();});
 document.addEventListener('tour:ended',({detail})=>{touring=false;if(detail?.finished)settleCamera();else{render();showCaption();}});
 // After "Start exploring": a gentle lean in and back, ending exactly where it started. Any drag or click takes over.
@@ -825,11 +840,12 @@ screenHover(false);document.dispatchEvent(new CustomEvent('laptop:screen-request
 const heroEl=document.getElementById('hero');
 coverOn=!!heroEl&&!heroEl.classList.contains('is-away');
 resize();
-// Shader compile is a long pause. Do it after the cover's entrance, not during it, and only once.
-let compiled=false;
-function compileScene(){if(compiled)return;compiled=true;modelRoot.visible=waterGroup.visible=true;renderer.compile(scene,camera);waterGroup.visible=waterOn;applyIntro(0);}
+// Shader compile and the first full frame are a long pause. Do them under the cover so
+// scrolling away is just sliding paper off an already-drawn room.
+function compileScene(){if(compiled)return;compiled=true;modelRoot.visible=waterGroup.visible=true;renderer.compile(scene,camera);waterGroup.visible=waterOn;}
+function warmUnderCover(){if(!coverOn)return;compileScene();finishIntro({quiet:true});render(true);}
 status.hidden=true;
-if(coverOn)setTimeout(compileScene,1400);else{compileScene();startDraftingIntro();}
+if(coverOn)requestAnimationFrame(()=>requestAnimationFrame(warmUnderCover));else{compileScene();startDraftingIntro();}
 photosLoaded=loadPhotoTextures();
 window.deskStudy={measured,estimated,room,scene,camera,renderer,refrigerator,aboveFridge,aboveCounter,aboveStove,fridgePartition};
 }catch(error){status.hidden=false;status.textContent='The 3D view could not load. Check your internet connection and WebGL support, then reload. ';console.error(error);}

@@ -1,7 +1,9 @@
 /* Hero: the cover over the room on the home page. Name first, photo to the side; the room shows faintly behind. */
 
 .hero{position:fixed;inset:0;z-index:50;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:clamp(32px,6vw,96px);padding:104px max(24px,calc((100vw - 1120px) / 2)) 88px;background:color-mix(in srgb,var(--paper-center) 84%,transparent);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);color:var(--inkStrong,#332c21);overflow:hidden;transition:transform .8s cubic-bezier(.65,0,.35,1),visibility 0s}
-.hero.is-away{transform:translateY(-100%);visibility:hidden;transition:transform .8s cubic-bezier(.65,0,.35,1),visibility 0s .8s;backdrop-filter:none;-webkit-backdrop-filter:none}
+/* Drop the blur before the slide. Transforming a blurred full-screen layer is what stuttered the scroll. */
+.hero.is-clear,.hero.is-away{backdrop-filter:none;-webkit-backdrop-filter:none}
+.hero.is-away{transform:translateY(-100%);visibility:hidden;transition:transform .8s cubic-bezier(.65,0,.35,1),visibility 0s .8s}
 .hero.no-slide{transition:none}
 
 .hero-text{min-width:0}
@@ -39,9 +41,15 @@
 
 .hero .visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 
+/* Phones, tablets, and iPads: never blur the room under the cover. iPads are often wider than a phone and still hitch on that blur. */
+@media(pointer:coarse),(hover:none),(max-width:1366px){
+  .hero{background:color-mix(in srgb,var(--paper-center) 94%,transparent);backdrop-filter:none;-webkit-backdrop-filter:none}
+}
+html[data-gpu=save] .hero{background:color-mix(in srgb,var(--paper-center) 94%,transparent);backdrop-filter:none;-webkit-backdrop-filter:none}
+html[data-gpu=save] .hero,html[data-gpu=save] .hero.is-away{transition-duration:.55s}
+
 /* Phones and narrow tablets: no photo, just the name centered, with the buttons stacked full width. */
 @media(max-width:760px){
-  /* Blurring the live room under the cover is what made the entrance stutter on a phone. */
   .hero{grid-template-columns:1fr;align-content:center;padding:80px 24px 84px;background:color-mix(in srgb,var(--paper-center) 97%,transparent);backdrop-filter:none;-webkit-backdrop-filter:none}
   .hero-photo{display:none}
   .hero-text{text-align:center}

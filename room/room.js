@@ -43,9 +43,11 @@ const estimated = {board:0.8,upright:0.85,desktopThickness:1.1};
 const stage = document.getElementById('stage');
 const scene = new THREE.Scene(); scene.background=null;
 // Phones and tablets redraw a lot of pixels. iPads often claim a fine pointer, so also
-// treat a touch screen at tablet width as handheld. A softer image keeps the swipe from hitching.
-const handheld=matchMedia('(pointer: coarse)').matches||matchMedia('(hover: none)').matches||(navigator.maxTouchPoints>1&&matchMedia('(max-width: 1366px)').matches);
-const renderer = new THREE.WebGLRenderer({antialias:!handheld,alpha:true});renderer.setPixelRatio(Math.min(devicePixelRatio,handheld?1.25:DRAFTING_CONFIG.camera.pixelRatioCap));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.domElement.setAttribute('aria-label',"3D model of Nathan's room. Use the navigation above to view About, Experience, Projects, Resume, and Contact.");renderer.domElement.tabIndex=0;stage.appendChild(renderer.domElement);
+// treat a touch screen at tablet width as handheld. Safari on iPhone is stricter still:
+// two WebGL contexts plus a full compile on load is what made it kill the tab and reload.
+const ios=/iP(hone|od|ad)/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+const handheld=ios||matchMedia('(pointer: coarse)').matches||matchMedia('(hover: none)').matches||(navigator.maxTouchPoints>1&&matchMedia('(max-width: 1366px)').matches);
+const renderer = new THREE.WebGLRenderer({antialias:!handheld,alpha:true,powerPreference:ios?'low-power':'default'});renderer.setPixelRatio(Math.min(devicePixelRatio,ios?1:handheld?1.25:DRAFTING_CONFIG.camera.pixelRatioCap));renderer.shadowMap.enabled=!ios;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.domElement.setAttribute('aria-label',"3D model of Nathan's room. Use the navigation above to view About, Experience, Projects, Resume, and Contact.");renderer.domElement.tabIndex=0;stage.appendChild(renderer.domElement);
 // Near is 1 inch. The closest view sits 18 inches away, and a nearer plane wastes depth
 // precision, which is what made thin labels flicker from across the room.
 const camera=new THREE.PerspectiveCamera(38,1,1,DRAFTING_CONFIG.camera.far);
@@ -128,7 +130,7 @@ for(const x of [-15,1])box(1.2,17.5,1.2,x,26.75,33,material,chair);
 box(17,11,1.5,-7,30.5,33,chairMat,chair);
 // Floor and room structure are built below after relocating the desk.
 scene.add(new THREE.HemisphereLight(0xe8efff,0x8b7153,1.35));
-const light=new THREE.DirectionalLight(0xffecd4,2.1);light.position.set(35,200,100);light.castShadow=true;light.shadow.mapSize.set(handheld?512:2048,handheld?512:2048);light.target.position.set(155,0,65);scene.add(light.target);light.shadow.camera.left=-240;light.shadow.camera.right=240;light.shadow.camera.top=200;light.shadow.camera.bottom=-200;light.shadow.camera.near=1;light.shadow.camera.far=600;light.shadow.bias=-0.0008;light.shadow.normalBias=.6;light.shadow.radius=4;scene.add(light);
+const light=new THREE.DirectionalLight(0xffecd4,2.1);light.position.set(35,200,100);light.castShadow=!ios;if(!ios)light.shadow.mapSize.set(handheld?512:2048,handheld?512:2048);light.target.position.set(155,0,65);scene.add(light.target);light.shadow.camera.left=-240;light.shadow.camera.right=240;light.shadow.camera.top=200;light.shadow.camera.bottom=-200;light.shadow.camera.near=1;light.shadow.camera.far=600;light.shadow.bias=-0.0008;light.shadow.normalBias=.6;light.shadow.radius=4;scene.add(light);
 // Lamp silhouette is estimated from the photos; the ambient light stays on
 // when its spotlight is off so the scene remains usable.
 const silver=new THREE.MeshStandardMaterial({color:'#a9adb0',metalness:.65,roughness:.3});
@@ -136,7 +138,7 @@ const lampMeshes=[box(4.5,.6,5,15,30.3,-4,silver),box(.8,10,.8,15,35.5,-6,silver
 const lampBar=box(1.25,.55,9,15,40.7,-2.2,silver);lampBar.rotation.x=-.15;
 const emitterMat=new THREE.MeshStandardMaterial({color:'#fff4d8',emissive:'#fff2d4',emissiveIntensity:2});
 const emitter=box(.9,.08,7.7,15,40.38,-2.2,emitterMat);emitter.rotation.x=-.15;
-const lampLight=new THREE.SpotLight(0xfff3dc,1800,55,.72,.75,2);lampLight.position.set(15,40,-1);lampLight.target.position.set(7,30,2);lampLight.castShadow=true;lampLight.shadow.mapSize.set(handheld?512:1024,handheld?512:1024);lampLight.shadow.bias=-.0001;scene.add(lampLight,lampLight.target);
+const lampLight=new THREE.SpotLight(0xfff3dc,1800,55,.72,.75,2);lampLight.position.set(15,40,-1);lampLight.target.position.set(7,30,2);lampLight.castShadow=!ios;if(!ios){lampLight.shadow.mapSize.set(handheld?512:1024,handheld?512:1024);lampLight.shadow.bias=-.0001;}scene.add(lampLight,lampLight.target);
 lampMeshes.push(lampBar,emitter);
 let lampOn=true,lampFadeFrame=0;
 
@@ -840,13 +842,13 @@ screenHover(false);document.dispatchEvent(new CustomEvent('laptop:screen-request
 const heroEl=document.getElementById('hero');
 coverOn=!!heroEl&&!heroEl.classList.contains('is-away');
 resize();
-// Shader compile and the first full frame are a long pause. Do them under the cover so
-// scrolling away is just sliding paper off an already-drawn room.
-function compileScene(){if(compiled)return;compiled=true;modelRoot.visible=waterGroup.visible=true;renderer.compile(scene,camera);waterGroup.visible=waterOn;}
+// Shader compile and the first full frame are a long pause. On Safari/iPhone, doing them
+// right after setup is what crashed the tab. Wait until they leave the cover, and skip compile().
+function compileScene(){if(compiled)return;compiled=true;modelRoot.visible=waterGroup.visible=true;if(!ios)renderer.compile(scene,camera);waterGroup.visible=waterOn;}
 function warmUnderCover(){if(!coverOn)return;compileScene();finishIntro({quiet:true});render(true);}
 status.hidden=true;
-if(coverOn)requestAnimationFrame(()=>requestAnimationFrame(warmUnderCover));else{compileScene();startDraftingIntro();}
-photosLoaded=loadPhotoTextures();
+if(coverOn){if(!ios)requestAnimationFrame(()=>requestAnimationFrame(warmUnderCover));}else{compileScene();startDraftingIntro();}
+if(ios)setTimeout(()=>{photosLoaded=loadPhotoTextures();},4000);else photosLoaded=loadPhotoTextures();
 window.deskStudy={measured,estimated,room,scene,camera,renderer,refrigerator,aboveFridge,aboveCounter,aboveStove,fridgePartition};
 }catch(error){status.hidden=false;status.textContent='The 3D view could not load. Check your internet connection and WebGL support, then reload. ';console.error(error);}
 // The typing on the cover waits for this. It used to wait for every photo, so the text sat still on a phone.

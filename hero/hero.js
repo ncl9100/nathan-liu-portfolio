@@ -1,6 +1,7 @@
 // Hero: the cover over the room on the home page (name, rotating roles, photo, Resume and Contact).
-// Scrolling down, swiping up, the arrow keys, or "Scroll to explore my room" slide it away,
+// Scrolling down, swiping, the arrow keys, or "Scroll to explore my room" slide it away,
 // but only after the 3D room has finished loading. Until then the hint reads "Loading the room".
+// A flick started during loading is thrown away, so it cannot fire the moment the room is ready.
 // Visitors who arrive at /#room (the pages' "Back to the room" button) skip it.
 // Visitors who turned on "reduce motion" see all the roles at once and no slide.
 //
@@ -75,7 +76,10 @@ function show() {
 // The room's 3D setup freezes the page for a second or two, which would stall the typing, so the
 // first role starts fully written and the typing waits for room:ready (or 8 seconds, just in case).
 // Explore stays locked until the room is actually ready, even if typing starts first.
+// A swipe or trackpad flick started during loading must not fire the moment we unlock.
 let roomReady = false, roomOpen = location.hash === '#room';
+let wheelTotal = 0, wheelReset = 0, touchY = null, ignoreUntil = 0;
+const gestureOk = () => roomOpen && performance.now() >= ignoreUntil;
 function startTyping() {
   if (roomReady) return;
   roomReady = true;
@@ -83,6 +87,9 @@ function startTyping() {
 }
 function allowExplore() {
   roomOpen = true;
+  wheelTotal = 0;
+  touchY = null;
+  ignoreUntil = performance.now() + 500;
   explore.disabled = false;
   explore.classList.remove('is-waiting');
   exploreText.textContent = exploreHint;
@@ -101,26 +108,27 @@ else roleText.textContent = profile.roles[0];
 explore.addEventListener('click', () => hide());
 
 // Trackpads send many tiny wheel events, so wait for a real downward scroll.
-let wheelTotal = 0, wheelReset = 0;
 hero.addEventListener('wheel', event => {
   event.preventDefault();
-  if (!roomOpen) return;
+  if (!gestureOk()) { wheelTotal = 0; return; }
   clearTimeout(wheelReset);
   wheelReset = setTimeout(() => wheelTotal = 0, 200);
   wheelTotal += event.deltaY;
   if (wheelTotal > 40) hide();
 }, { passive: false });
 
-let touchY = null;
-hero.addEventListener('touchstart', event => { touchY = event.touches[0].clientY; }, { passive: true });
+hero.addEventListener('touchstart', event => {
+  if (!gestureOk()) { touchY = null; return; }
+  touchY = event.touches[0].clientY;
+}, { passive: true });
 hero.addEventListener('touchend', event => {
-  if (!roomOpen) { touchY = null; return; }
-  if (touchY !== null && touchY - event.changedTouches[0].clientY > 40) hide();
+  if (!gestureOk()) { touchY = null; return; }
+  if (touchY !== null && Math.abs(touchY - event.changedTouches[0].clientY) > 40) hide();
   touchY = null;
 });
 
 document.addEventListener('keydown', event => {
-  if (!roomOpen || isAway() || event.target.closest?.('a, button, input, textarea')) return;
+  if (!gestureOk() || isAway() || event.target.closest?.('a, button, input, textarea')) return;
   if (['ArrowDown', 'PageDown', ' ', 'Spacebar'].includes(event.key)) { event.preventDefault(); hide(); }
 });
 

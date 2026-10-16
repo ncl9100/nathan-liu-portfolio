@@ -1,7 +1,8 @@
 // Hero: the cover over the room on the home page (name, rotating roles, photo, Resume and Contact).
 // Scrolling down, swiping, the arrow keys, or "Scroll to explore my room" slide it away,
 // but only after the 3D room has finished loading. Until then the hint reads "Loading the room".
-// A flick started during loading is thrown away, so it cannot fire the moment the room is ready.
+// A flick or a Resume / Contact tap started during loading is thrown away, so it cannot
+// fire the moment the room is ready.
 // Visitors who arrive at /#room (the pages' "Back to the room" button) skip it.
 // Visitors who turned on "reduce motion" see all the roles at once and no slide.
 //
@@ -78,7 +79,8 @@ function show() {
 // The room's 3D setup freezes the page for a second or two, which would stall the typing, so the
 // first role starts fully written and the typing waits for room:ready (or 8 seconds, just in case).
 // Explore stays locked until the room is actually ready, even if typing starts first.
-// A swipe or trackpad flick started during loading must not fire the moment we unlock.
+// A swipe, trackpad flick, or Resume / Contact tap started during loading must not fire
+// the moment we unlock.
 let roomReady = false, roomOpen = location.hash === '#room';
 let wheelTotal = 0, wheelReset = 0, touchY = null, ignoreUntil = 0;
 const gestureOk = () => roomOpen && performance.now() >= ignoreUntil;
@@ -108,6 +110,10 @@ if (location.hash === '#room') {
 else roleText.textContent = profile.roles[0];
 
 explore.addEventListener('click', () => hide());
+hero.addEventListener('click', event => {
+  if (!event.target.closest?.('.hero-actions a')) return;
+  if (!gestureOk()) event.preventDefault();
+}, true);
 
 // Trackpads send many tiny wheel events, so wait for a real downward scroll.
 hero.addEventListener('wheel', event => {

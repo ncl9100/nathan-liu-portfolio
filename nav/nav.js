@@ -11,6 +11,8 @@
 //                 hero:show                      "Nathan Liu" → bring the intro cover back
 //   Listens for:  room:view {view}               highlight the floor-plan button
 //                 laptop:closed / resume:closed  close the mobile menu
+//                 room:ready                     on the room page, leftover Resume / Contact
+//                                                taps from loading are thrown away
 
 const markup = await fetch(new URL('nav.html', import.meta.url)).then(response => response.text());
 document.body.insertAdjacentHTML('afterbegin', markup);
@@ -40,6 +42,15 @@ document.addEventListener('pointerdown', event => { if (!nav.contains(event.targ
 window.addEventListener('resize', () => { if (innerWidth > 600) closeMenu(); });
 
 if (page === 'room') {
+  // Same leftover-tap rule as the cover: a Resume / Contact click during loading
+  // must not open the PDF or the contact page the instant the room is ready.
+  let linksOpen = location.hash === '#room', ignoreUntil = 0;
+  document.addEventListener('room:ready', () => { linksOpen = true; ignoreUntil = performance.now() + 500; }, { once: true });
+  for (const id of ['nav-resume', 'nav-contact']) {
+    document.getElementById(id)?.addEventListener('click', event => {
+      if (!linksOpen || performance.now() < ignoreUntil) event.preventDefault();
+    }, true);
+  }
   // Camera links: stay on the page and ask the room to move instead of reloading.
   for (const link of nav.querySelectorAll('[data-view]'))
     link.addEventListener('click', event => {

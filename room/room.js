@@ -10,7 +10,7 @@
 //                                              (ended with finished: a gentle camera settle)
 // Announces:    room:view {view}               where the camera is (nav highlights)
 //               resume:open / resume:close     ask the résumé viewer to open or close
-//               room:ready                     the heavy setup is done (or failed), so the page is responsive again
+//               room:ready                     the room can be shown (setup done, and warmed when that is safe)
 //               laptop:open / laptop:close / laptop:screen-request
 //               photo:open {src,thumb,caption,rect} / photo:close   ask the photo pop-up to open or close
 
@@ -845,11 +845,10 @@ resize();
 // Shader compile and the first full frame are a long pause. On Safari/iPhone, doing them
 // right after setup is what crashed the tab. Wait until they leave the cover, and skip compile().
 function compileScene(){if(compiled)return;compiled=true;modelRoot.visible=waterGroup.visible=true;if(!ios)renderer.compile(scene,camera);waterGroup.visible=waterOn;}
-function warmUnderCover(){if(!coverOn)return;compileScene();finishIntro({quiet:true});render(true);}
+function announceReady(){document.dispatchEvent(new CustomEvent('room:ready'));}
+function warmUnderCover(){if(!coverOn)return;compileScene();finishIntro({quiet:true});render(true);announceReady();}
 status.hidden=true;
-if(coverOn){if(!ios)requestAnimationFrame(()=>requestAnimationFrame(warmUnderCover));}else{compileScene();startDraftingIntro();}
+if(coverOn){if(ios)announceReady();else requestAnimationFrame(()=>requestAnimationFrame(warmUnderCover));}else{compileScene();startDraftingIntro();announceReady();}
 if(ios)setTimeout(()=>{photosLoaded=loadPhotoTextures();},4000);else photosLoaded=loadPhotoTextures();
 window.deskStudy={measured,estimated,room,scene,camera,renderer,refrigerator,aboveFridge,aboveCounter,aboveStove,fridgePartition};
-}catch(error){status.hidden=false;status.textContent='The 3D view could not load. Check your internet connection and WebGL support, then reload. ';console.error(error);}
-// The typing on the cover waits for this. It used to wait for every photo, so the text sat still on a phone.
-requestAnimationFrame(()=>document.dispatchEvent(new CustomEvent('room:ready')));
+}catch(error){status.hidden=false;status.textContent='The 3D view could not load. Check your internet connection and WebGL support, then reload. ';console.error(error);document.dispatchEvent(new CustomEvent('room:ready'));}

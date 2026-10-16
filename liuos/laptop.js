@@ -27,9 +27,11 @@ document.documentElement.style.setProperty('--focus-accent',LIUOS_CONFIG.colors.
 for(const [name,value] of Object.entries({font:LIUOS_CONFIG.font,labelFont:LIUOS_CONFIG.labelFont,blur:LIUOS_CONFIG.blur+'px',radius:LIUOS_CONFIG.radius+'px',transition:LIUOS_CONFIG.transitionMs+'ms'}))osElement.style.setProperty('--os-'+name,value);
 
 const laptopDialog=document.getElementById('laptop-window');let laptopReturnFocus=null,laptopPowered=true,laptopUnlocked=false;
+const ios=/iP(hone|od|ad)/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
 // The in-room screen keeps a static wallpaper frame and minute-based clock updates.
 // The live shader is reserved for the visible LiuOS screen to keep room rendering light.
-const screenCanvas=document.createElement('canvas');screenCanvas.width=LIUOS_CONFIG.screen.resolution;screenCanvas.height=Math.round(screenCanvas.width/LIUOS_CONFIG.screen.aspect);
+// Safari/iPhone: a 2048 screen texture plus a second WebGL wallpaper is what ran the tab out of memory.
+const screenCanvas=document.createElement('canvas');screenCanvas.width=ios?1024:LIUOS_CONFIG.screen.resolution;screenCanvas.height=Math.round(screenCanvas.width/LIUOS_CONFIG.screen.aspect);
 const screenContext=screenCanvas.getContext('2d');
 let screenMinute='',screenState='',screenClockTimer=0;
 function localClock(now=new Date()){return {time:now.toLocaleTimeString([],{hour:'numeric',minute:'2-digit',hour12:false}),date:now.toLocaleDateString([],{weekday:'long',month:'long',day:'numeric'})};}
@@ -99,10 +101,41 @@ function initBattery(){if(!navigator.getBattery){renderBattery(1,true);return;}n
 renderWeather('cloud',null,LIUOS_CONFIG.weather.city);refreshWeather();setInterval(refreshWeather,LIUOS_CONFIG.weather.refreshMs);initBattery();
 
 // One renderer and one quad are shared by the lock screen and desktop.
-let wallpaperController=null;
-function updateWallpaperState(){if(!wallpaperController)return;const desktop=document.getElementById('desktop');const unlocked=!desktop.hidden;const covered=unlocked&&Array.from(document.querySelectorAll('.os-window')).some(el=>!el.hidden&&!el.classList.contains('os-closing')&&(el.classList.contains('os-maximized')||desktop.clientWidth<=LIUOS_CONFIG.windows.mobileBreakpoint));wallpaperController.mount(unlocked?desktop:document.getElementById('lock-screen'));wallpaperController.setState({visible:laptopDialog.open,covered,alternate:alternateWallpaper});}
-try{const wallpaperModule=await import(LIUOS_CONFIG.wallpaper.module);wallpaperController=wallpaperModule.createWallpaper(THREE,LIUOS_CONFIG.wallpaper,motionPreference,LIUOS_CONFIG.colors);updateWallpaperState();}catch(error){console.warn('LiuOS wallpaper unavailable; showing the static background.',error);}
-window.addEventListener('pagehide',event=>{if(!event.persisted)wallpaperController?.dispose();});
+// Do not create that WebGL context until LiuOS is actually open. Safari on iPhone
+// was crashing when the room and this wallpaper both started on the first load.
+let wallpaperController=null,wallpaperPromise=null;
+async function ensureWallpaper(){
+  if(wallpaperController)return wallpaperController;
+  if(wallpaperPromise)return wallpaperPromise;
+  wallpaperPromise=(async()=>{
+    try{
+      const wallpaperModule=await import(LIUOS_CONFIG.wallpaper.module);
+      wallpaperController=wallpaperModule.createWallpaper(THREE,LIUOS_CONFIG.wallpaper,motionPreference,LIUOS_CONFIG.colors);
+      return wallpaperController;
+    }catch(error){
+      console.warn('LiuOS wallpaper unavailable; showing the static background.',error);
+      wallpaperPromise=null;
+      return null;
+    }
+  })();
+  return wallpaperPromise;
+}
+function updateWallpaperState(){
+  if(!laptopDialog.open){
+    if(ios&&wallpaperController){wallpaperController.dispose();wallpaperController=null;wallpaperPromise=null;}
+    else wallpaperController?.setState({visible:false,covered:true,alternate:alternateWallpaper});
+    return;
+  }
+  ensureWallpaper().then(controller=>{
+    if(!controller||!laptopDialog.open)return;
+    const desktop=document.getElementById('desktop');
+    const unlocked=!desktop.hidden;
+    const covered=unlocked&&Array.from(document.querySelectorAll('.os-window')).some(el=>!el.hidden&&!el.classList.contains('os-closing')&&(el.classList.contains('os-maximized')||desktop.clientWidth<=LIUOS_CONFIG.windows.mobileBreakpoint));
+    controller.mount(unlocked?desktop:document.getElementById('lock-screen'));
+    controller.setState({visible:true,covered,alternate:alternateWallpaper});
+  });
+}
+window.addEventListener('pagehide',event=>{if(!event.persisted){wallpaperController?.dispose();wallpaperController=null;wallpaperPromise=null;}});
 const osWindows=new Map();let nextWindowZ=10,selectedDesktopIcon=null;
 // App builders use DOM text nodes for user-editable content.
 // Desktop "Currently" card: my newest role (first in the experience list) and my school, from content/portfolio.js.

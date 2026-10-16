@@ -29,6 +29,8 @@
 .hero-explore{position:absolute;left:max(24px,calc((100vw - 1120px) / 2));bottom:28px;display:flex;align-items:center;gap:12px;padding:8px 0;border-radius:0;font:12px Segoe UI,sans-serif;text-transform:uppercase;letter-spacing:.14em;color:var(--drawing-ink)}
 .hero-explore:hover{background:none;color:var(--inkStrong,#332c21)}
 .hero-explore-rule{width:48px;height:1px;background:var(--drawing-rule)}
+.hero-explore.is-waiting{opacity:.45;pointer-events:none}
+.hero-explore.is-waiting .hero-explore-arrow{visibility:hidden}
 
 /* First load: each piece fades in and drifts up, one after another. */
 .hero-kicker,.hero-name,.hero-role,.hero-actions,.hero-photo,.hero-explore{animation:hero-rise .7s cubic-bezier(.2,.7,.2,1) both}

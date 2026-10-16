@@ -1,9 +1,10 @@
 // Hero: the cover over the room on the home page (name, rotating roles, photo, Resume and Contact).
-// Scrolling down, swiping up, the arrow keys, or "Scroll to explore my room" slide it away.
+// Scrolling down, swiping up, the arrow keys, or "Scroll to explore my room" slide it away,
+// but only after the 3D room has finished loading. Until then the hint reads "Loading the room".
 // Visitors who arrive at /#room (the pages' "Back to the room" button) skip it.
 // Visitors who turned on "reduce motion" see all the roles at once and no slide.
 //
-// Listens for:  room:ready         the room finished loading, so start typing the roles
+// Listens for:  room:ready         the room finished loading, so offer explore and start typing
 //               hero:show          slide back in (nav: "Nathan Liu")
 //               room:go {view}     the floor-plan button moved the camera, so get out of the way
 //                                  (the overview, "angle", comes with hero:show instead)
@@ -26,7 +27,9 @@ hero.querySelector('.hero-kicker').textContent = `${profile.year} · ${profile.e
 hero.querySelector('.hero-first').textContent = first;
 hero.querySelector('.hero-last').textContent = rest.join(' ');
 hero.querySelector('.hero-roles-all').textContent = profile.roles.join(', ');
-if (matchMedia('(pointer: coarse)').matches) hero.querySelector('.hero-explore-text').textContent = 'Swipe up to explore my room';
+const explore = hero.querySelector('.hero-explore');
+const exploreText = hero.querySelector('.hero-explore-text');
+const exploreHint = matchMedia('(pointer: coarse)').matches ? 'Swipe up to explore my room' : 'Scroll to explore my room';
 
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 const TYPE_MS = 70, DELETE_MS = 35, HOLD_MS = 1600;
@@ -49,6 +52,8 @@ const isAway = () => hero.classList.contains('is-away');
 
 function hide({ announce = true } = {}) {
   if (isAway()) return;
+  // /#room still skips the cover before the room is ready. Everyone else waits.
+  if (!roomOpen && announce !== false) return;
   clearTimeout(timer);
   hero.classList.add('is-clear');
   hero.style.willChange = 'transform';
@@ -69,13 +74,21 @@ function show() {
 
 // The room's 3D setup freezes the page for a second or two, which would stall the typing, so the
 // first role starts fully written and the typing waits for room:ready (or 8 seconds, just in case).
-let roomReady = false;
+// Explore stays locked until the room is actually ready, even if typing starts first.
+let roomReady = false, roomOpen = location.hash === '#room';
 function startTyping() {
   if (roomReady) return;
   roomReady = true;
   if (!isAway()) cycleRoles(0, profile.roles[0].length);
 }
-document.addEventListener('room:ready', startTyping, { once: true });
+function allowExplore() {
+  roomOpen = true;
+  explore.disabled = false;
+  explore.classList.remove('is-waiting');
+  exploreText.textContent = exploreHint;
+  startTyping();
+}
+document.addEventListener('room:ready', allowExplore, { once: true });
 setTimeout(startTyping, 8000);
 
 if (location.hash === '#room') {
@@ -85,12 +98,13 @@ if (location.hash === '#room') {
 } else if (reducedMotion.matches) cycleRoles();
 else roleText.textContent = profile.roles[0];
 
-hero.querySelector('.hero-explore').addEventListener('click', () => hide());
+explore.addEventListener('click', () => hide());
 
 // Trackpads send many tiny wheel events, so wait for a real downward scroll.
 let wheelTotal = 0, wheelReset = 0;
 hero.addEventListener('wheel', event => {
   event.preventDefault();
+  if (!roomOpen) return;
   clearTimeout(wheelReset);
   wheelReset = setTimeout(() => wheelTotal = 0, 200);
   wheelTotal += event.deltaY;
@@ -100,12 +114,13 @@ hero.addEventListener('wheel', event => {
 let touchY = null;
 hero.addEventListener('touchstart', event => { touchY = event.touches[0].clientY; }, { passive: true });
 hero.addEventListener('touchend', event => {
+  if (!roomOpen) { touchY = null; return; }
   if (touchY !== null && touchY - event.changedTouches[0].clientY > 40) hide();
   touchY = null;
 });
 
 document.addEventListener('keydown', event => {
-  if (isAway() || event.target.closest?.('a, button, input, textarea')) return;
+  if (!roomOpen || isAway() || event.target.closest?.('a, button, input, textarea')) return;
   if (['ArrowDown', 'PageDown', ' ', 'Spacebar'].includes(event.key)) { event.preventDefault(); hide(); }
 });
 

@@ -17,7 +17,7 @@ export const profile = {
     "Hi, I'm Nathan. I'm a junior at NYU pursuing a Bachelor of Arts in Computer Science and Data Science, and I'm working toward a career in ML engineering and data science.",
     "Right now I'm a data science intern at the Leslie eLab, NYU's startup hub, where I work on data and AI tooling. Recently my team took 2nd place at the NYU Stern Sustainability Hackathon with HotTakes, a project that reuses data center waste heat to supply hot water to nearby residents.",
     "Outside of building, I tutor math and computer science (150+ hours and a 5.0 rating on Wyzant), and I co-founded Seeds of Change, an English program that served 100+ students in rural Taiwan. I've also played violin for over 12 years.",
-    "I grew up in the Bay Area and now live in New York. This room is my attempt to make a portfolio feel like a place you can actually walk into."
+    "I'm originally from Cupertino, California, and I live in New York City now. I'm open to opportunities in both areas."
   ],
   "aboutProjectLink": {
     "text": "HotTakes",

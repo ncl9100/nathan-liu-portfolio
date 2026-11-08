@@ -25,6 +25,7 @@
 /* font-family and letter-spacing are reset because pages may style every h1 (the room sets Georgia). */
 .r-heading h1 { margin: 0; font-family: inherit; font-size: calc(24.88 * var(--pt)); line-height: 1.2; font-weight: 700; letter-spacing: normal; }
 .r-heading p { margin: calc(1 * var(--pt)) 0 0; font-size: calc(10 * var(--pt)); line-height: 1.2; }
+.r-heading a[href^="mailto:"] { white-space: nowrap; overflow-wrap: normal; word-break: keep-all; }
 
 /* \section: \large \scshape with a rule underneath */
 .resume-sheet h2 {

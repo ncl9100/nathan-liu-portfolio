@@ -47,6 +47,7 @@
   overflow-wrap: anywhere;
   padding: 10px 0;
 }
+#contact-email { overflow-wrap: normal; word-break: keep-all; white-space: nowrap; }
 .contact-row a:hover { text-decoration-color: currentColor; }
 
 #copy-email {
